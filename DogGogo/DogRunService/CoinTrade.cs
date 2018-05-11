@@ -27,14 +27,14 @@ namespace DogRunService
 
         static ILog logger = LogManager.GetLogger(typeof(AnalyzeResult));
 
-        public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol)
+        public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol, bool isBuy)
         {
             var key = HistoryKlinePools.GetKey(symbol, "1min");
             var historyKlineData = HistoryKlinePools.Get(key);
-            if (historyKlineData == null || historyKlineData.Data == null
+            if (historyKlineData == null || historyKlineData.Data == null 
                 || historyKlineData.Data.Count == 0 || historyKlineData.Date < DateTime.Now.AddMinutes(-1)) // TODO
             {
-                logger.Error($"RunBuy 数据还未准备好：{symbol.BaseCurrency}");
+                logger.Error($"GetAnalyzeResult 数据还未准备好：{symbol.BaseCurrency}");
                 Thread.Sleep(1000 * 5);
                 return null;
             }
@@ -46,39 +46,39 @@ namespace DogRunService
             // 分析是否下跌， 下跌超过一定数据，可以考虑
             decimal flexPercent = (decimal)1.045;
             var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.040;
                 flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
             }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.035;
                 flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
             }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.03;
                 flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
             }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.025;
                 flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
             }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.02;
                 flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
             }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.015;
                 flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
             }
             if (flexPointList.Count == 0 && flexPointList.Count == 0)
             {
-                logger.Error($"RunBuy--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
+                logger.Error($"--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
                 return null;
             }
 
@@ -100,26 +100,15 @@ namespace DogRunService
 
         public static void Run(CommonSymbols symbol)
         {
-            AnalyzeResult analyzeResult = null;
 
             try
             {
-                analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
-                if (analyzeResult == null)
+                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+                if(analyzeResult != null)
                 {
-                    return;
+                    // 计算是否适合购买
+                    RunBuy(symbol, analyzeResult);
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("---> 分析异常: " + ex.Message, ex);
-                return;
-            }
-
-            try
-            {
-                // 计算是否适合购买
-                RunBuy(symbol, analyzeResult);
             }
             catch (Exception ex)
             {
@@ -127,8 +116,12 @@ namespace DogRunService
             }
             try
             {
-                // 计算是否适合出售
-                RunSell(symbol);
+                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
+                if(analyzeResult != null)
+                {
+                    // 计算是否适合出售
+                    RunSell(symbol, analyzeResult);
+                }
             }
             catch (Exception ex)
             {
@@ -268,56 +261,13 @@ namespace DogRunService
             }
         }
 
-        private static void RunSell(CommonSymbols symbol)
+        private static void RunSell(CommonSymbols symbol, AnalyzeResult analyzeResult)
         {
-            var key = HistoryKlinePools.GetKey(symbol, "1min");
-            var historyKlineData = HistoryKlinePools.Get(key);
-            if (historyKlineData == null || historyKlineData.Data == null || historyKlineData.Data.Count == 0
-                || historyKlineData.Date < DateTime.Now.AddMinutes(-1))// TODO
-            {
-                logger.Error($"RunSell 数据还未准备好：{symbol.BaseCurrency}");
-                Thread.Sleep(1000 * 5);
-                return;
-            }
-
-            var historyKlines = historyKlineData.Data;
-
-            // 获取最近行情
-            decimal lastLowPrice;
-            decimal nowPrice;
-            // 分析是否下跌， 下跌超过一定数据，可以考虑
-            decimal flexPercent = (decimal)1.04;
-            var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && !flexPointList[0].isHigh))
-            {
-                flexPercent = (decimal)1.035;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && !flexPointList[0].isHigh))
-            {
-                flexPercent = (decimal)1.03;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && !flexPointList[0].isHigh))
-            {
-                flexPercent = (decimal)1.025;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && !flexPointList[0].isHigh))
-            {
-                flexPercent = (decimal)1.02;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && !flexPointList[0].isHigh))
-            {
-                flexPercent = (decimal)1.015;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
-            }
-            if (flexPointList.Count == 0 && flexPointList.Count == 0)
-            {
-                logger.Error($"--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
-                return;
-            }
+            var flexPointList = analyzeResult.FlexPointList;
+            var historyKlines = analyzeResult.HistoryKlines;
+            var nowPrice = analyzeResult.NowPrice;
+            var lastLowPrice = analyzeResult.LastLowPrice;
+            var flexPercent = analyzeResult.FlexPercent;
 
             if (!flexPointList[0].isHigh)
             {

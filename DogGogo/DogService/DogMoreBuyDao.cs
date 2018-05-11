@@ -77,16 +77,6 @@ namespace DogService
             return Database.Query<decimal>(sql).FirstOrDefault();
         }
 
-        public void ChangeDataWhenSell(long id, decimal sellQuantity, decimal sellOrderPrice, string sellOrderResult, string sFlex, long sellOrderId)
-        {
-            using (var tx = Database.BeginTransaction())
-            {
-                var sql = $"update t_pig_more set SQuantity={sellQuantity}, SOrderP={sellOrderPrice}, SDate=now(), SFlex='{sFlex}', SOrderResult='{sellOrderResult}',SOrderId={sellOrderId} where Id = {id}";
-                Database.Execute(sql);
-                tx.Commit();
-            }
-        }
-
         public DogMoreBuy GetByBuyOrderId(long buyOrderId)
         {
             var sql = $"select * from t_dog_more_buy where BuyOrderId={buyOrderId}";

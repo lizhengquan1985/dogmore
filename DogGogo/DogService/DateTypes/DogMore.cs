@@ -38,7 +38,7 @@ namespace DogService.DateTypes
         public string SymbolName { get; set; }
         public string AccountId { get; set; }
         public string UserName { get; set; }
-        public string BuyOrderId { get; set; }
+        public long BuyOrderId { get; set; }
         public long SellOrderId { get; set; }
         public string SellOrderResult { get; set; }
         public decimal SellQuantity { get; set; }

@@ -1,6 +1,7 @@
 ﻿using DogAccount;
 using DogPlatform;
 using DogPlatform.Model;
+using DogRunService.DataTypes;
 using DogRunService.Helper;
 using DogService;
 using DogService.DateTypes;
@@ -15,41 +16,27 @@ using System.Threading.Tasks;
 
 namespace DogRunService
 {
-    public class CoinTrade
+    public class AnalyzeResult
     {
-        static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
+        public List<FlexPoint> FlexPointList { get; set; }
+        public decimal NowPrice { get; set; }
+        public decimal LastLowPrice { get; set; }
+        public List<HistoryKline> HistoryKlines { get; set; }
+        public decimal FlexPercent { get; set; }
 
-        public static void Run(CommonSymbols symbol)
-        {
-            try
-            {
-                // 计算是否适合购买
-                RunBuy(symbol);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("---> 购买异常: " + ex.Message, ex);
-            }
-            try
-            {
-                // 计算是否适合出售
-                RunSell(symbol);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("---> 出售异常: " + ex.Message, ex);
-            }
-        }
 
-        private static void RunBuy(CommonSymbols symbol)
+        static ILog logger = LogManager.GetLogger(typeof(AnalyzeResult));
+
+        public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol)
         {
             var key = HistoryKlinePools.GetKey(symbol, "1min");
             var historyKlineData = HistoryKlinePools.Get(key);
-            if (historyKlineData == null || historyKlineData.Data == null || historyKlineData.Data.Count == 0 || historyKlineData.Date < DateTime.Now.AddMinutes(-1))// TODO
+            if (historyKlineData == null || historyKlineData.Data == null
+                || historyKlineData.Data.Count == 0 || historyKlineData.Date < DateTime.Now.AddMinutes(-1)) // TODO
             {
                 logger.Error($"RunBuy 数据还未准备好：{symbol.BaseCurrency}");
                 Thread.Sleep(1000 * 5);
-                return;
+                return null;
             }
             var historyKlines = historyKlineData.Data;
 
@@ -57,8 +44,13 @@ namespace DogRunService
             decimal lastLowPrice;
             decimal nowPrice;
             // 分析是否下跌， 下跌超过一定数据，可以考虑
-            decimal flexPercent = (decimal)1.04;
+            decimal flexPercent = (decimal)1.045;
             var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
+            {
+                flexPercent = (decimal)1.040;
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+            }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && flexPointList[0].isHigh))
             {
                 flexPercent = (decimal)1.035;
@@ -87,15 +79,74 @@ namespace DogRunService
             if (flexPointList.Count == 0 && flexPointList.Count == 0)
             {
                 logger.Error($"RunBuy--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
+                return null;
+            }
+
+            AnalyzeResult analyzeResult = new AnalyzeResult()
+            {
+                FlexPointList = flexPointList,
+                LastLowPrice = lastLowPrice,
+                NowPrice = nowPrice,
+                HistoryKlines = historyKlines,
+                FlexPercent = flexPercent
+            };
+            return analyzeResult;
+        }
+    }
+
+    public class CoinTrade
+    {
+        static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
+
+        public static void Run(CommonSymbols symbol)
+        {
+            AnalyzeResult analyzeResult = null;
+
+            try
+            {
+                analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
+                if (analyzeResult == null)
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("---> 分析异常: " + ex.Message, ex);
                 return;
             }
 
+            try
+            {
+                // 计算是否适合购买
+                RunBuy(symbol, analyzeResult);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("---> 购买异常: " + ex.Message, ex);
+            }
+            try
+            {
+                // 计算是否适合出售
+                RunSell(symbol);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("---> 出售异常: " + ex.Message, ex);
+            }
+        }
+
+        private static void RunBuy(CommonSymbols symbol, AnalyzeResult analyzeResult)
+        {
+            var flexPointList = analyzeResult.FlexPointList;
+            var historyKlines = analyzeResult.HistoryKlines;
+            var nowPrice = analyzeResult.NowPrice;
+            var flexPercent = analyzeResult.FlexPercent;
+
+            // 不适合购入的情况 最高点, 快速升高, 大量回落
             if (flexPointList[0].isHigh || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
                 )//|| JudgeBuyUtils.CheckCalcMaxhuoluo(historyKlines)
             {
-                // 最高点 不适合购入
-                // 快速升高 不适合购入
-                // 大量回落 不适合购入
                 return;
             }
 
@@ -105,7 +156,6 @@ namespace DogRunService
                 AccountConfig accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                 var accountId = accountConfig.MainAccountId;
 
-                //var noSellList = new PigMoreDao().ListPigMore(accountId, userName, symbol.BaseCurrency, new List<string> { StateConst.PartialFilled, StateConst.Submitted, StateConst.Submitting, StateConst.PreSubmitted });
                 var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
                 if (!canBuy)
                 {
@@ -117,13 +167,6 @@ namespace DogRunService
                 {
                     minBuyPrice = 999999;
                 }
-                //noSellList.ForEach(item =>
-                //{
-                //    if (item.BOrderP < minBuyPrice)
-                //    {
-                //        minBuyPrice = item.BOrderP;
-                //    }
-                //});
 
                 if (nowPrice * (decimal)1.03 > minBuyPrice)
                 {
@@ -137,18 +180,15 @@ namespace DogRunService
                 decimal recommendAmount = usdt.balance / 200; // TODO 测试阶段，暂定低一些，
                 Console.WriteLine($"RunBuy--------> 开始 {symbol.BaseCurrency}  推荐额度：{decimal.Round(recommendAmount, 2)} ");
 
-                if (recommendAmount < (decimal)0.3)
+                if (recommendAmount < (decimal)1.1)
                 {
+                    // 余额要足够，推荐购买的额度要大于1.1
                     continue;
                 }
 
-                // 获取最近的购买记录
                 // 购买的要求
-                // 1. 最近一次是低点， 并且有上升的迹象。
                 // 2. 快速上升的，快速下降情况（如果升的太高， 最一定要回落，或者有5个小时平稳才考虑购入，）
                 // 3. 如果flexpoint 小于等于1.02，则只能考虑买少一点。
-                // 4. 余额要足够，推荐购买的额度要大于0.3
-                // 5. 
 
                 decimal buyQuantity = recommendAmount / nowPrice;
 
@@ -177,36 +217,25 @@ namespace DogRunService
                 HBResponse<long> order = api.OrderPlace(req);
                 if (order.Status == "ok")
                 {
-                    new DogMoreBuyDao().CreatePigMore(new PigMore()
+                    new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
                     {
-                        Name = symbol.BaseCurrency,
+                        SymbolName = symbol.BaseCurrency,
                         AccountId = accountId,
                         UserName = accountConfig.UserName,
                         FlexPercent = flexPercent,
 
-                        BQuantity = buyQuantity,
-                        BOrderP = orderPrice,
-                        BDate = DateTime.Now,
-                        BOrderResult = JsonConvert.SerializeObject(order),
-                        BState = StateConst.PreSubmitted,
-                        BTradeP = 0,
-                        BOrderId = order.Data,
-                        BFlex = JsonConvert.SerializeObject(flexPointList),
-                        BMemo = "",
-                        BOrderDetail = "",
-                        BOrderMatchResults = "",
-
-                        SOrderId = 0,
-                        SOrderResult = "",
-                        SDate = DateTime.MinValue,
-                        SFlex = "",
-                        SMemo = "",
-                        SOrderDetail = "",
-                        SOrderMatchResults = "",
-                        SOrderP = 0,
-                        SQuantity = 0,
-                        SState = "",
-                        STradeP = 0,
+                        BuyQuantity = buyQuantity,
+                        BuyOrderPrice = orderPrice,
+                        BuyDate = DateTime.Now,
+                        BuyOrderResult = JsonConvert.SerializeObject(order),
+                        BuyState = StateConst.PreSubmitted,
+                        BuyTradePrice = 0,
+                        BuyOrderId = order.Data,
+                        BuyFlex = JsonConvert.SerializeObject(flexPointList),
+                        BuyMemo = "",
+                        BuyOrderDetail = "",
+                        BuyOrderMatchResults = "",
+                        IsFinished = false
                     });
                     // 下单成功马上去查一次
                     QueryBuyDetailAndUpdate(userName, order.Data);
@@ -302,13 +331,13 @@ namespace DogRunService
             {
                 var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                 var accountId = accountConfig.MainAccountId;
-                var needSellPigMoreList = new DogMoreBuyDao().GetNeedSellPigMore(accountId, userName, symbol.BaseCurrency);
+                var needSellPigMoreList = new DogMoreBuyDao().GetNeedSellDogMoreBuy(accountId, userName, symbol.BaseCurrency);
 
                 foreach (var needSellPigMoreItem in needSellPigMoreList)
                 {
                     // 分析是否 大于
                     decimal itemNowPrice = 0;
-                    decimal higher = JudgeSellUtils.AnalyzeNeedSell(needSellPigMoreItem.BOrderP, needSellPigMoreItem.BDate, symbol.BaseCurrency, symbol.QuoteCurrency, out itemNowPrice, historyKlines);
+                    decimal higher = JudgeSellUtils.AnalyzeNeedSell(needSellPigMoreItem.BuyOrderPrice, needSellPigMoreItem.BuyDate, symbol.BaseCurrency, symbol.QuoteCurrency, out itemNowPrice, historyKlines);
 
                     decimal gaoyuPercentSell = (decimal)1.035;
 
@@ -316,19 +345,19 @@ namespace DogRunService
                     if (flexPercent < (decimal)1.04)
                     {
                         gaoyuPercentSell = (decimal)1.035;
-                        if (flexPointList.Count <= 2 && needSellPigMoreList.Where(it => it.BDate > DateTime.Now.AddDays(-1)).ToList().Count == 0)
+                        if (flexPointList.Count <= 2 && needSellPigMoreList.Where(it => it.BuyDate > DateTime.Now.AddDays(-1)).ToList().Count == 0)
                         {
                             // 1天都没有交易. 并且波动比较小. 则不需要回头
                             needHuitou = false;
                         }
                     }
 
-                    var canSell = JudgeSellUtils.CheckCanSell(needSellPigMoreItem.BOrderP, higher, itemNowPrice, gaoyuPercentSell, needHuitou);
+                    var canSell = JudgeSellUtils.CheckCanSell(needSellPigMoreItem.BuyOrderPrice, higher, itemNowPrice, gaoyuPercentSell, needHuitou);
 
                     //logger.Error($"是否能够出售:  {symbol.BaseCurrency},{canSell}, price:{needSellPigMoreItem.BOrderP}, nowPrice:{nowPrice},itemNowPrice:{itemNowPrice}, {userName}, {needSellPigMoreList.Count}, {accountId}");
                     if (canSell)
                     {
-                        decimal sellQuantity = needSellPigMoreItem.BQuantity * (decimal)0.99;
+                        decimal sellQuantity = needSellPigMoreItem.BuyQuantity * (decimal)0.99;
                         sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
                         if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
                         {
@@ -347,7 +376,27 @@ namespace DogRunService
                         HBResponse<long> order = api.OrderPlace(req);
                         if (order.Status == "ok")
                         {
-                            new DogMoreBuyDao().ChangeDataWhenSell(needSellPigMoreItem.Id, sellQuantity, sellPrice, JsonConvert.SerializeObject(order), JsonConvert.SerializeObject(flexPointList), order.Data);
+                            DogMoreSell dogMoreSell = new DogMoreSell()
+                            {
+                                AccountId = accountId,
+                                BuyOrderId = needSellPigMoreItem.BuyOrderId,
+                                SellDate = DateTime.Now,
+                                SellFlex = JsonConvert.SerializeObject(flexPointList),
+                                SellOrderId = order.Data,
+                                SellOrderPrice = sellPrice,
+                                SellOrderResult = JsonConvert.SerializeObject(order),
+                                SellQuantity = sellQuantity,
+                                SellMemo = "",
+                                SellOrderDetail = "",
+                                SellOrderMatchResults = "",
+                                SellState = "",
+                                SellTradePrice = 1,
+                                SymbolName = 1,
+                                UserName = userName
+                            };
+
+                            new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);
+
                             // 下单成功马上去查一次
                             QuerySellDetailAndUpdate(userName, order.Data);
                         }

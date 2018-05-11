@@ -31,7 +31,7 @@ namespace DogRunService
         {
             var key = HistoryKlinePools.GetKey(symbol, "1min");
             var historyKlineData = HistoryKlinePools.Get(key);
-            if (historyKlineData == null || historyKlineData.Data == null 
+            if (historyKlineData == null || historyKlineData.Data == null
                 || historyKlineData.Data.Count == 0 || historyKlineData.Date < DateTime.Now.AddMinutes(-1)) // TODO
             {
                 logger.Error($"GetAnalyzeResult 数据还未准备好：{symbol.BaseCurrency}");
@@ -104,7 +104,7 @@ namespace DogRunService
             try
             {
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
-                if(analyzeResult != null)
+                if (analyzeResult != null)
                 {
                     // 计算是否适合购买
                     RunBuy(symbol, analyzeResult);
@@ -117,7 +117,7 @@ namespace DogRunService
             try
             {
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
-                if(analyzeResult != null)
+                if (analyzeResult != null)
                 {
                     // 计算是否适合出售
                     RunSell(symbol, analyzeResult);
@@ -170,7 +170,7 @@ namespace DogRunService
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 var accountInfo = api.GetAccountBalance(accountId);
                 var usdt = accountInfo.Data.list.Find(it => it.currency == "usdt");
-                decimal recommendAmount = usdt.balance / 200; // TODO 测试阶段，暂定低一些，
+                decimal recommendAmount = usdt.balance / 500; // TODO 测试阶段，暂定低一些，
                 Console.WriteLine($"RunBuy--------> 开始 {symbol.BaseCurrency}  推荐额度：{decimal.Round(recommendAmount, 2)} ");
 
                 if (recommendAmount < (decimal)1.1)
@@ -245,18 +245,18 @@ namespace DogRunService
             var orderDetail = api.QueryOrderDetail(orderId);
             if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
             {
-                var matchResult = api.QueryOrderMatchResult(orderId);
+                var orderMatchResult = api.QueryOrderMatchResult(orderId);
                 decimal maxPrice = 0;
-                foreach (var item in matchResult.Data)
+                foreach (var item in orderMatchResult.Data)
                 {
                     if (maxPrice < item.price)
                     {
                         maxPrice = item.price;
                     }
                 }
-                if (matchResult.Status == "ok")
+                if (orderMatchResult.Status == "ok")
                 {
-                    new DogMoreBuyDao().UpdatePigMoreBuySuccess(orderId, orderDetail, matchResult, maxPrice);
+                    new DogMoreBuyDao().UpdatePigMoreBuySuccess(orderId, orderDetail, orderMatchResult, maxPrice);
                 }
             }
         }
@@ -374,8 +374,11 @@ namespace DogRunService
                         minPrice = item.price;
                     }
                 }
-                // 完成
-                new DogMoreBuyDao().UpdateTradeRecordSellSuccess(orderId, orderDetail, orderMatchResult, minPrice);
+                if (orderMatchResult.Status == "ok")
+                {
+                    // 完成
+                    new DogMoreSellDao().UpdateTradeRecordSellSuccess(orderId, orderDetail, orderMatchResult, minPrice);
+                }
             }
         }
 
@@ -383,17 +386,16 @@ namespace DogRunService
         {
             try
             {
-                var needChangeBuyStatePigMoreList = new DogMoreBuyDao().ListNeedChangeBuyStatePigMore();
-                //Console.WriteLine($"未改变状态的交易记录2：{needChangeBuyStatePigMoreList.Count}");
-                foreach (var item in needChangeBuyStatePigMoreList)
+                var needChangeBuyStateDogMoreBuyList = new DogMoreBuyDao().ListNeedChangeBuyStateDogMoreBuy();
+                foreach (var item in needChangeBuyStateDogMoreBuyList)
                 {
                     // 如果长时间没有购买成功， 则取消订单。
-                    if (item.BDate < DateTime.Now.AddMinutes(-30))
+                    if (item.BuyDate < DateTime.Now.AddMinutes(-30))
                     {
                         //api.
                     }
                     // TODO
-                    QueryBuyDetailAndUpdate(item.UserName, item.BOrderId);
+                    QueryBuyDetailAndUpdate(item.UserName, item.BuyOrderId);
                 }
             }
             catch (Exception ex)
@@ -403,13 +405,12 @@ namespace DogRunService
 
             try
             {
-                var needChangeSellStatePigMoreList = new DogMoreBuyDao().ListNeedChangeSellStatePigMore();
-                //Console.WriteLine($"未改变状态的交易记录1：{needChangeSellStatePigMoreList.Count}");
-                foreach (var item in needChangeSellStatePigMoreList)
+                var needChangeSellStateDogMoreSellList = new DogMoreSellDao().ListNeedChangeSellStateDogMoreSell();
+                foreach (var item in needChangeSellStateDogMoreSellList)
                 {
                     // 如果长时间没有出售成功， 则取消订单。
                     // TODO
-                    QuerySellDetailAndUpdate(item.UserName, item.SOrderId);
+                    QuerySellDetailAndUpdate(item.UserName, item.SellOrderId);
                 }
             }
             catch (Exception ex)

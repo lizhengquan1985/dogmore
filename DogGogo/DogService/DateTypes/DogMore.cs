@@ -7,36 +7,49 @@ using System.Threading.Tasks;
 
 namespace DogService.DateTypes
 {
-    [Table("t_pig_more")]
-    public class PigMore
+    [Table("t_dog_more_buy")]
+    public class DogMoreBuy
     {
+        [Key]
         public long Id { get; set; }
-        public string Name { get; set; }
+        public string SymbolName { get; set; }
         public string AccountId { get; set; }
         public string UserName { get; set; }
-        public decimal BQuantity { get; set; }
-        public decimal BOrderP { get; set; }
-        public decimal BTradeP { get; set; }
-        public DateTime BDate { get; set; }
-        public string BOrderResult { get; set; }
-        public string BState { get; set; }
-        public decimal SQuantity { get; set; }
-        public decimal SOrderP { get; set; }
-        public decimal STradeP { get; set; }
-        public DateTime SDate { get; set; }
-        public string SOrderResult { get; set; }
-        public string SState { get; set; }
-        public string BFlex { get; set; }
-        public string SFlex { get; set; }
-        public string BMemo { get; set; }
-        public string SMemo { get; set; }
-        public long BOrderId { get; set; }
-        public string BOrderDetail { get; set; }
-        public string BOrderMatchResults { get; set; }
-        public long SOrderId { get; set; }
-        public string SOrderDetail { get; set; }
-        public string SOrderMatchResults { get; set; }
+        public long BuyOrderId { get; set; }
+        public string BuyOrderResult { get; set; }
+        public decimal BuyQuantity { get; set; }
+        public decimal BuyOrderPrice { get; set; }
+        public decimal BuyTradePrice { get; set; }
+        public string BuyState { get; set; }
+        public string BuyFlex { get; set; }
+        public string BuyMemo { get; set; }
+        public string BuyOrderDetail { get; set; }
+        public string BuyOrderMatchResults { get; set; }
+        public DateTime BuyDate { get; set; }
         public decimal FlexPercent { get; set; }
+        public bool IsFinished { get; set; }
+    }
+
+    [Table("t_dog_more_sell")]
+    public class DogMoreSell
+    {
+        [Key]
+        public long Id { get; set; }
+        public string SymbolName { get; set; }
+        public string AccountId { get; set; }
+        public string UserName { get; set; }
+        public string BuyOrderId { get; set; }
+        public long SellOrderId { get; set; }
+        public string SellOrderResult { get; set; }
+        public decimal SellQuantity { get; set; }
+        public decimal SellOrderPrice { get; set; }
+        public decimal SellTradePrice { get; set; }
+        public string SellState { get; set; }
+        public string SellFlex { get; set; }
+        public string SellOrderDetail { get; set; }
+        public string SellOrderMatchResults { get; set; }
+        public string SellMemo { get; set; }
+        public DateTime SellDate { get; set; }
     }
 
     public class StateConst

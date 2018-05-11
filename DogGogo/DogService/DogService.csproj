@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDao.cs" />
+    <Compile Include="DateTypes\DogEmpty.cs" />
     <Compile Include="DateTypes\DogMore.cs" />
     <Compile Include="DogEmptySellDao.cs" />
     <Compile Include="DogMoreBuyDao.cs" />

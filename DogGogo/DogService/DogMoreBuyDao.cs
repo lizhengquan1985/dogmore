@@ -20,11 +20,11 @@ namespace DogService
         {
         }
 
-        public void CreatePigMore(PigMore pigMore)
+        public void CreateDogMoreBuy(DogMoreBuy dogMoreBuy)
         {
             using (var tx = Database.BeginTransaction())
             {
-                Database.Insert(pigMore);
+                Database.Insert(dogMoreBuy);
                 tx.Commit();
             }
         }
@@ -36,39 +36,18 @@ namespace DogService
         /// </summary>
         /// <param name="accountId"></param>
         /// <returns></returns>
-        public List<PigMore> ListNeedChangeBuyStatePigMore()
+        public List<DogMoreBuy> ListNeedChangeBuyStateDogMoreBuy()
         {
             var states = $"'{StateConst.PartialFilled}','{StateConst.Filled}'";
-            var sql = $"select * from t_pig_more where BState not in({states})";
-            return Database.Query<PigMore>(sql).ToList();
-        }
-
-        /// <summary>
-        /// 列出需要改变出售状态的
-        /// </summary>
-        /// <returns></returns>
-        public List<PigMore> ListNeedChangeSellStatePigMore()
-        {
-            var states = $"'{StateConst.PartialFilled}','{StateConst.Filled}'";
-            var sql = $"select * from t_pig_more where SState not in({states}) and SOrderId>0";
-            return Database.Query<PigMore>(sql).ToList();
+            var sql = $"select * from t_pig_more_buy where BuyState not in({states})";
+            return Database.Query<DogMoreBuy>(sql).ToList();
         }
 
         public void UpdatePigMoreBuySuccess(long buyOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal buyTradePrice)
         {
             using (var tx = Database.BeginTransaction())
             {
-                var sql = $"update t_pig_more set BTradeP={buyTradePrice}, BState='{orderDetail.Data.state}' ,BOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where BOrderId ='{buyOrderId}'";
-                Database.Execute(sql);
-                tx.Commit();
-            }
-        }
-
-        public void UpdateTradeRecordSellSuccess(long sellOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal sellTradePrice)
-        {
-            using (var tx = Database.BeginTransaction())
-            {
-                var sql = $"update t_pig_more set STradeP={sellTradePrice}, SState='{orderDetail.Data.state}' ,SOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', SOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where SOrderId ='{sellOrderId}'";
+                var sql = $"update t_pig_more set BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where BuyOrderId ='{buyOrderId}'";
                 Database.Execute(sql);
                 tx.Commit();
             }
@@ -76,7 +55,7 @@ namespace DogService
 
         #endregion
 
-        public List<PigMore> GetNeedSellPigMore(string accountId, string userName, string coin)
+        public List<DogMoreBuy> GetNeedSellDogMoreBuy(string accountId, string userName, string symbolName)
         {
             List<string> stateList = new List<string>() { StateConst.PartialCanceled, StateConst.Filled };
             var states = "";
@@ -88,8 +67,8 @@ namespace DogService
                 }
                 states += $"'{it}'";
             });
-            var sql = $"select * from t_pig_more where AccountId='{accountId}' and Name = '{coin}' and BState in({states}) and (SOrderId<=0 or SOrderId is null) and UserName='{userName}' order by BOrderP asc limit 0,5";
-            return Database.Query<PigMore>(sql).ToList();
+            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{symbolName}' and BState in({states}) and (SOrderId<=0 or SOrderId is null) and UserName='{userName}' order by BOrderP asc limit 0,5";
+            return Database.Query<DogMoreBuy>(sql).ToList();
         }
 
         public decimal GetMinPriceOfNotSell(string accountId, string userName, string coin)
@@ -108,10 +87,10 @@ namespace DogService
             }
         }
 
-        public PigMore GetByBOrderId(long orderId)
+        public DogMoreBuy GetByBuyOrderId(long buyOrderId)
         {
-            var sql = $"select * from t_pig_more where BOrderId={orderId}";
-            return Database.Query<PigMore>(sql).FirstOrDefault();
+            var sql = $"select * from t_dog_more_buy where BuyOrderId={buyOrderId}";
+            return Database.Query<DogMoreBuy>(sql).FirstOrDefault();
         }
     }
 }

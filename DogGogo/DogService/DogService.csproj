@@ -54,6 +54,7 @@
     <Compile Include="DateTypes\DogMore.cs" />
     <Compile Include="DogEmptySellDao.cs" />
     <Compile Include="DogMoreBuyDao.cs" />
+    <Compile Include="DogMoreSellDao.cs" />
     <Compile Include="DogMoreStatisticsDao.cs" />
     <Compile Include="DTO\DogMoreStatisticsDay.cs" />
     <Compile Include="KlineDao.cs" />

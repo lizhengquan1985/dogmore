@@ -1,0 +1,11 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/DogGogo/.vs/DogGogo/v15
+/DogGogo/DogAccount/obj/Debug
+/DogGogo/DogApi/obj/Debug
+/DogGogo/DogPlatform/obj/Debug
+/DogGogo/DogRunService/obj/Debug
+/DogGogo/DogService/obj/Debug
+/DogGogo/Test/obj/Debug

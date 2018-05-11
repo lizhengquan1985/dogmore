@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogAccount", "DogAccount\DogAccount.csproj", "{B656C0CB-B352-4F52-AD9B-D426423FECFB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogApi", "DogApi\DogApi.csproj", "{D1B18E6E-4534-44BD-81D4-2BA34DC4E014}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogPlatform", "DogPlatform\DogPlatform.csproj", "{DA837026-6AF7-47E8-B56F-CD9703E75D44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogRunService", "DogRunService\DogRunService.csproj", "{1C37E930-B3E1-461D-9C88-1796F2C727D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogService", "DogService\DogService.csproj", "{0EB3BBA3-9734-4AD9-B9F0-19927773B082}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{FBA4FF66-B373-4936-8E15-1A0073972F59}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B656C0CB-B352-4F52-AD9B-D426423FECFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B656C0CB-B352-4F52-AD9B-D426423FECFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B656C0CB-B352-4F52-AD9B-D426423FECFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B656C0CB-B352-4F52-AD9B-D426423FECFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1B18E6E-4534-44BD-81D4-2BA34DC4E014}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1B18E6E-4534-44BD-81D4-2BA34DC4E014}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1B18E6E-4534-44BD-81D4-2BA34DC4E014}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1B18E6E-4534-44BD-81D4-2BA34DC4E014}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA837026-6AF7-47E8-B56F-CD9703E75D44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA837026-6AF7-47E8-B56F-CD9703E75D44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA837026-6AF7-47E8-B56F-CD9703E75D44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA837026-6AF7-47E8-B56F-CD9703E75D44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C37E930-B3E1-461D-9C88-1796F2C727D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C37E930-B3E1-461D-9C88-1796F2C727D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C37E930-B3E1-461D-9C88-1796F2C727D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C37E930-B3E1-461D-9C88-1796F2C727D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EB3BBA3-9734-4AD9-B9F0-19927773B082}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EB3BBA3-9734-4AD9-B9F0-19927773B082}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EB3BBA3-9734-4AD9-B9F0-19927773B082}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EB3BBA3-9734-4AD9-B9F0-19927773B082}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBA4FF66-B373-4936-8E15-1A0073972F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBA4FF66-B373-4936-8E15-1A0073972F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBA4FF66-B373-4936-8E15-1A0073972F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBA4FF66-B373-4936-8E15-1A0073972F59}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3DC205E6-5095-46EB-991D-5B9C489648CE}
+	EndGlobalSection
+EndGlobal

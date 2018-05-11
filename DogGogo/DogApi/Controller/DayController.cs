@@ -26,7 +26,8 @@ namespace DogApi.Controller
         {
             try
             {
-                var pigMoreList = await new DogMoreStatisticsDao().ListTodayTrade(userName);
+                var pigMoreBuyList = await new DogMoreStatisticsDao().ListTodayBuy(userName);
+                var pigMoreSellList = await new DogMoreStatisticsDao().ListTodayBuy(userName);
 
                 var buyCount = 0;
                 var sellCount = 0;
@@ -34,12 +35,12 @@ namespace DogApi.Controller
                 var sellAmount = (decimal)0.0;
                 var sellEarnings = (decimal)0.0;
                 var list = new List<TodayTradeDTO>();
-                pigMoreList.ForEach(it =>
+                pigMoreBuyList.ForEach(it =>
                 {
-                    if (it.BDate >= Utils.GetSmallestOfTheDate(DateTime.Now))
+                    if (it.BuyDate >= Utils.GetSmallestOfTheDate(DateTime.Now))
                     {
                         buyCount++;
-                        buyAmount += it.BQuantity * it.BTradeP;
+                        buyAmount += it.BuyQuantity * it.BuyTradePrice;
                     }
                     if (it.SOrderId > 0)
                     {
@@ -49,10 +50,10 @@ namespace DogApi.Controller
                     }
                     list.Add(new TodayTradeDTO()
                     {
-                        Name = it.Name,
-                        BDate = it.BDate,
-                        BQuantity = it.BQuantity,
-                        BTradeP = it.BTradeP,
+                        Name = it.SymbolName,
+                        BDate = it.BuyDate,
+                        BQuantity = it.BuyQuantity,
+                        BTradeP = it.BuyTradePrice,
                         SQuantity = it.SQuantity,
                         SDate = it.SDate,
                         STradeP = it.STradeP,
@@ -81,7 +82,7 @@ namespace DogApi.Controller
         {
             try
             {
-                return await new DogMoreStatisticsDao().Statistics(userName);
+                return await new DogMoreStatisticsDayDao().ListStatisticsData(userName);
             }
             catch (Exception ex)
             {
@@ -103,8 +104,8 @@ namespace DogApi.Controller
                 var klineList = new KlineDao().ListKline(name, begin, end);
                 return new
                 {
-                    buyList = buyList.Select(it => new { it.BDate, it.BTradeP }),
-                    sellList = sellList.Select(it => new { it.SDate, it.STradeP }),
+                    buyList = buyList.Select(it => new { it.BuyDate, it.BuyTradePrice }),
+                    sellList = sellList.Select(it => new { it.SellDate, it.SellTradePrice }),
                     klineList = klineList.Select(it => new { it.Close, it.Id, it.High })
                 };
             }

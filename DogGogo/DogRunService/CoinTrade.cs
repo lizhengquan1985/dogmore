@@ -155,7 +155,7 @@ namespace DogRunService
                     continue;
                 }
 
-                decimal minBuyPrice = new DogMoreBuyDao().GetMinPriceOfNotSell(accountId, userName, symbol.BaseCurrency);
+                decimal minBuyPrice = new DogMoreBuyDao().GetMinPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
                 if (minBuyPrice <= 0)
                 {
                     minBuyPrice = 999999;
@@ -349,7 +349,7 @@ namespace DogRunService
                             QuerySellDetailAndUpdate(userName, order.Data);
                         }
 
-                        logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice} higher：{higher}，accountId：{accountId}");
+                        logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice} higher：{afterBuyHighClosePrice}，accountId：{accountId}");
                         logger.Error($"下单出售结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
                     }
                 }
@@ -375,7 +375,7 @@ namespace DogRunService
                 if (orderMatchResult.Status == "ok")
                 {
                     // 完成
-                    new DogMoreSellDao().UpdateTradeRecordSellSuccess(orderId, orderDetail, orderMatchResult, minPrice);
+                    new DogMoreSellDao().UpdateDogMoreSellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);
                 }
             }
         }

@@ -29,6 +29,11 @@ namespace DogService
             }
         }
 
+        public DogMoreSell GetDogMoreSellBySellOrderId(long sellOrderId)
+        {
+            return Database.Query<DogMoreSell>(new { SellOrderId = sellOrderId }).FirstOrDefault();
+        }
+
         #region 先查找出需要查询购买或者出售结果的记录， 然后查询结果，最后修改数据库记录
 
         /// <summary>
@@ -37,17 +42,23 @@ namespace DogService
         /// <returns></returns>
         public List<DogMoreSell> ListNeedChangeSellStateDogMoreSell()
         {
-            var states = $"'{StateConst.PartialFilled}','{StateConst.Filled}'";
-            var sql = $"select * from t_pig_more_sell where SellState not in({states})";
+            var states = GetStateStringIn(new List<string>() { StateConst.PartialFilled, StateConst.Filled });
+            var sql = $"select * from t_dog_more_sell where SellState not in({states})";
             return Database.Query<DogMoreSell>(sql).ToList();
         }
 
-        public void UpdateTradeRecordSellSuccess(long sellOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal sellTradePrice)
+        public void UpdateDogMoreSellWhenSuccess(long sellOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal sellTradePrice)
         {
+            var dogMoreSell = GetDogMoreSellBySellOrderId(sellOrderId);
+
             using (var tx = Database.BeginTransaction())
             {
-                var sql = $"update t_pig_more set STradeP={sellTradePrice}, SState='{orderDetail.Data.state}' ,SOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', SOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where SOrderId ='{sellOrderId}'";
-                Database.Execute(sql);
+                var sqlBuy = $"update t_dog_more_buy set IsFinished=1 where BuyOrderId={dogMoreSell.BuyOrderId}";
+                Database.Execute(sqlBuy);
+
+                var sqlSell = $"update t_dog_more_sell set SellTradePrice={sellTradePrice}, SellState='{orderDetail.Data.state}' ,SellOrderDetail='{JsonConvert.SerializeObject(orderDetail)}'," +
+                    $" SellOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where SellOrderId ='{sellOrderId}'";
+                Database.Execute(sqlSell);
                 tx.Commit();
             }
         }

@@ -57,23 +57,25 @@ namespace DogService
 
         public List<DogMoreBuy> GetNeedSellDogMoreBuy(string accountId, string userName, string symbolName)
         {
-            List<string> stateList = new List<string>() { StateConst.PartialCanceled, StateConst.Filled };
-            var states = "";
-            stateList.ForEach(it =>
-            {
-                if (states != "")
-                {
-                    states += ",";
-                }
-                states += $"'{it}'";
-            });
-            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{symbolName}' and BState in({states}) and (SOrderId<=0 or SOrderId is null) and UserName='{userName}' order by BOrderP asc limit 0,5";
+            var states = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled });
+            var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
+            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{symbolName}' and BuyState in({states}) and IsFinished=0 " +
+                $" and UserName='{userName}' and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where AccountId='{accountId}' and UserName='{userName}' and SellState not in({states})) " +
+                $" order by BuyOrderPrice asc limit 0,5";
             return Database.Query<DogMoreBuy>(sql).ToList();
         }
 
-        public decimal GetMinPriceOfNotSell(string accountId, string userName, string coin)
+        /// <summary>
+        /// 为了下一笔购买做好判断的.
+        /// </summary>
+        /// <param name="accountId"></param>
+        /// <param name="userName"></param>
+        /// <param name="coin"></param>
+        /// <returns></returns>
+        public decimal GetMinPriceOfNotSellFinished(string accountId, string userName, string coin)
         {
-            var sql = $"select case when min(BTradeP) is null then 99999 else min(BTRADEP) END from t_pig_more where AccountId='{accountId}' and Name = '{coin}' and BState!='({StateConst.Canceled.ToString()})' and (SOrderId<=0 or SOrderId is null) and UserName='{userName}'";
+            var sql = $"select case when min(BuyTradePrice) is null then 999999 else min(BuyTradePrice) END from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' " +
+                $" and BuyState!='({StateConst.Canceled.ToString()})' and IsFinished=0 and UserName='{userName}' and BuyOrderId not in(select )";
             return Database.Query<decimal>(sql).FirstOrDefault();
         }
 

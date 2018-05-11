@@ -18,5 +18,20 @@ namespace DogService
             var connection = new SqlConnection(connectionString);
             Database = new DapperConnection(connection);
         }
+
+        public string GetStateStringIn(List<string> stateList)
+        {
+           // List<string> stateList = new List<string>() { StateConst.PartialCanceled, StateConst.Filled };
+            var states = "";
+            stateList.ForEach(it =>
+            {
+                if (states != "")
+                {
+                    states += ",";
+                }
+                states += $"'{it}'";
+            });
+            return states;
+        }
     }
 }

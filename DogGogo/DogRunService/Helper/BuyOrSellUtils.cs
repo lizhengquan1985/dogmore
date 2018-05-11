@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DogPlatform;
+using DogPlatform.Model;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

@@ -1,7 +1,15 @@
-﻿using System;
+﻿using DogAccount;
+using DogPlatform;
+using DogPlatform.Model;
+using DogRunService.Helper;
+using DogService.DateTypes;
+using log4net;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DogRunService

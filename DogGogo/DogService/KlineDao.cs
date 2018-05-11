@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DogPlatform.Model;
+using SharpDapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

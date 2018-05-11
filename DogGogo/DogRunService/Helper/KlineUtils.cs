@@ -1,7 +1,12 @@
-﻿using System;
+﻿using DogPlatform;
+using DogPlatform.Model;
+using DogService;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DogRunService.Helper

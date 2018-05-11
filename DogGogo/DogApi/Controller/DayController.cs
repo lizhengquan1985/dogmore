@@ -1,8 +1,12 @@
-﻿using System;
+﻿using DogApi.DTO;
+using DogService;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace DogApi.Controller
 {
@@ -10,7 +14,7 @@ namespace DogApi.Controller
     {
         static ILog logger = LogManager.GetLogger(typeof(DayController));
 
-        public PigMoreStatisticsDao PigMoreStatisticsDao { get; set; }
+        public DogMoreStatisticsDao PigMoreStatisticsDao { get; set; }
 
         /// <summary>
         /// 今日交易， 购买数量，出售数量， 购买总额，出售总额，每条记录（）。
@@ -22,7 +26,7 @@ namespace DogApi.Controller
         {
             try
             {
-                var pigMoreList = await new PigMoreStatisticsDao().ListTodayTrade(userName);
+                var pigMoreList = await new DogMoreStatisticsDao().ListTodayTrade(userName);
 
                 var buyCount = 0;
                 var sellCount = 0;
@@ -77,7 +81,7 @@ namespace DogApi.Controller
         {
             try
             {
-                return await new PigMoreStatisticsDao().Statistics(userName);
+                return await new DogMoreStatisticsDao().Statistics(userName);
             }
             catch (Exception ex)
             {
@@ -94,8 +98,8 @@ namespace DogApi.Controller
                 var begin = date.AddMinutes(-60 * 24);
                 var end = date.AddMinutes(10);
 
-                var buyList = await new PigMoreStatisticsDao().ListBuy(userName, name, begin, end);
-                var sellList = await new PigMoreStatisticsDao().ListSell(userName, name, begin, end);
+                var buyList = await new DogMoreStatisticsDao().ListBuy(userName, name, begin, end);
+                var sellList = await new DogMoreStatisticsDao().ListSell(userName, name, begin, end);
                 var klineList = new KlineDao().ListKline(name, begin, end);
                 return new
                 {

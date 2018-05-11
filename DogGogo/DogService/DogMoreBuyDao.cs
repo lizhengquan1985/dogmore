@@ -1,4 +1,10 @@
-﻿using System;
+﻿using DogPlatform.Model;
+using DogService.DateTypes;
+using log4net;
+using Newtonsoft.Json;
+using SharpDapper;
+using SharpDapper.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +14,9 @@ namespace DogService
 {
     public class DogMoreBuyDao : BaseDao
     {
-        static ILog logger = LogManager.GetLogger(typeof(PigMoreDao));
+        static ILog logger = LogManager.GetLogger(typeof(DogMoreBuyDao));
 
-        public PigMoreDao() : base()
+        public DogMoreBuyDao() : base()
         {
         }
 

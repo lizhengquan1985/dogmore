@@ -62,5 +62,15 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DogAccount\DogAccount.csproj">
+      <Project>{B656C0CB-B352-4F52-AD9B-D426423FECFB}</Project>
+      <Name>DogAccount</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DogPlatform\DogPlatform.csproj">
+      <Project>{DA837026-6AF7-47E8-B56F-CD9703E75D44}</Project>
+      <Name>DogPlatform</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

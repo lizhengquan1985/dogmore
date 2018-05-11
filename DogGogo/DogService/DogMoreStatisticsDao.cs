@@ -1,4 +1,8 @@
-﻿using System;
+﻿using DogService.DateTypes;
+using DogService.DTO;
+using log4net;
+using SharpDapper;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace DogService
 {
-    public class DogMoreStatisticsDao
+    public class DogMoreStatisticsDao : BaseDao
     {
-        static ILog logger = LogManager.GetLogger(typeof(PigMoreStatisticsDao));
+        static ILog logger = LogManager.GetLogger(typeof(DogMoreStatisticsDao));
 
-        public PigMoreStatisticsDao() : base()
+        public DogMoreStatisticsDao() : base()
         {
         }
 
@@ -27,7 +31,7 @@ namespace DogService
             return (await Database.QueryAsync<PigMore>(sql, new { SmallDate = smallDate })).ToList();
         }
 
-        public async Task<List<PigMoreStatisticsDay>> Statistics(string userName)
+        public async Task<List<DogMoreStatisticsDay>> Statistics(string userName)
         {
             var where = "";
             if (!string.IsNullOrEmpty(userName))
@@ -37,7 +41,7 @@ namespace DogService
             var sql = $"select * from (select DATE_FORMAT(BDate,'%Y-%m-%d') BDate, count(1) BCount, sum(BQuantity*BTradeP) BAmount from t_pig_more {where} group by DATE_FORMAT(BDate,'%Y-%m-%d')) b "
                 + $"join(select DATE_FORMAT(SDate, '%Y-%m-%d') SDate, count(1) SCount, sum(SQuantity * STradeP) SAmount, sum(SQuantity * STradeP - BQuantity * BTradeP) Earning from t_pig_more {where} group by DATE_FORMAT(SDate, '%Y-%m-%d')) s"
                 + " on b.BDate = s.SDate order by b.BDate DESC";
-            return (await Database.QueryAsync<PigMoreStatisticsDay>(sql)).ToList();
+            return (await Database.QueryAsync<DogMoreStatisticsDay>(sql)).ToList();
         }
 
         public async Task<List<PigMore>> ListBuy(string userName, string name, DateTime begin, DateTime end)

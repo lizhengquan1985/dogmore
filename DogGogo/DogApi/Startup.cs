@@ -1,8 +1,21 @@
-﻿using System;
+﻿using Autofac;
+using Autofac.Integration.WebApi;
+using Beginor.Owin.StaticFile;
+using DogService;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Owin;
+using SharpDapper;
+using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
+using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
+using System.Web.Http.Cors;
+using System.Web.Http.Dependencies;
 
 namespace DogApi
 {
@@ -48,7 +61,7 @@ namespace DogApi
                 .InstancePerRequest();
 
             //注册数据库对象
-            builder.Register<IDapperConnection>(ctx => new DapperConnection(new MySqlConnection("server=localhost;port=3306;user id=root; password=lyx123456; database=studyplan; pooling=true; charset=utf8mb4"))).InstancePerRequest();
+            builder.Register<IDapperConnection>(ctx => new DapperConnection(new SqlConnection("server=localhost;port=3306;user id=root; password=lyx123456; database=studyplan; pooling=true; charset=utf8mb4"))).InstancePerRequest();
 
             // Create and assign a dependency resolver for Web API to use.
             var container = builder.Build();

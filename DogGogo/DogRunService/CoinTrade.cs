@@ -2,6 +2,7 @@
 using DogPlatform;
 using DogPlatform.Model;
 using DogRunService.Helper;
+using DogService;
 using DogService.DateTypes;
 using log4net;
 using Newtonsoft.Json;
@@ -111,7 +112,7 @@ namespace DogRunService
                     continue;
                 }
 
-                decimal minBuyPrice = new PigMoreDao().GetMinPriceOfNotSell(accountId, userName, symbol.BaseCurrency);
+                decimal minBuyPrice = new DogMoreBuyDao().GetMinPriceOfNotSell(accountId, userName, symbol.BaseCurrency);
                 if (minBuyPrice <= 0)
                 {
                     minBuyPrice = 999999;
@@ -176,7 +177,7 @@ namespace DogRunService
                 HBResponse<long> order = api.OrderPlace(req);
                 if (order.Status == "ok")
                 {
-                    new PigMoreDao().CreatePigMore(new PigMore()
+                    new DogMoreBuyDao().CreatePigMore(new PigMore()
                     {
                         Name = symbol.BaseCurrency,
                         AccountId = accountId,
@@ -233,7 +234,7 @@ namespace DogRunService
                 }
                 if (matchResult.Status == "ok")
                 {
-                    new PigMoreDao().UpdatePigMoreBuySuccess(orderId, orderDetail, matchResult, maxPrice);
+                    new DogMoreBuyDao().UpdatePigMoreBuySuccess(orderId, orderDetail, matchResult, maxPrice);
                 }
             }
         }
@@ -301,7 +302,7 @@ namespace DogRunService
             {
                 var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                 var accountId = accountConfig.MainAccountId;
-                var needSellPigMoreList = new PigMoreDao().GetNeedSellPigMore(accountId, userName, symbol.BaseCurrency);
+                var needSellPigMoreList = new DogMoreBuyDao().GetNeedSellPigMore(accountId, userName, symbol.BaseCurrency);
 
                 foreach (var needSellPigMoreItem in needSellPigMoreList)
                 {
@@ -346,7 +347,7 @@ namespace DogRunService
                         HBResponse<long> order = api.OrderPlace(req);
                         if (order.Status == "ok")
                         {
-                            new PigMoreDao().ChangeDataWhenSell(needSellPigMoreItem.Id, sellQuantity, sellPrice, JsonConvert.SerializeObject(order), JsonConvert.SerializeObject(flexPointList), order.Data);
+                            new DogMoreBuyDao().ChangeDataWhenSell(needSellPigMoreItem.Id, sellQuantity, sellPrice, JsonConvert.SerializeObject(order), JsonConvert.SerializeObject(flexPointList), order.Data);
                             // 下单成功马上去查一次
                             QuerySellDetailAndUpdate(userName, order.Data);
                         }
@@ -375,7 +376,7 @@ namespace DogRunService
                     }
                 }
                 // 完成
-                new PigMoreDao().UpdateTradeRecordSellSuccess(orderId, orderDetail, orderMatchResult, minPrice);
+                new DogMoreBuyDao().UpdateTradeRecordSellSuccess(orderId, orderDetail, orderMatchResult, minPrice);
             }
         }
 
@@ -383,7 +384,7 @@ namespace DogRunService
         {
             try
             {
-                var needChangeBuyStatePigMoreList = new PigMoreDao().ListNeedChangeBuyStatePigMore();
+                var needChangeBuyStatePigMoreList = new DogMoreBuyDao().ListNeedChangeBuyStatePigMore();
                 //Console.WriteLine($"未改变状态的交易记录2：{needChangeBuyStatePigMoreList.Count}");
                 foreach (var item in needChangeBuyStatePigMoreList)
                 {
@@ -403,7 +404,7 @@ namespace DogRunService
 
             try
             {
-                var needChangeSellStatePigMoreList = new PigMoreDao().ListNeedChangeSellStatePigMore();
+                var needChangeSellStatePigMoreList = new DogMoreBuyDao().ListNeedChangeSellStatePigMore();
                 //Console.WriteLine($"未改变状态的交易记录1：{needChangeSellStatePigMoreList.Count}");
                 foreach (var item in needChangeSellStatePigMoreList)
                 {

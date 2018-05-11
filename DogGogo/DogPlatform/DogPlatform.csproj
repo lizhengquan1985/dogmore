@@ -40,6 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Coins.cs" />
+    <Compile Include="DataTypes.cs" />
+    <Compile Include="Model\Account.cs" />
+    <Compile Include="Model\AccountBalance.cs" />
+    <Compile Include="Model\CommonSymbols.cs" />
+    <Compile Include="Model\HBResponse.cs" />
+    <Compile Include="Model\HistoryKline.cs" />
+    <Compile Include="Model\OrderDetail.cs" />
+    <Compile Include="Model\OrderMatchResult.cs" />
+    <Compile Include="Model\OrderPlaceRequest.cs" />
+    <Compile Include="PlatformApi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

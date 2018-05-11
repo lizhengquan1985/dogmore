@@ -38,16 +38,12 @@ namespace DogRunService
             return false;
         }
 
-        public static decimal AnalyzeNeedSell(decimal comparePrice, DateTime compareDate, string coin, string toCoin, out decimal nowPrice, List<HistoryKline> data)
+        public static decimal AnalyzeNeedSell(decimal comparePrice, DateTime compareDate, string coin, string toCoin, List<HistoryKline> data)
         {
-            // 当前open
-            nowPrice = 0;
             decimal higher = new decimal(0);
 
             try
             {
-                nowPrice = data[0].Close;
-
                 List<FlexPoint> flexPointList = new List<FlexPoint>();
 
                 decimal closeHigh = data[0].Close;

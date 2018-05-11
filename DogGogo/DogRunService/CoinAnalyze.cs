@@ -14,15 +14,12 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(CoinAnalyze));
 
-        public static List<FlexPoint> Analyze(List<HistoryKline> data, out decimal lastLowPrice, out decimal nowPrice, decimal flexPercent)
+        public static List<FlexPoint> Analyze(List<HistoryKline> data, out decimal lastLowPrice, decimal flexPercent)
         {
-            nowPrice = 0; //现在的价格
             lastLowPrice = 999999999;
 
             try
             {
-                nowPrice = data[0].Close;
-
                 List<FlexPoint> flexPointList = new List<FlexPoint>();
 
                 decimal closeHigh = data[0].Close;

@@ -42,39 +42,39 @@ namespace DogRunService
 
             // 获取最近行情
             decimal lastLowPrice;
-            decimal nowPrice;
+            decimal nowPrice = historyKlines[0].Close;
             // 分析是否下跌， 下跌超过一定数据，可以考虑
             decimal flexPercent = (decimal)1.045;
-            var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+            var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.040;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.035;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.03;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.025;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.02;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.015;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, out nowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
             }
             if (flexPointList.Count == 0 && flexPointList.Count == 0)
             {
@@ -281,13 +281,12 @@ namespace DogRunService
             {
                 var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                 var accountId = accountConfig.MainAccountId;
-                var needSellPigMoreList = new DogMoreBuyDao().GetNeedSellDogMoreBuy(accountId, userName, symbol.BaseCurrency);
+                var needSellDogMoreBuyList = new DogMoreBuyDao().GetNeedSellDogMoreBuy(accountId, userName, symbol.BaseCurrency);
 
-                foreach (var needSellPigMoreItem in needSellPigMoreList)
+                foreach (var needSellDogMoreBuyItem in needSellDogMoreBuyList)
                 {
                     // 分析是否 大于
-                    decimal itemNowPrice = 0;
-                    decimal higher = JudgeSellUtils.AnalyzeNeedSell(needSellPigMoreItem.BuyOrderPrice, needSellPigMoreItem.BuyDate, symbol.BaseCurrency, symbol.QuoteCurrency, out itemNowPrice, historyKlines);
+                    decimal higher = JudgeSellUtils.AnalyzeNeedSell(needSellDogMoreBuyItem.BuyOrderPrice, needSellDogMoreBuyItem.BuyDate, symbol.BaseCurrency, symbol.QuoteCurrency, historyKlines);
 
                     decimal gaoyuPercentSell = (decimal)1.035;
 
@@ -295,26 +294,26 @@ namespace DogRunService
                     if (flexPercent < (decimal)1.04)
                     {
                         gaoyuPercentSell = (decimal)1.035;
-                        if (flexPointList.Count <= 2 && needSellPigMoreList.Where(it => it.BuyDate > DateTime.Now.AddDays(-1)).ToList().Count == 0)
+                        if (flexPointList.Count <= 2 && needSellDogMoreBuyList.Where(it => it.BuyDate > DateTime.Now.AddDays(-1)).ToList().Count == 0)
                         {
                             // 1天都没有交易. 并且波动比较小. 则不需要回头
                             needHuitou = false;
                         }
                     }
 
-                    var canSell = JudgeSellUtils.CheckCanSell(needSellPigMoreItem.BuyOrderPrice, higher, itemNowPrice, gaoyuPercentSell, needHuitou);
+                    var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyOrderPrice, higher, nowPrice, gaoyuPercentSell, needHuitou);
 
                     //logger.Error($"是否能够出售:  {symbol.BaseCurrency},{canSell}, price:{needSellPigMoreItem.BOrderP}, nowPrice:{nowPrice},itemNowPrice:{itemNowPrice}, {userName}, {needSellPigMoreList.Count}, {accountId}");
                     if (canSell)
                     {
-                        decimal sellQuantity = needSellPigMoreItem.BuyQuantity * (decimal)0.99;
+                        decimal sellQuantity = needSellDogMoreBuyItem.BuyQuantity * (decimal)0.99;
                         sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
                         if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
                         {
                             sellQuantity = 1;
                         }
                         // 出售
-                        decimal sellPrice = decimal.Round(itemNowPrice * (decimal)0.985, symbol.PricePrecision);
+                        decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
                         OrderPlaceRequest req = new OrderPlaceRequest();
                         req.account_id = accountId;
                         req.amount = sellQuantity.ToString();
@@ -329,7 +328,7 @@ namespace DogRunService
                             DogMoreSell dogMoreSell = new DogMoreSell()
                             {
                                 AccountId = accountId,
-                                BuyOrderId = needSellPigMoreItem.BuyOrderId,
+                                BuyOrderId = needSellDogMoreBuyItem.BuyOrderId,
                                 SellDate = DateTime.Now,
                                 SellFlex = JsonConvert.SerializeObject(flexPointList),
                                 SellOrderId = order.Data,
@@ -351,7 +350,7 @@ namespace DogRunService
                             QuerySellDetailAndUpdate(userName, order.Data);
                         }
 
-                        logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},itemNowPrice：{itemNowPrice} higher：{higher}，accountId：{accountId}");
+                        logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice} higher：{higher}，accountId：{accountId}");
                         logger.Error($"下单出售结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
                     }
                 }

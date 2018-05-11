@@ -286,7 +286,7 @@ namespace DogRunService
                 foreach (var needSellDogMoreBuyItem in needSellDogMoreBuyList)
                 {
                     // 分析是否 大于
-                    decimal higher = JudgeSellUtils.AnalyzeNeedSell(needSellDogMoreBuyItem.BuyOrderPrice, needSellDogMoreBuyItem.BuyDate, symbol.BaseCurrency, symbol.QuoteCurrency, historyKlines);
+                    decimal afterBuyHighClosePrice = JudgeSellUtils.AnalyzeNeedSell(needSellDogMoreBuyItem.BuyOrderPrice, needSellDogMoreBuyItem.BuyDate, historyKlines);
 
                     decimal gaoyuPercentSell = (decimal)1.035;
 
@@ -301,9 +301,8 @@ namespace DogRunService
                         }
                     }
 
-                    var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyOrderPrice, higher, nowPrice, gaoyuPercentSell, needHuitou);
+                    var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyOrderPrice, afterBuyHighClosePrice, nowPrice, gaoyuPercentSell, needHuitou);
 
-                    //logger.Error($"是否能够出售:  {symbol.BaseCurrency},{canSell}, price:{needSellPigMoreItem.BOrderP}, nowPrice:{nowPrice},itemNowPrice:{itemNowPrice}, {userName}, {needSellPigMoreList.Count}, {accountId}");
                     if (canSell)
                     {
                         decimal sellQuantity = needSellDogMoreBuyItem.BuyQuantity * (decimal)0.99;
@@ -328,20 +327,20 @@ namespace DogRunService
                             DogMoreSell dogMoreSell = new DogMoreSell()
                             {
                                 AccountId = accountId,
+                                UserName = userName,
                                 BuyOrderId = needSellDogMoreBuyItem.BuyOrderId,
+                                SellOrderId = order.Data,
+                                SellOrderResult = JsonConvert.SerializeObject(order),
                                 SellDate = DateTime.Now,
                                 SellFlex = JsonConvert.SerializeObject(flexPointList),
-                                SellOrderId = order.Data,
-                                SellOrderPrice = sellPrice,
-                                SellOrderResult = JsonConvert.SerializeObject(order),
                                 SellQuantity = sellQuantity,
+                                SellOrderPrice = sellPrice,
+                                SellState = StateConst.Submitted,
+                                SellTradePrice = 0,
+                                SymbolName = symbol.BaseCurrency,
                                 SellMemo = "",
                                 SellOrderDetail = "",
-                                SellOrderMatchResults = "",
-                                SellState = "",
-                                SellTradePrice = 1,
-                                SymbolName = 1,
-                                UserName = userName
+                                SellOrderMatchResults = ""
                             };
 
                             new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);

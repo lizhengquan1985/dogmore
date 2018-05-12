@@ -50,6 +50,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDao.cs" />
+    <Compile Include="DateTypes\ControlAvgInput.cs" />
+    <Compile Include="DateTypes\ControlBuyCritical.cs" />
     <Compile Include="DateTypes\DogEmpty.cs" />
     <Compile Include="DateTypes\DogMore.cs" />
     <Compile Include="DateTypes\DogMoreStatisticsDay.cs" />

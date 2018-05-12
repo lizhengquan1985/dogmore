@@ -17,6 +17,12 @@ namespace DogService
         {
         }
 
+        public async Task<List<DogMoreBuy>> ListBuyByBuyOrderId(List<long> buyOrderIds)
+        {
+            var sql = $"select * from t_dog_more_buy where BuyOrderId in({string.Join(",",buyOrderIds)})";
+            return (await Database.QueryAsync<DogMoreBuy>(sql)).ToList();
+        }
+
         public async Task<List<DogMoreBuy>> ListTodayBuy(string userName)
         {
             var smallDate = Utils.GetSmallestOfTheDate(DateTime.Now);

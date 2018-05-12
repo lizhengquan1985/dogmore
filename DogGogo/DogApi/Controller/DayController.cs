@@ -1,5 +1,4 @@
-﻿using DogApi.DTO;
-using DogService;
+﻿using DogService;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using System.Web.Http;
 
 namespace DogApi.Controller
 {
-    public class DayController:ApiController
+    public class DayController : ApiController
     {
         static ILog logger = LogManager.GetLogger(typeof(DayController));
 
@@ -27,14 +26,13 @@ namespace DogApi.Controller
             try
             {
                 var pigMoreBuyList = await new DogMoreStatisticsDao().ListTodayBuy(userName);
-                var pigMoreSellList = await new DogMoreStatisticsDao().ListTodayBuy(userName);
+                var pigMoreSellList = await new DogMoreStatisticsDao().ListTodaySell(userName);
 
                 var buyCount = 0;
                 var sellCount = 0;
                 var buyAmount = (decimal)0.0;
                 var sellAmount = (decimal)0.0;
                 var sellEarnings = (decimal)0.0;
-                var list = new List<TodayTradeDTO>();
                 pigMoreBuyList.ForEach(it =>
                 {
                     if (it.BuyDate >= Utils.GetSmallestOfTheDate(DateTime.Now))
@@ -42,22 +40,17 @@ namespace DogApi.Controller
                         buyCount++;
                         buyAmount += it.BuyQuantity * it.BuyTradePrice;
                     }
-                    if (it.SOrderId > 0)
-                    {
-                        sellCount++;
-                        sellAmount += it.SQuantity * it.STradeP;
-                        sellEarnings += it.SQuantity * it.STradeP - it.BQuantity * it.BTradeP;
-                    }
-                    list.Add(new TodayTradeDTO()
-                    {
-                        Name = it.SymbolName,
-                        BDate = it.BuyDate,
-                        BQuantity = it.BuyQuantity,
-                        BTradeP = it.BuyTradePrice,
-                        SQuantity = it.SQuantity,
-                        SDate = it.SDate,
-                        STradeP = it.STradeP,
-                    });
+                });
+                var buyList = await new DogMoreStatisticsDao().ListBuyByBuyOrderId(pigMoreSellList.Select(it => it.BuyOrderId).ToList());
+                pigMoreSellList.ForEach(it =>
+                {
+                    sellCount++;
+                    sellAmount += it.SellQuantity * it.SellTradePrice;
+                });
+                buyList.ForEach(it =>
+                {
+                    var sellList = pigMoreSellList.FindAll(item => it.BuyOrderId == it.BuyOrderId);
+                    sellEarnings += sellList.Sum(s => s.SellQuantity * s.SellTradePrice) - it.BuyQuantity * it.BuyTradePrice;
                 });
                 return new
                 {
@@ -66,7 +59,22 @@ namespace DogApi.Controller
                     buyAmount,
                     sellAmount,
                     sellEarnings,
-                    list
+                    buyList = pigMoreBuyList.Select(it => new
+                    {
+                        it.BuyQuantity,
+                        it.BuyTradePrice,
+                        it.BuyDate,
+                        it.IsFinished,
+                        SellPrice = pigMoreSellList.FindAll(s => s.BuyOrderId == it.BuyOrderId).Min(s => s.SellTradePrice)
+                    }),
+                    sellList = pigMoreSellList.Select(it => new
+                    {
+                        it.SellQuantity,
+                        it.SellTradePrice,
+                        it.SellDate,
+                        it.SellState,
+                        BuyPrice = buyList.Find(b => b.BuyOrderId == it.BuyOrderId).BuyTradePrice
+                    })
                 };
             }
             catch (Exception ex)

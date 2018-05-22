@@ -16,7 +16,7 @@ namespace DogRunService
 
         public static List<FlexPoint> Analyze(List<HistoryKline> data, out decimal lastLowPrice, decimal flexPercent)
         {
-            lastLowPrice = 999999999;
+            lastLowPrice = 25000;
 
             try
             {

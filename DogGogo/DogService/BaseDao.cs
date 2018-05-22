@@ -1,4 +1,5 @@
 ﻿using DogAccount;
+using MySql.Data.MySqlClient;
 using SharpDapper;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace DogService
         public BaseDao()
         {
             string connectionString = AccountConfigUtils.sqlConfig;
-            var connection = new SqlConnection(connectionString);
+            var connection = new MySqlConnection(connectionString);
             Database = new DapperConnection(connection);
         }
 

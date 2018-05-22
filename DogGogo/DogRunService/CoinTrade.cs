@@ -158,7 +158,7 @@ namespace DogRunService
                 decimal minBuyPrice = new DogMoreBuyDao().GetMinPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
                 if (minBuyPrice <= 0)
                 {
-                    minBuyPrice = 999999;
+                    minBuyPrice = 9000;
                 }
 
                 if (nowPrice * (decimal)1.03 > minBuyPrice)
@@ -171,7 +171,6 @@ namespace DogRunService
                 var accountInfo = api.GetAccountBalance(accountId);
                 var usdt = accountInfo.Data.list.Find(it => it.currency == "usdt");
                 decimal recommendAmount = usdt.balance / 500; // TODO 测试阶段，暂定低一些，
-                Console.WriteLine($"RunBuy--------> 开始 {symbol.BaseCurrency}  推荐额度：{decimal.Round(recommendAmount, 2)} ");
 
                 if (recommendAmount < (decimal)1.1)
                 {
@@ -207,6 +206,7 @@ namespace DogRunService
                     Thread.Sleep(1000 * 5);
                     return;
                 }
+
                 HBResponse<long> order = api.OrderPlace(req);
                 if (order.Status == "ok")
                 {

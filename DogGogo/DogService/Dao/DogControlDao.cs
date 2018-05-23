@@ -24,5 +24,10 @@ namespace DogService.Dao
                 tx.Commit();
             }
         }
+
+        public async Task<List<DogControl>> ListDogControl()
+        {
+            return (await Database.QueryAsync<DogControl>(new { IsValid = true })).ToList();
+        }
     }
 }

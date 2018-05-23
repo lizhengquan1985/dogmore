@@ -44,7 +44,7 @@ namespace DogApi
             // 初始化
             CoinUtils.Init();
 
-            UserPools.Push("xx");
+            //UserPools.Push("xx");
             UserPools.Push("qq");
 
             // 初始化k线

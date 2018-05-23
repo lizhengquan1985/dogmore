@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DogRunService.Helper
@@ -16,7 +17,8 @@ namespace DogRunService.Helper
         public static void Begin()
         {
             var symbols = CoinUtils.GetAllCommonSymbols();
-            RunCoin(symbols.Where(it => it.BaseCurrency != "btc").ToList());
+            RunCoin(symbols.Where(it => it.BaseCurrency == "let" || it.BaseCurrency == "zec" || it.BaseCurrency == "etc" || it.BaseCurrency == "act" || it.BaseCurrency == "storj").ToList());
+            //RunCoin(symbols.Where(it => it.BaseCurrency != "btc").ToList());
             //var splitIndex = 16;
             //RunCoin(symbols.GetRange(0, splitIndex + 1));
             //RunCoin(symbols.GetRange(splitIndex, symbols.Count - splitIndex));
@@ -47,7 +49,7 @@ namespace DogRunService.Helper
                         {
                             logger.Error("RunCoin:  " + ex.Message, ex);
                         }
-                        //Thread.Sleep(1000 * 1);
+                        Thread.Sleep(1000 * 6);
                     }
                 }
             });

@@ -15,6 +15,9 @@ namespace DogService.DateTypes
         public string SymbolName { get; set; }
         public decimal PredictPrice { get; set; }
         public DateTime PredictExpiredTime { get; set; }
+        /// <summary>
+        /// 到了这个价可以考虑做空一次
+        /// </summary>
         public decimal EmptyPrice { get; set; }
         public DateTime EmptyExpiredTime { get; set; }
         public decimal AvgInputAmount { get; set; }

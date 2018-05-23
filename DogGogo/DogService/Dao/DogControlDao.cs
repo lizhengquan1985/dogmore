@@ -19,7 +19,9 @@ namespace DogService.Dao
         {
             using (var tx = Database.BeginTransaction())
             {
-                await Database.UpdateAsync<ControlAvgInput>(new { IsValid = false }, new { dogControl.SymbolName });
+                await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { dogControl.SymbolName });
+                dogControl.IsValid = true;
+                dogControl.CreateTime = DateTime.Now;
                 await Database.InsertAsync(dogControl);
                 tx.Commit();
             }
@@ -27,7 +29,8 @@ namespace DogService.Dao
 
         public async Task<List<DogControl>> ListDogControl()
         {
-            return (await Database.QueryAsync<DogControl>(new { IsValid = true })).ToList();
+            //var sql = $"select * from t_dog_control where IsValid=1";
+            return (await Database.QueryAsync<DogControl>(new { IsValid = 1})).ToList();
         }
     }
 }

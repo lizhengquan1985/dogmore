@@ -39,15 +39,15 @@ namespace DogService
         public List<DogMoreBuy> ListNeedChangeBuyStateDogMoreBuy()
         {
             var states = $"'{StateConst.PartialFilled}','{StateConst.Filled}'";
-            var sql = $"select * from t_pig_more_buy where BuyState not in({states})";
+            var sql = $"select * from t_dog_more_buy where BuyState not in({states})";
             return Database.Query<DogMoreBuy>(sql).ToList();
         }
 
-        public void UpdatePigMoreBuySuccess(long buyOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal buyTradePrice)
+        public void UpdateDogMoreBuySuccess(long buyOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal buyTradePrice)
         {
             using (var tx = Database.BeginTransaction())
             {
-                var sql = $"update t_pig_more set BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where BuyOrderId ='{buyOrderId}'";
+                var sql = $"update t_dog_more_buy set BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where BuyOrderId ='{buyOrderId}'";
                 Database.Execute(sql);
                 tx.Commit();
             }
@@ -74,9 +74,26 @@ namespace DogService
         /// <returns></returns>
         public decimal GetMinPriceOfNotSellFinished(string accountId, string userName, string coin)
         {
-            var sql = $"select case when min(BuyTradePrice) is null then 999999 else min(BuyTradePrice) END from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' " +
-                $" and BuyState!='({StateConst.Canceled.ToString()})' and IsFinished=0 and UserName='{userName}' and BuyOrderId not in(select )";
-            return Database.Query<decimal>(sql).FirstOrDefault();
+            //var sql = $"select case when min(BuyTradePrice) is null then 25000 else min(BuyTradePrice) END from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' " +
+            //    $" and BuyState!='({StateConst.Canceled.ToString()})' and IsFinished=0 and UserName='{userName}' ";
+            //return Database.Query<decimal>(sql).FirstOrDefault();
+
+            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' and BuyState!='({StateConst.Canceled.ToString()})' " +
+                $" and IsFinished=0 and UserName='{userName}'";
+            var list = Database.Query<DogMoreBuy>(sql).ToList();
+            var minPrice = (decimal)25000;
+            foreach (var item in list)
+            {
+                if (item.BuyTradePrice > 0 && item.BuyTradePrice < minPrice)
+                {
+                    minPrice = item.BuyTradePrice;
+                }
+                if (item.BuyTradePrice <= 0 && item.BuyOrderPrice < minPrice)
+                {
+                    minPrice = item.BuyOrderPrice;
+                }
+            }
+            return minPrice;
         }
 
         public DogMoreBuy GetByBuyOrderId(long buyOrderId)

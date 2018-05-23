@@ -23,7 +23,7 @@ namespace DogRunService
         public static bool CheckCalcMaxhuoluo(List<HistoryKline> data)
         {
             decimal max = 0;
-            decimal min = 999999;
+            decimal min = 25000;
             decimal nowPrice = data[0].Close;
             foreach (var item in data)
             {
@@ -44,7 +44,7 @@ namespace DogRunService
         {
             // 暂时判断 1个小时内是否上涨超过12%， 如果超过，则控制下
             var max = (decimal)0;
-            var min = (decimal)9999999;
+            var min = (decimal)25000;
             var nowClose = historyKlines[0].Close;
             for (var i = 0; i < 60; i++)
             {

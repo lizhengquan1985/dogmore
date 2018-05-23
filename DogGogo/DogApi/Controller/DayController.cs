@@ -13,7 +13,7 @@ namespace DogApi.Controller
     {
         static ILog logger = LogManager.GetLogger(typeof(DayController));
 
-        public DogMoreStatisticsDao PigMoreStatisticsDao { get; set; }
+        public DogMoreStatisticsDao DogMoreStatisticsDao { get; set; }
 
         /// <summary>
         /// 今日交易， 购买数量，出售数量， 购买总额，出售总额，每条记录（）。

@@ -158,7 +158,7 @@ namespace DogRunService
                 decimal minBuyPrice = new DogMoreBuyDao().GetMinPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
                 if (minBuyPrice <= 0)
                 {
-                    minBuyPrice = 999999;
+                    minBuyPrice = 25000;
                 }
 
                 if (nowPrice * (decimal)1.03 > minBuyPrice)
@@ -171,7 +171,6 @@ namespace DogRunService
                 var accountInfo = api.GetAccountBalance(accountId);
                 var usdt = accountInfo.Data.list.Find(it => it.currency == "usdt");
                 decimal recommendAmount = usdt.balance / 500; // TODO 测试阶段，暂定低一些，
-                Console.WriteLine($"RunBuy--------> 开始 {symbol.BaseCurrency}  推荐额度：{decimal.Round(recommendAmount, 2)} ");
 
                 if (recommendAmount < (decimal)1.1)
                 {
@@ -207,7 +206,9 @@ namespace DogRunService
                     Thread.Sleep(1000 * 5);
                     return;
                 }
+
                 HBResponse<long> order = api.OrderPlace(req);
+                logger.Error("下单购买结果：" + JsonConvert.SerializeObject(order));
                 if (order.Status == "ok")
                 {
                     new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
@@ -256,7 +257,7 @@ namespace DogRunService
                 }
                 if (orderMatchResult.Status == "ok")
                 {
-                    new DogMoreBuyDao().UpdatePigMoreBuySuccess(orderId, orderDetail, orderMatchResult, maxPrice);
+                    new DogMoreBuyDao().UpdateDogMoreBuySuccess(orderId, orderDetail, orderMatchResult, maxPrice);
                 }
             }
         }
@@ -322,6 +323,7 @@ namespace DogRunService
                         req.type = "sell-limit";
                         PlatformApi api = PlatformApi.GetInstance(userName);
                         HBResponse<long> order = api.OrderPlace(req);
+                        logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
                         if (order.Status == "ok")
                         {
                             DogMoreSell dogMoreSell = new DogMoreSell()
@@ -364,7 +366,7 @@ namespace DogRunService
             if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
             {
                 var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                decimal minPrice = 99999999;
+                decimal minPrice = 25000;
                 foreach (var item in orderMatchResult.Data)
                 {
                     if (minPrice > item.price)

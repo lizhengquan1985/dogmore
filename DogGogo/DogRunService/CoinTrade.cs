@@ -121,7 +121,7 @@ namespace DogRunService
                 if (analyzeResult != null)
                 {
                     // 计算是否适合出售
-                    // RunSell(symbol, analyzeResult);
+                    RunSell(symbol, analyzeResult);
                 }
             }
             catch (Exception ex)
@@ -213,28 +213,36 @@ namespace DogRunService
                 logger.Error("下单购买结果：" + JsonConvert.SerializeObject(order));
                 if (order.Status == "ok")
                 {
-                    new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
+                    try
                     {
-                        SymbolName = symbol.BaseCurrency,
-                        AccountId = accountId,
-                        UserName = accountConfig.UserName,
-                        FlexPercent = flexPercent,
+                        new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
+                        {
+                            SymbolName = symbol.BaseCurrency,
+                            AccountId = accountId,
+                            UserName = accountConfig.UserName,
+                            FlexPercent = flexPercent,
 
-                        BuyQuantity = buyQuantity,
-                        BuyOrderPrice = orderPrice,
-                        BuyDate = DateTime.Now,
-                        BuyOrderResult = JsonConvert.SerializeObject(order),
-                        BuyState = StateConst.PreSubmitted,
-                        BuyTradePrice = 0,
-                        BuyOrderId = order.Data,
-                        BuyFlex = JsonConvert.SerializeObject(flexPointList),
-                        BuyMemo = "",
-                        BuyOrderDetail = "",
-                        BuyOrderMatchResults = "",
-                        IsFinished = false
-                    });
-                    // 下单成功马上去查一次
-                    QueryBuyDetailAndUpdate(userName, order.Data);
+                            BuyQuantity = buyQuantity,
+                            BuyOrderPrice = orderPrice,
+                            BuyDate = DateTime.Now,
+                            BuyOrderResult = JsonConvert.SerializeObject(order),
+                            BuyState = StateConst.PreSubmitted,
+                            BuyTradePrice = 0,
+                            BuyOrderId = order.Data,
+                            BuyFlex = JsonConvert.SerializeObject(flexPointList),
+                            BuyMemo = "",
+                            BuyOrderDetail = "",
+                            BuyOrderMatchResults = "",
+                            IsFinished = false
+                        });
+                        // 下单成功马上去查一次
+                        QueryBuyDetailAndUpdate(userName, order.Data);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("----------危险-----------");
+                        Thread.Sleep(1000 * 60 * 60);
+                    }
                 }
                 logger.Error($"下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyPrice},nowPrice：{nowPrice}, accountId：{accountId}");
                 logger.Error($"下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
@@ -320,6 +328,72 @@ namespace DogRunService
                     logger.Error($"空-下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
                 }
             }
+        }
+
+
+        public static void ShouGeEmpty(DogEmptySell dogEmptySell)
+        {
+            CommonSymbols symbol = new CommonSymbols();
+            symbol.BaseCurrency = dogEmptySell.SymbolName;
+            symbol.QuoteCurrency = "usdt";
+
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+            var nowPrice = analyzeResult.NowPrice;
+            if (nowPrice * (decimal)1.02 > dogEmptySell.SellTradePrice)
+            {
+                logger.Error($"{dogEmptySell.SymbolName}, --> nowPrice:{nowPrice}, tradePrice:{dogEmptySell.SellTradePrice} 收割不了");
+                return;
+            }
+
+            decimal buyQuantity = dogEmptySell.SellQuantity * (decimal)1.004;
+            buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
+
+            decimal orderPrice = decimal.Round(nowPrice * (decimal)1.005, symbol.PricePrecision);
+
+            OrderPlaceRequest req = new OrderPlaceRequest();
+            req.account_id = dogEmptySell.AccountId;
+            req.amount = buyQuantity.ToString();
+            req.price = orderPrice.ToString();
+            req.source = "api";
+            req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
+            req.type = "buy-limit";
+            //if (BuyLimitUtils.Record(dogEmptySell.UserName, symbol.BaseCurrency))
+            //{
+            //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
+            //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
+            //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
+            //    Thread.Sleep(1000 * 5);
+            //    return;
+            //}
+
+            PlatformApi api = PlatformApi.GetInstance(dogEmptySell.UserName);
+            HBResponse<long> order = api.OrderPlace(req);
+            logger.Error("空-下单购买结果：" + JsonConvert.SerializeObject(order));
+            if (order.Status == "ok")
+            {
+                new DogEmptyBuyDao().CreateDogEmptyBuy(new DogEmptyBuy()
+                {
+                    SymbolName = symbol.BaseCurrency,
+                    AccountId = dogEmptySell.AccountId,
+                    UserName = dogEmptySell.UserName,
+                    SellOrderId = dogEmptySell.SellOrderId,
+
+                    BuyQuantity = buyQuantity,
+                    BuyOrderPrice = orderPrice,
+                    BuyDate = DateTime.Now,
+                    BuyOrderResult = JsonConvert.SerializeObject(order),
+                    BuyState = StateConst.PreSubmitted,
+                    BuyTradePrice = 0,
+                    BuyOrderId = order.Data,
+                    BuyFlex = "",
+                    BuyMemo = "手动",
+                    BuyOrderDetail = "",
+                    BuyOrderMatchResults = "",
+                });
+                // 下单成功马上去查一次
+                QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
+            }
+            logger.Error($"收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
         }
 
         private static void QueryBuyDetailAndUpdate(string userName, long orderId)
@@ -409,26 +483,33 @@ namespace DogRunService
                         logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
                         if (order.Status == "ok")
                         {
-                            DogMoreSell dogMoreSell = new DogMoreSell()
+                            try
                             {
-                                AccountId = accountId,
-                                UserName = userName,
-                                BuyOrderId = needSellDogMoreBuyItem.BuyOrderId,
-                                SellOrderId = order.Data,
-                                SellOrderResult = JsonConvert.SerializeObject(order),
-                                SellDate = DateTime.Now,
-                                SellFlex = JsonConvert.SerializeObject(flexPointList),
-                                SellQuantity = sellQuantity,
-                                SellOrderPrice = sellPrice,
-                                SellState = StateConst.Submitted,
-                                SellTradePrice = 0,
-                                SymbolName = symbol.BaseCurrency,
-                                SellMemo = "",
-                                SellOrderDetail = "",
-                                SellOrderMatchResults = ""
-                            };
-
-                            new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);
+                                DogMoreSell dogMoreSell = new DogMoreSell()
+                                {
+                                    AccountId = accountId,
+                                    UserName = userName,
+                                    BuyOrderId = needSellDogMoreBuyItem.BuyOrderId,
+                                    SellOrderId = order.Data,
+                                    SellOrderResult = JsonConvert.SerializeObject(order),
+                                    SellDate = DateTime.Now,
+                                    SellFlex = JsonConvert.SerializeObject(flexPointList),
+                                    SellQuantity = sellQuantity,
+                                    SellOrderPrice = sellPrice,
+                                    SellState = StateConst.Submitted,
+                                    SellTradePrice = 0,
+                                    SymbolName = symbol.BaseCurrency,
+                                    SellMemo = "",
+                                    SellOrderDetail = "",
+                                    SellOrderMatchResults = ""
+                                };
+                                new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("----------危险-----------");
+                                Thread.Sleep(1000 * 60 * 60);
+                            }
 
                             // 下单成功马上去查一次
                             QuerySellDetailAndUpdate(userName, order.Data);

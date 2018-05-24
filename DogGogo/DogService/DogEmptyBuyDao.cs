@@ -29,6 +29,12 @@ namespace DogService
             }
         }
 
+        public List<DogEmptyBuy> ListDogEmptyBuyBySellOrderId(long sellOrderId)
+        {
+            var sql = $"select * from t_dog_empty_buy where SellOrderId={sellOrderId}";
+            return Database.Query<DogEmptyBuy>(sql).ToList();
+        }
+
         public List<DogEmptyBuy> ListNeedChangeBuyStateDogEmptyBuy()
         {
             var states = GetStateStringIn(new List<string>() { StateConst.PartialFilled, StateConst.Filled });

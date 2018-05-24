@@ -49,7 +49,7 @@ namespace DogRunService.Helper
                         {
                             logger.Error("RunCoin:  " + ex.Message, ex);
                         }
-                        Thread.Sleep(1000 * 6);
+                        Thread.Sleep(1000 * 3);
                     }
                 }
             });

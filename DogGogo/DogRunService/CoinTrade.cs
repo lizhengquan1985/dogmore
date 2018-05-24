@@ -35,7 +35,7 @@ namespace DogRunService
                 || historyKlineData.Data.Count == 0 || historyKlineData.Date < DateTime.Now.AddMinutes(-1)) // TODO
             {
                 logger.Error($"GetAnalyzeResult 数据还未准备好：{symbol.BaseCurrency}");
-                Thread.Sleep(1000 * 5);
+                Thread.Sleep(1000 * 3);
                 return null;
             }
             var historyKlines = historyKlineData.Data;
@@ -241,7 +241,8 @@ namespace DogRunService
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("----------危险-----------");
+                        Console.WriteLine("----RunBuy------危险-----------");
+                        logger.Error(ex.Message, ex);
                         Thread.Sleep(1000 * 60 * 60);
                     }
                 }
@@ -500,7 +501,8 @@ namespace DogRunService
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine("----------危险-----------");
+                                logger.Error("------RunSell----危险-----------");
+                                logger.Error(ex.Message, ex);
                                 Thread.Sleep(1000 * 60 * 60);
                             }
 

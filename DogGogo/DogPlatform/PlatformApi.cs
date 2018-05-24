@@ -185,7 +185,7 @@ namespace DogPlatform
             {
                 logger.Error(resourcePath);
                 logger.Error(JsonConvert.SerializeObject(result.Content));
-                logger.Error(ex.Message, ex);
+                //logger.Error(ex.Message, ex);
                 throw ex;
             }
         }

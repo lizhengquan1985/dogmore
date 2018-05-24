@@ -70,7 +70,7 @@ namespace DogRunService.Helper
                 HistoryKlinePools.Init(key, klines);
 
                 // 记录到数据库
-                Record(symbol.BaseCurrency, klines[0]);
+                //Record(symbol.BaseCurrency, klines[0]);
             }
             catch (Exception ex)
             {

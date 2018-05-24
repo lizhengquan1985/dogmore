@@ -113,7 +113,7 @@ namespace DogRunService
             catch (Exception ex)
             {
                 logger.Error("---> 购买异常: " + ex.Message, ex);
-                Thread.Sleep(1000 * 60 * 60);
+                //Thread.Sleep(1000 * 60 * 60);
             }
             try
             {
@@ -121,13 +121,13 @@ namespace DogRunService
                 if (analyzeResult != null)
                 {
                     // 计算是否适合出售
-                    RunSell(symbol, analyzeResult);
+                    // RunSell(symbol, analyzeResult);
                 }
             }
             catch (Exception ex)
             {
                 logger.Error("---> 出售异常: " + ex.Message, ex);
-                Thread.Sleep(1000 * 60 * 60);
+                //Thread.Sleep(1000 * 60 * 60);
             }
         }
 
@@ -246,19 +246,29 @@ namespace DogRunService
                 AccountConfig accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                 var accountId = accountConfig.MainAccountId;
 
+                var needBuyDogEmptySellList = new DogEmptySellDao().GetNeedBuyDogEmptySell(accountId, userName, symbol.BaseCurrency);
+                Console.WriteLine(symbol.BaseCurrency + $", nowPrice:{nowPrice} 空单数量：" + needBuyDogEmptySellList.Count + "--");
+                foreach (var item in needBuyDogEmptySellList)
+                {
+                    Console.WriteLine(item.SellTradePrice);
+                }
+
                 var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
                 if (!canBuy)
                 {
                     continue;
                 }
 
-                var needBuyDogEmptySellList = new DogEmptySellDao().GetNeedBuyDogEmptySell(accountId, userName, symbol.BaseCurrency);
-
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 var accountInfo = api.GetAccountBalance(accountId);
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
                 {
+                    if (nowPrice * (decimal)1.025 > needBuyDogEmptySellItem.SellTradePrice)
+                    {
+                        continue;
+                    }
+
                     decimal buyQuantity = needBuyDogEmptySellItem.SellQuantity * (decimal)1.005;
                     buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
 
@@ -304,7 +314,7 @@ namespace DogRunService
                             BuyOrderMatchResults = "",
                         });
                         // 下单成功马上去查一次
-                        QueryBuyDetailAndUpdate(userName, order.Data);
+                        QueryEmptyBuyDetailAndUpdate(userName, order.Data);
                     }
                     logger.Error($"空-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{accountId}");
                     logger.Error($"空-下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
@@ -489,6 +499,86 @@ namespace DogRunService
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+            }
+
+
+            // 空
+            try
+            {
+                var needChangeSellStateDogEmptySellList = new DogEmptySellDao().ListNeedChangeSellStateDogEmptySell();
+                foreach (var item in needChangeSellStateDogEmptySellList)
+                {
+                    // 如果长时间没有出售成功， 则取消订单。
+                    // TODO
+                    QueryEmptySellDetailAndUpdate(item.UserName, item.SellOrderId);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+
+            try
+            {
+                var needChangeBuyStateDogEmptyBuyList = new DogEmptyBuyDao().ListNeedChangeBuyStateDogEmptyBuy();
+                foreach (var item in needChangeBuyStateDogEmptyBuyList)
+                {
+                    // 如果长时间没有出售成功， 则取消订单。
+                    // TODO
+                    QueryEmptyBuyDetailAndUpdate(item.UserName, item.BuyOrderId);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+        }
+
+        private static void QueryEmptySellDetailAndUpdate(string userName, long orderId)
+        {
+            PlatformApi api = PlatformApi.GetInstance(userName);
+
+            var orderDetail = api.QueryOrderDetail(orderId);
+            if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
+            {
+                var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                decimal minPrice = 25000;
+                foreach (var item in orderMatchResult.Data)
+                {
+                    if (minPrice > item.price)
+                    {
+                        minPrice = item.price;
+                    }
+                }
+                if (orderMatchResult.Status == "ok")
+                {
+                    // 完成
+                    new DogEmptySellDao().UpdateDogEmptySellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);
+                }
+            }
+        }
+
+        private static void QueryEmptyBuyDetailAndUpdate(string userName, long orderId)
+        {
+            PlatformApi api = PlatformApi.GetInstance(userName);
+
+            var orderDetail = api.QueryOrderDetail(orderId);
+            if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
+            {
+                var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                decimal maxPrice = 0;
+                foreach (var item in orderMatchResult.Data)
+                {
+                    if (maxPrice < item.price)
+                    {
+                        maxPrice = item.price;
+                    }
+                }
+                if (orderMatchResult.Status == "ok")
+                {
+                    // 完成
+                    new DogEmptyBuyDao().UpdateDogEmptyBuyWhenSuccess(orderId, orderDetail, orderMatchResult, maxPrice);
+                }
             }
         }
     }

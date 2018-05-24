@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -47,6 +50,21 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DogAccount\DogAccount.csproj">
+      <Project>{B656C0CB-B352-4F52-AD9B-D426423FECFB}</Project>
+      <Name>DogAccount</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DogPlatform\DogPlatform.csproj">
+      <Project>{DA837026-6AF7-47E8-B56F-CD9703E75D44}</Project>
+      <Name>DogPlatform</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DogService\DogService.csproj">
+      <Project>{0EB3BBA3-9734-4AD9-B9F0-19927773B082}</Project>
+      <Name>DogService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

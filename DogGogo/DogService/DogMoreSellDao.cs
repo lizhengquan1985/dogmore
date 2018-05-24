@@ -20,6 +20,12 @@ namespace DogService
         {
         }
 
+        public List<DogMoreSell> ListDogMoreSellByBuyOrderId(long buyOrderId)
+        {
+            var sql = $"select * from t_dog_more_sell where BuyOrderId={buyOrderId}";
+            return Database.Query<DogMoreSell>(sql).ToList();
+        }
+
         public void CreateDogMoreBuy(DogMoreSell dogMoreSell)
         {
             using (var tx = Database.BeginTransaction())

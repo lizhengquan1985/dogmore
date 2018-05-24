@@ -11,9 +11,9 @@ using System.Web.Http;
 
 namespace DogApi.Controller
 {
-    public class EmptyController : ApiController
+    public class MoreController : ApiController
     {
-        static ILog logger = LogManager.GetLogger(typeof(EmptyController));
+        static ILog logger = LogManager.GetLogger(typeof(MoreController));
 
         [HttpGet]
         [ActionName("shouge")]
@@ -21,14 +21,19 @@ namespace DogApi.Controller
         {
             try
             {
-                var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(orderId);
+                var dogEmptySell = new DogMoreBuyDao().GetDogMoreBuyByBuyOrderId(orderId);
                 if (dogEmptySell.IsFinished)
                 {
                     return;
                 }
 
-                var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(orderId);
-                if(dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it=>it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
+                var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(orderId);
+                if (dogMoreSellList.Count > 0 &&
+                    dogMoreSellList.Find(it =>
+                        it.SellState != StateConst.Canceled.ToString()
+                        && it.SellState != StateConst.PartialFilled.ToString()
+                        && it.SellState != StateConst.Filled.ToString()
+                    ) != null)
                 {
                     // 存在操作中的,则不操作
                     return;
@@ -42,4 +47,3 @@ namespace DogApi.Controller
             }
         }
     }
-}

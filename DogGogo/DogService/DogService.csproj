@@ -70,6 +70,7 @@
     <Compile Include="DateTypes\DogEmpty.cs" />
     <Compile Include="DateTypes\DogMore.cs" />
     <Compile Include="DateTypes\DogMoreStatisticsDay.cs" />
+    <Compile Include="DogEmptyBuyDao.cs" />
     <Compile Include="DogEmptySellDao.cs" />
     <Compile Include="DogMoreBuyDao.cs" />
     <Compile Include="DogMoreSellDao.cs" />

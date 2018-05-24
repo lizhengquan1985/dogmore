@@ -13,6 +13,9 @@ namespace DogService.DateTypes
         [Key]
         public long Id { get; set; }
         public string SymbolName { get; set; }
+        /// <summary>
+        /// 预计价格
+        /// </summary>
         public decimal PredictPrice { get; set; }
         public DateTime PredictExpiredTime { get; set; }
         /// <summary>
@@ -20,8 +23,14 @@ namespace DogService.DateTypes
         /// </summary>
         public decimal EmptyPrice { get; set; }
         public DateTime EmptyExpiredTime { get; set; }
+        /// <summary>
+        /// 平均投入额度
+        /// </summary>
         public decimal AvgInputAmount { get; set; }
         public DateTime AvgInputExpiredTime { get; set; }
+        /// <summary>
+        /// 最大投入价格
+        /// </summary>
         public decimal MaxInputPrice { get; set; }
         public DateTime MaxInputPriceExpiredTime { get; set; }
         public bool IsValid { get; set; }

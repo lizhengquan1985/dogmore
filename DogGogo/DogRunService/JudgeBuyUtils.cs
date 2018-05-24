@@ -1,4 +1,5 @@
 ﻿using DogPlatform.Model;
+using DogService.Dao;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -68,6 +69,24 @@ namespace DogRunService
                 }
             }
             return isQuickRise;
+        }
+
+        public static bool ControlCanBuy(string symbolName, decimal nowPrice)
+        {
+            var control = new DogControlDao().GetDogControl(symbolName);
+            if (control == null)
+            {
+                // 没有控制的,默认可以购买
+                return true;
+            }
+
+            if(nowPrice > control.MaxInputPrice && control.MaxInputPriceExpiredTime > DateTime.Now)
+            {
+                logger.Error($"由于管控,不能购入 MaxInputPrice:{control.MaxInputPrice}, nowPrice:{nowPrice}, MaxInputPriceExpiredTime:{control.MaxInputPriceExpiredTime}");
+                return false;
+            }
+
+            return true;
         }
     }
 }

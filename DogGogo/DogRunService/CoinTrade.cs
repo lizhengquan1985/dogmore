@@ -140,6 +140,7 @@ namespace DogRunService
 
             // 不适合购入的情况 最高点, 快速升高, 大量回落
             if (flexPointList[0].isHigh || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
+                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice)
                 )//|| JudgeBuyUtils.CheckCalcMaxhuoluo(historyKlines)
             {
                 return;
@@ -357,14 +358,6 @@ namespace DogRunService
             req.source = "api";
             req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
             req.type = "buy-limit";
-            //if (BuyLimitUtils.Record(dogEmptySell.UserName, symbol.BaseCurrency))
-            //{
-            //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-            //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-            //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-            //    Thread.Sleep(1000 * 5);
-            //    return;
-            //}
 
             PlatformApi api = PlatformApi.GetInstance(dogEmptySell.UserName);
             HBResponse<long> order = api.OrderPlace(req);

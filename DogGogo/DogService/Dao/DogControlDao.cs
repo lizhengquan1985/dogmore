@@ -10,9 +10,9 @@ namespace DogService.Dao
 {
     public class DogControlDao : BaseDao
     {
-        public async Task<DogControl> GetDogControl(string symbolName)
+        public DogControl GetDogControl(string symbolName)
         {
-            return await Database.GetAsync<DogControl>(new { SymbolName = symbolName, IsValid = true });
+            return Database.Get<DogControl>(new { SymbolName = symbolName, IsValid = true });
         }
 
         public async Task CreateDogControl(DogControl dogControl)

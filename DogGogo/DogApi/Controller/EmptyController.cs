@@ -28,7 +28,7 @@ namespace DogApi.Controller
                 }
 
                 var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(orderId);
-                if(dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it=>it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
+                if (dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it => it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
                 {
                     // 存在操作中的,则不操作
                     return;
@@ -39,6 +39,48 @@ namespace DogApi.Controller
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+            }
+        }
+
+        [HttpGet]
+        [ActionName("forceShouge")]
+        public async Task forceShouge(long orderId)
+        {
+            try
+            {
+                var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(orderId);
+                if (dogEmptySell.IsFinished)
+                {
+                    return;
+                }
+
+                var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(orderId);
+                if (dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it => it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
+                {
+                    // 存在操作中的,则不操作
+                    return;
+                }
+
+                CoinTrade.ShouGeEmpty(dogEmptySell, (decimal)1.01);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+        }
+
+        [HttpGet]
+        [ActionName("listEmptySellIsNotFinished")]
+        public async Task<object> listEmptySellIsNotFinished(string symbolName)
+        {
+            try
+            {
+                return new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return null;
             }
         }
     }

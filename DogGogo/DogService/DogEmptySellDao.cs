@@ -66,5 +66,15 @@ namespace DogService
                 tx.Commit();
             }
         }
+
+        /// <summary>
+        /// 列出需要改变出售状态的
+        /// </summary>
+        /// <returns></returns>
+        public List<DogEmptySell> ListDogEmptySellNotFinished(string symbolName)
+        {
+            var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName";
+            return Database.Query<DogEmptySell>(sql, new { symbolName }).ToList();
+        }
     }
 }

@@ -332,7 +332,7 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeEmpty(DogEmptySell dogEmptySell)
+        public static void ShouGeEmpty(DogEmptySell dogEmptySell, decimal percent = (decimal)1.02)
         {
             CommonSymbols symbol = new CommonSymbols();
             symbol.BaseCurrency = dogEmptySell.SymbolName;
@@ -340,7 +340,7 @@ namespace DogRunService
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             var nowPrice = analyzeResult.NowPrice;
-            if (nowPrice * (decimal)1.02 > dogEmptySell.SellTradePrice)
+            if (nowPrice * percent > dogEmptySell.SellTradePrice)
             {
                 logger.Error($"{dogEmptySell.SymbolName}, --> nowPrice:{nowPrice}, tradePrice:{dogEmptySell.SellTradePrice} 收割不了");
                 return;
@@ -389,7 +389,7 @@ namespace DogRunService
             logger.Error($"收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
         }
 
-        public static void ShouGeMore(DogMoreBuy dogMoreBuy)
+        public static void ShouGeMore(DogMoreBuy dogMoreBuy, decimal percent = (decimal)1.02)
         {
             CommonSymbols symbol = new CommonSymbols();
             symbol.BaseCurrency = dogMoreBuy.SymbolName;
@@ -397,7 +397,7 @@ namespace DogRunService
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             var nowPrice = analyzeResult.NowPrice;
-            if (nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.02)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * percent)
             {
                 logger.Error($"{dogMoreBuy.SymbolName}, --> nowPrice:{nowPrice}, tradePrice:{dogMoreBuy.BuyTradePrice} 收割多不了");
                 return;

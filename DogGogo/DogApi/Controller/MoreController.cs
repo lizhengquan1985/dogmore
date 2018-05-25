@@ -46,5 +46,52 @@ namespace DogApi.Controller
                 logger.Error(ex.Message, ex);
             }
         }
+
+        [HttpGet]
+        [ActionName("forceShouge")]
+        public async Task forceShouge(long orderId)
+        {
+            try
+            {
+                var dogMoreBuy = new DogMoreBuyDao().GetDogMoreBuyByBuyOrderId(orderId);
+                if (dogMoreBuy.IsFinished)
+                {
+                    return;
+                }
+
+                var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(orderId);
+                if (dogMoreSellList.Count > 0 &&
+                    dogMoreSellList.Find(it =>
+                        it.SellState != StateConst.Canceled.ToString()
+                        && it.SellState != StateConst.PartialFilled.ToString()
+                        && it.SellState != StateConst.Filled.ToString()
+                    ) != null)
+                {
+                    // 存在操作中的,则不操作
+                    return;
+                }
+
+                CoinTrade.ShouGeMore(dogMoreBuy, (decimal)1.01);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+        }
+
+        [HttpGet]
+        [ActionName("listMoreBuyIsNotFinished")]
+        public async Task<object> listMoreBuyIsNotFinished(string symbolName)
+        {
+            try
+            {
+                return new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return null;
+            }
+        }
     }
 }

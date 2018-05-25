@@ -29,7 +29,7 @@ namespace Alert
                 PriceAlert.RunAlert(symbols.Find(it => it.BaseCurrency == symbol), decimal.Parse(big), decimal.Parse(small));
             }
 
-
+            Console.WriteLine("over - over - over");
             Console.ReadLine();
         }
 
@@ -38,6 +38,11 @@ namespace Alert
         {
             var fileName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             var root = Path.GetDirectoryName(fileName);
+            if (!File.Exists(root + @"\symbol.txt"))
+            {
+                File.Create(root + @"\symbol.txt");
+            }
+
             var strArr = File.ReadAllLines(root + @"\symbol.txt");
             Console.WriteLine(root);
 

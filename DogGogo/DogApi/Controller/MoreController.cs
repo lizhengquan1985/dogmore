@@ -21,8 +21,8 @@ namespace DogApi.Controller
         {
             try
             {
-                var dogEmptySell = new DogMoreBuyDao().GetDogMoreBuyByBuyOrderId(orderId);
-                if (dogEmptySell.IsFinished)
+                var dogMoreBuy = new DogMoreBuyDao().GetDogMoreBuyByBuyOrderId(orderId);
+                if (dogMoreBuy.IsFinished)
                 {
                     return;
                 }
@@ -39,7 +39,7 @@ namespace DogApi.Controller
                     return;
                 }
 
-                CoinTrade.ShouGeEmpty(dogEmptySell);
+                CoinTrade.ShouGeMore(dogMoreBuy);
             }
             catch (Exception ex)
             {
@@ -47,3 +47,4 @@ namespace DogApi.Controller
             }
         }
     }
+}

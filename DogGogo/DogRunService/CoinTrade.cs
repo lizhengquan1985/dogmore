@@ -457,7 +457,7 @@ namespace DogRunService
                 QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
             }
 
-            logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice} higher：{afterBuyHighClosePrice}，accountId：{dogMoreBuy.AccountId}");
+            logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice}，accountId：{dogMoreBuy.AccountId}");
         }
 
         private static void QueryBuyDetailAndUpdate(string userName, long orderId)

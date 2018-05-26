@@ -73,7 +73,7 @@ namespace DogService
         /// <returns></returns>
         public List<DogEmptySell> ListDogEmptySellNotFinished(string symbolName)
         {
-            var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName";
+            var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName order by SellTradePrice desc";
             return Database.Query<DogEmptySell>(sql, new { symbolName }).ToList();
         }
     }

@@ -21,6 +21,11 @@ namespace DogRunService
             return canbuy;
         }
 
+        public static bool CheckFlexPoint(decimal nowOpen, decimal nearLowOpen, decimal percent)
+        {
+            return nowOpen > nearLowOpen * percent && nowOpen < nearLowOpen * (decimal)1.01;
+        }
+
         public static bool CheckCalcMaxhuoluo(List<HistoryKline> data)
         {
             decimal max = 0;

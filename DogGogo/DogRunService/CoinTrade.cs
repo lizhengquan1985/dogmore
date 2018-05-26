@@ -274,7 +274,7 @@ namespace DogRunService
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
                 {
-                    if (nowPrice * (decimal)1.025 > needBuyDogEmptySellItem.SellTradePrice)
+                    if (nowPrice * (decimal)1.02 > needBuyDogEmptySellItem.SellTradePrice)
                     {
                         continue;
                     }

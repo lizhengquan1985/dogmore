@@ -110,7 +110,7 @@ namespace DogService
 
         public List<DogMoreBuy> listMoreBuyIsNotFinished(string symbolName)
         {
-            var sql = $"select * from t_dog_more_buy where IsFinished=0 and SymbolName=@symbolName";
+            var sql = $"select * from t_dog_more_buy where IsFinished=0 and SymbolName=@symbolName order by BuyTradePrice asc";
             return Database.Query<DogMoreBuy>(sql, new { symbolName }).ToList();
         }
     }

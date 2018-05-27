@@ -4,6 +4,7 @@ using DogPlatform.Model;
 using DogRunService.DataTypes;
 using DogRunService.Helper;
 using DogService;
+using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
 using Newtonsoft.Json;
@@ -329,6 +330,30 @@ namespace DogRunService
                     logger.Error($"空-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{accountId}");
                     logger.Error($"空-下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
                 }
+            }
+
+            try
+            {
+                // 收割指令
+                var list = new OrderReapDao().List(ReapType.ForceShouge, false);
+                foreach (var item in list)
+                {
+                    var percent = (decimal)1.01;
+                    var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(item.OrderId);
+                    if(dogEmptySell.SymbolName != symbol.BaseCurrency)
+                    {
+                        continue;
+                    }
+                    if (dogEmptySell.SellTradePrice < nowPrice * percent)
+                    {
+                        continue;
+                    }
+                    ShouGeEmpty(dogEmptySell, percent);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
             }
         }
 

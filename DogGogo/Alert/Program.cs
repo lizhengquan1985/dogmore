@@ -15,7 +15,10 @@ namespace Alert
         {
             var symbols = CoinUtils.GetAllCommonSymbols();
 
-            ReadText(symbols);
+            // 空
+            EmptyOrderTask.Run(symbols);
+
+            ReadAutoBuySellText(symbols);
 
             while (true)
             {
@@ -34,7 +37,7 @@ namespace Alert
         }
 
 
-        static void ReadText(List<CommonSymbols> symbols)
+        static void ReadAutoBuySellText(List<CommonSymbols> symbols)
         {
             var fileName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             var root = Path.GetDirectoryName(fileName);

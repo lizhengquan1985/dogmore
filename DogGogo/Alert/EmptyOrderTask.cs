@@ -24,7 +24,7 @@ namespace Alert
                 {
                     var fileName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
                     var root = Path.GetDirectoryName(fileName);
-                    fileName = root + "\autoempty.txt";
+                    fileName = root + "/autoempty.txt";
                     if (!File.Exists(fileName))
                     {
                         Thread.Sleep(1000 * 5);

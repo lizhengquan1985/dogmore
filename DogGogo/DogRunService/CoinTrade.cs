@@ -335,19 +335,40 @@ namespace DogRunService
             try
             {
                 // 收割指令
-                var list = new OrderReapDao().List(ReapType.ForceShouge, false);
+                var list = new OrderReapDao().List(false);
                 foreach (var item in list)
                 {
                     var percent = (decimal)1.01;
+                    if(item.ReapType == ReapType.Huiben)
+                    {
+                        percent = (decimal)1.006;
+                    }else if(item.ReapType == ReapType.Shouge)
+                    {
+                        percent = (decimal)1.02;
+                    }
                     var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(item.OrderId);
-                    if(dogEmptySell.SymbolName != symbol.BaseCurrency)
+                    if (dogEmptySell.IsFinished)
                     {
                         continue;
                     }
+
+                    if (dogEmptySell.SymbolName != symbol.BaseCurrency)
+                    {
+                        continue;
+                    }
+
                     if (dogEmptySell.SellTradePrice < nowPrice * percent)
                     {
                         continue;
                     }
+
+                    var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(dogEmptySell.SellOrderId);
+                    if (dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it => it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
+                    {
+                        // 存在操作中的,则不操作
+                        continue;
+                    }
+
                     ShouGeEmpty(dogEmptySell, percent);
                 }
             }
@@ -359,9 +380,10 @@ namespace DogRunService
 
         public static void ShouGeEmpty(DogEmptySell dogEmptySell, decimal percent = (decimal)1.02)
         {
-            CommonSymbols symbol = new CommonSymbols();
-            symbol.BaseCurrency = dogEmptySell.SymbolName;
-            symbol.QuoteCurrency = "usdt";
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            CommonSymbols symbol = symbols.Find(it=>it.BaseCurrency == dogEmptySell.SymbolName);
+            //symbol.BaseCurrency = dogEmptySell.SymbolName;
+            //symbol.QuoteCurrency = "usdt";
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             var nowPrice = analyzeResult.NowPrice;
@@ -521,7 +543,7 @@ namespace DogRunService
             if (!flexPointList[0].isHigh)
             {
                 // 最低点 不适合出售
-                logger.Error($"最低点 不适合出售 {symbol.BaseCurrency}-{flexPercent},lastLowPrice:{lastLowPrice}, nowPrice:{nowPrice}, flexPointList:{JsonConvert.SerializeObject(flexPointList)}");
+                //logger.Error($"最低点 不适合出售 {symbol.BaseCurrency}-{flexPercent},lastLowPrice:{lastLowPrice}, nowPrice:{nowPrice}, flexPointList:{JsonConvert.SerializeObject(flexPointList)}");
                 return;
             }
 

@@ -67,7 +67,7 @@ namespace DogService
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
             var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{symbolName}' and BuyState in({states}) and IsFinished=0 " +
                 $" and UserName='{userName}' and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where AccountId='{accountId}' and UserName='{userName}' and SellState not in({states})) " +
-                $" order by BuyOrderPrice asc limit 0,5";
+                $" order by BuyOrderPrice asc limit 0,8";
             return Database.Query<DogMoreBuy>(sql).ToList();
         }
 

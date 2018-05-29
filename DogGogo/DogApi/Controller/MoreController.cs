@@ -1,7 +1,9 @@
-﻿using DogRunService;
+﻿using DogPlatform.Model;
+using DogRunService;
 using DogService;
 using DogService.DateTypes;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +88,40 @@ namespace DogApi.Controller
             try
             {
                 return new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return null;
+            }
+        }
+
+        [HttpGet]
+        [ActionName("listMoreBuyIsFinished")]
+        public async Task<object> listMoreBuyIsFinished(string userName, string symbolName)
+        {
+            try
+            {
+                return new DogMoreBuyDao().listDogMoreBuyIsFinished(userName, symbolName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return null;
+            }
+        }
+        [HttpGet]
+        [ActionName("getMoreBuyDetail")]
+        public async Task<object> GetMoreBuyDetail(long buyOrderId)
+        {
+            try
+            {
+                var dogMoreBuy = new DogMoreBuyDao().GetByBuyOrderId(buyOrderId);
+                var orderDetail = JsonConvert.DeserializeObject<HBResponse<OrderDetail>>(dogMoreBuy.BuyOrderDetail);
+                //orderDetail.Data.
+
+                var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(buyOrderId);
+                return new { orderDetail , dogMoreSellList };
             }
             catch (Exception ex)
             {

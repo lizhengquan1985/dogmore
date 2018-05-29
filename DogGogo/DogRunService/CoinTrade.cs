@@ -658,6 +658,12 @@ namespace DogRunService
                     new DogMoreSellDao().UpdateDogMoreSellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);
                 }
             }
+
+            if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.Canceled)
+            {
+                // 完成
+                new DogMoreSellDao().UpdateDogMoreSellWhenCancel(orderId);
+            }
         }
 
         public static void CheckBuyOrSellState()

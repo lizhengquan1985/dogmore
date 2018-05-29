@@ -69,6 +69,16 @@ namespace DogService
             }
         }
 
+        public void UpdateDogMoreSellWhenCancel(long sellOrderId)
+        {
+            using (var tx = Database.BeginTransaction())
+            {
+                var sqlSell = $"update t_dog_more_sell set SellState='{StateConst.Canceled}' where SellOrderId ='{sellOrderId}'";
+                Database.Execute(sqlSell);
+                tx.Commit();
+            }
+        }
+
         #endregion
     }
 }

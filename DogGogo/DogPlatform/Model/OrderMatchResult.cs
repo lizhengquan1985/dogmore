@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,5 +15,9 @@ namespace DogPlatform.Model
         public string type { get; set; }
         public decimal price { get; set; }
         public string source { get; set; }
-    }
+        [JsonProperty(PropertyName = "filled-amount")]
+        public decimal FilledAmount { get; set; }
+        [JsonProperty(PropertyName = "filled-fees")]
+        public decimal FilledFees { get; set; }
+}
 }

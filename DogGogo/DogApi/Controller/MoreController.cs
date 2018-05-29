@@ -117,17 +117,57 @@ namespace DogApi.Controller
             try
             {
                 var dogMoreBuy = new DogMoreBuyDao().GetByBuyOrderId(buyOrderId);
-                var orderDetail = JsonConvert.DeserializeObject<HBResponse<OrderDetail>>(dogMoreBuy.BuyOrderDetail);
-                //orderDetail.Data.
+                var orderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(dogMoreBuy.BuyOrderMatchResults);
+                var buyQuantity = (decimal)0;
+                var buyAmount = (decimal)0;
+                var buyFees = (decimal)0;
+                foreach (var item in orderMatchResult.Data)
+                {
+                    buyAmount += item.FilledAmount * item.price;
+                    buyQuantity += item.FilledAmount;
+                    buyFees += item.FilledFees;
+                }
 
+                // 交易量，交易总额，  出售总额 出售数量， 
+                var sellQuantity = (decimal)0;
+                var sellAmount = (decimal)0;
+                var sellFees = (decimal)0;
                 var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(buyOrderId);
-                return new { orderDetail , dogMoreSellList };
+
+                foreach (var sell in dogMoreSellList)
+                {
+                    var sellOrderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(sell.SellOrderMatchResults);
+                    foreach (var item in sellOrderMatchResult.Data)
+                    {
+                        sellAmount += item.FilledAmount * item.price;
+                        sellQuantity += item.FilledAmount;
+                        sellFees += item.FilledFees;
+                    }
+                }
+                return new
+                {
+                    buyQuantity,
+                    buyAmount,
+                    buyFees,
+                    sellAmount,
+                    sellQuantity,
+                    sellFees,
+                    usdt = sellAmount - buyAmount - sellFees,
+                    baseSymbol = buyQuantity - sellQuantity - buyFees
+                };
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
                 return null;
             }
+        }
+
+        [HttpGet]
+        [ActionName("delete")]
+        public async Task Delete(long buyOrderId)
+        {
+            new DogMoreBuyDao().Delete(buyOrderId);
         }
     }
 }

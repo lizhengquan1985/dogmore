@@ -83,5 +83,12 @@ namespace DogApi.Controller
                 return null;
             }
         }
+
+        [HttpGet]
+        [ActionName("delete")]
+        public async Task Delete(long sellOrderId)
+        {
+            new DogEmptySellDao().Delete(sellOrderId);
+        }
     }
 }

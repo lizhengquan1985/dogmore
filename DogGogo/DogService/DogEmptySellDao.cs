@@ -76,5 +76,18 @@ namespace DogService
             var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName order by SellTradePrice desc";
             return Database.Query<DogEmptySell>(sql, new { symbolName }).ToList();
         }
+        public void Delete(long sellOrderId)
+        {
+            var dogMoreSell = GetDogEmptySellBySellOrderId(sellOrderId);
+            if (dogMoreSell.SellState != StateConst.Canceled && dogMoreSell.SellState != StateConst.Filled && dogMoreSell.SellState != StateConst.PartialFilled)
+            {
+                throw new ApplicationException("未取消或者未完成的订单，不能删除");
+            }
+
+            var sql = $"delete from t_dog_empty_sell where SellOrderId={sellOrderId}";
+            Database.Execute(sql);
+            sql = $"delete from t_dog_empty_buy where SellOrderId={sellOrderId}";
+            Database.Execute(sql);
+        }
     }
 }

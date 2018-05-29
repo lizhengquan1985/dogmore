@@ -47,7 +47,12 @@ namespace DogApi.Controller
                     }
                     res.Add(new DogControl()
                     {
-                        SymbolName = itemSymbol
+                        SymbolName = itemSymbol,
+                        AvgInputExpiredTime = DateTime.Now,
+                        EmptyExpiredTime = DateTime.Now,
+                        MaxInputPriceExpiredTime = DateTime.Now,
+                        PredictExpiredTime = DateTime.Now,
+                        CreateTime = DateTime.Now
                     });
                 }
                 return res;

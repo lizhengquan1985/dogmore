@@ -84,9 +84,9 @@ namespace DogService
                 throw new ApplicationException("未取消或者未完成的订单，不能删除");
             }
 
-            var sql = $"delete from t_dog_empty_sell where SellOrderId={sellOrderId}";
+            var sql = $"delete from t_dog_empty_buy where SellOrderId={sellOrderId}";
             Database.Execute(sql);
-            sql = $"delete from t_dog_empty_buy where SellOrderId={sellOrderId}";
+            sql = $"delete from t_dog_empty_sell where SellOrderId={sellOrderId}";
             Database.Execute(sql);
         }
     }

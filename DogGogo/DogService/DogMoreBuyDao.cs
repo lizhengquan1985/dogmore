@@ -135,7 +135,7 @@ namespace DogService
 
             var sql = $"delete from t_dog_more_sell where BuyOrderId={buyOrderId}";
             Database.Execute(sql);
-            sql = $"delete from t_dog_more_sell where BuyOrderId={buyOrderId}";
+            sql = $"delete from t_dog_more_buy where BuyOrderId={buyOrderId}";
             Database.Execute(sql);
         }
     }

@@ -1,4 +1,6 @@
-﻿using DogRunService;
+﻿using DogAccount;
+using DogPlatform;
+using DogRunService;
 using DogService;
 using DogService.DateTypes;
 using log4net;
@@ -89,6 +91,27 @@ namespace DogApi.Controller
         public async Task Delete(long sellOrderId)
         {
             new DogEmptySellDao().Delete(sellOrderId);
+        }
+
+        [HttpGet]
+        [ActionName("emptyInfo")]
+        public async Task<object> EmptyInfo(string userName, string symbolName)
+        {
+            PlatformApi api = PlatformApi.GetInstance(userName);
+
+            var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+            var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbolName);
+
+            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
+            var totalQuantity = (decimal)0;
+            list.ForEach(it => totalQuantity += it.BuyQuantity);
+
+            return balanceItem;
+        }
+
+        public async Task DoEmpty(string userName, string symbolName)
+        {
+            // 加入一个做空指令， 来决定是否做空。
         }
     }
 }

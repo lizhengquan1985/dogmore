@@ -271,7 +271,7 @@ namespace DogRunService
                 }
 
                 PlatformApi api = PlatformApi.GetInstance(userName);
-                var accountInfo = api.GetAccountBalance(accountId);
+                //var accountInfo = api.GetAccountBalance(accountId);
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
                 {

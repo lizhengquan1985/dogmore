@@ -12,6 +12,17 @@ namespace DogService
 {
     public class BaseDao
     {
+        public string LikeStr(string str)
+        {
+            StringBuilder sb = new StringBuilder(str);
+            sb.Replace("'", "''");
+            sb.Insert(0, "%", 1);
+            sb.Append("%");
+            sb.Replace(@"\", @"\\");
+
+            return sb.ToString();
+        }
+
         protected IDapperConnection Database { get; private set; }
         public BaseDao()
         {

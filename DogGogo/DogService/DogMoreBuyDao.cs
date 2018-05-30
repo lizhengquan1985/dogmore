@@ -116,19 +116,19 @@ namespace DogService
 
         public List<DogMoreBuy> listDogMoreBuyIsFinished(string userName, string symbolName)
         {
-            var where = $" where IsFinished=1 and SymbolName=@symbolName ";
+            var where = $" where IsFinished=1 and SymbolName like @symbolName ";
             if (!string.IsNullOrEmpty(userName))
             {
                 where += $" and UserName=@userName";
             }
             var sql = $"select * from t_dog_more_buy {where} order by BuyTradePrice asc";
-            return Database.Query<DogMoreBuy>(sql, new { symbolName, userName }).ToList();
+            return Database.Query<DogMoreBuy>(sql, new { symbolName = LikeStr(symbolName), userName }).ToList();
         }
 
         public void Delete(long buyOrderId)
         {
             var dogMoreBuy = GetByBuyOrderId(buyOrderId);
-            if(dogMoreBuy.BuyState != StateConst.Canceled && dogMoreBuy.BuyState != StateConst.Filled && dogMoreBuy.BuyState != StateConst.PartialFilled)
+            if (dogMoreBuy.BuyState != StateConst.Canceled && dogMoreBuy.BuyState != StateConst.Filled && dogMoreBuy.BuyState != StateConst.PartialFilled)
             {
                 throw new ApplicationException("未取消或者未完成的订单，不能删除");
             }

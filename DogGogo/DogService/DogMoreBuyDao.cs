@@ -114,6 +114,12 @@ namespace DogService
             return Database.Query<DogMoreBuy>(sql, new { symbolName }).ToList();
         }
 
+        public List<DogMoreBuy> listMoreBuyIsNotFinished(string symbolName, string userName)
+        {
+            var sql = $"select * from t_dog_more_buy where IsFinished=0 and SymbolName=@symbolName and UserName=@userName order by BuyTradePrice asc";
+            return Database.Query<DogMoreBuy>(sql, new { symbolName, userName }).ToList();
+        }
+
         public List<DogMoreBuy> listDogMoreBuyIsFinished(string userName, string symbolName)
         {
             var where = $" where IsFinished=1 and SymbolName like @symbolName ";

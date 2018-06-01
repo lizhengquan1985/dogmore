@@ -110,9 +110,15 @@ namespace DogApi.Controller
                 return null;
             }
         }
+
+        /// <summary>
+        /// 查看一个购买后出售的详情。
+        /// </summary>
+        /// <param name="buyOrderId"></param>
+        /// <returns></returns>
         [HttpGet]
         [ActionName("getMoreBuyDetail")]
-        public async Task<object> GetMoreBuyDetail(long buyOrderId)
+        public object GetMoreBuyDetail(long buyOrderId)
         {
             try
             {
@@ -146,6 +152,8 @@ namespace DogApi.Controller
                 }
                 return new
                 {
+                    buyOrderId,
+                    symbolName = dogMoreBuy.SymbolName,
                     buyQuantity,
                     buyAmount,
                     buyFees,

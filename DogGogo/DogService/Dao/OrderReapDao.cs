@@ -37,9 +37,9 @@ namespace DogService.Dao
             }
         }
 
-        public List<OrderReap> List(bool isMore)
+        public List<OrderReap> List(ReapType reapType)
         {
-            var sql = $"select * from t_order_reap where IsMore={isMore}";
+            var sql = $"select * from t_order_reap where ReapType={(int)reapType}";
             return Database.Query<OrderReap>(sql).ToList();
         }
     }

@@ -37,6 +37,22 @@ namespace DogRunService
             return false;
         }
 
+        public static bool CheckCanMakeEmpty(decimal afterBuyHighClosePrice, decimal nowPrice, decimal gaoyuPercentSell = (decimal)1.03)
+        {
+            if (nowPrice * (decimal)1.005 < afterBuyHighClosePrice)
+            {
+                // 表示回头趋势， 暂时定为 0.5% 就有回头趋势
+                return true;
+            }
+
+            if (nowPrice * (decimal)1.001 < afterBuyHighClosePrice)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public static decimal AnalyzeNeedSell(decimal comparePrice, DateTime compareDate, List<HistoryKline> data)
         {
             decimal higher = new decimal(0);

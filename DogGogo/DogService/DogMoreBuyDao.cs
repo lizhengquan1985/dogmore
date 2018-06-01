@@ -127,7 +127,7 @@ namespace DogService
             {
                 where += $" and UserName=@userName";
             }
-            var sql = $"select * from t_dog_more_buy {where} order by BuyTradePrice asc";
+            var sql = $"select * from t_dog_more_buy {where} limit 0,100 order by BuyTradePrice asc";
             return Database.Query<DogMoreBuy>(sql, new { symbolName = LikeStr(symbolName), userName }).ToList();
         }
 

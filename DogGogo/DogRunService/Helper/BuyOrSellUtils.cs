@@ -30,6 +30,7 @@ namespace DogRunService.Helper
             {
                 while (true)
                 {
+                    var begin = DateTime.Now;
                     foreach (var symbol in symbols)
                     {
                         try
@@ -51,6 +52,7 @@ namespace DogRunService.Helper
                         }
                         //Thread.Sleep(1000 * 3);
                     }
+                    Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
                 }
             });
         }

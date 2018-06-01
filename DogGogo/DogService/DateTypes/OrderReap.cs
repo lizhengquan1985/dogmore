@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace DogService.DateTypes
 {
+    /// <summary>
+    /// 收割空单，收割多单（收割比率），做空指令
+    /// </summary>
     [Table("t_order_reap")]
     public class OrderReap
     {
@@ -16,12 +19,22 @@ namespace DogService.DateTypes
         public long OrderId { get; set; }
         public DateTime CreateTime { get; set; }
         public bool IsMore { get; set; }
+        public decimal Percent { get; set; }
     }
 
     public enum ReapType
     {
-        Shouge = 0,
-        ForceShouge = 1,
-        Huiben = 2
+        /// <summary>
+        /// 收割
+        /// </summary>
+        ShougeMore = 0,
+        /// <summary>
+        /// 强制收割
+        /// </summary>
+        ShougeEmpty = 1,
+        /// <summary>
+        /// 做空指令
+        /// </summary>
+        MakeEmpty = 2
     }
 }

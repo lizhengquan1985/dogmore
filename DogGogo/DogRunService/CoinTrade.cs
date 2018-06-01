@@ -251,7 +251,7 @@ namespace DogRunService
                 logger.Error($"下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
             }
 
-            // 空
+            // 空单的自动波动收割
             foreach (var userName in userNames)
             {
                 AccountConfig accountConfig = AccountConfigUtils.GetAccountConfig(userName);
@@ -334,25 +334,13 @@ namespace DogRunService
 
             try
             {
-                // 收割指令
-                var list = new OrderReapDao().List(false);
+                // 空单的指令收割
+                var list = new OrderReapDao().List(ReapType.ShougeEmpty);
                 foreach (var item in list)
                 {
-                    var percent = (decimal)1.01;
-                    if(item.ReapType == ReapType.Huiben)
-                    {
-                        percent = (decimal)1.006;
-                    }else if(item.ReapType == ReapType.Shouge)
-                    {
-                        percent = (decimal)1.02;
-                    }
+                    var percent = item.Percent;
                     var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(item.OrderId);
-                    if (dogEmptySell.IsFinished)
-                    {
-                        continue;
-                    }
-
-                    if (dogEmptySell.SymbolName != symbol.BaseCurrency)
+                    if (dogEmptySell.IsFinished || dogEmptySell.SymbolName != symbol.BaseCurrency)
                     {
                         continue;
                     }
@@ -363,7 +351,11 @@ namespace DogRunService
                     }
 
                     var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(dogEmptySell.SellOrderId);
-                    if (dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it => it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
+                    if (dogEmptyBuyList.Count > 0 &&
+                        dogEmptyBuyList.Find(it =>
+                            it.BuyState != StateConst.Canceled.ToString()
+                            && it.BuyState != StateConst.PartialFilled.ToString()
+                            && it.BuyState != StateConst.Filled.ToString()) != null)
                     {
                         // 存在操作中的,则不操作
                         continue;
@@ -381,9 +373,7 @@ namespace DogRunService
         public static void ShouGeEmpty(DogEmptySell dogEmptySell, decimal percent = (decimal)1.02)
         {
             var symbols = CoinUtils.GetAllCommonSymbols();
-            CommonSymbols symbol = symbols.Find(it=>it.BaseCurrency == dogEmptySell.SymbolName);
-            //symbol.BaseCurrency = dogEmptySell.SymbolName;
-            //symbol.QuoteCurrency = "usdt";
+            CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             var nowPrice = analyzeResult.NowPrice;
@@ -450,13 +440,13 @@ namespace DogRunService
                 return;
             }
 
-
             decimal sellQuantity = dogMoreBuy.BuyQuantity * (decimal)0.99;
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
             if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
             {
                 sellQuantity = 1;
             }
+
             // 出售
             decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
             OrderPlaceRequest req = new OrderPlaceRequest();
@@ -547,6 +537,7 @@ namespace DogRunService
                 return;
             }
 
+            // 多单的自动波动收割
             var userNames = UserPools.GetAllUserName();
             foreach (var userName in userNames)
             {
@@ -633,6 +624,56 @@ namespace DogRunService
                         logger.Error($"下单出售结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
                     }
                 }
+            }
+
+            try
+            {
+                // 多单的指令收割
+                var list = new OrderReapDao().List(ReapType.ShougeMore);
+                foreach (var item in list)
+                {
+                    var percent = item.Percent;
+                    var dogMoreBuy = new DogMoreBuyDao().GetByBuyOrderId(item.OrderId);
+                    if (dogMoreBuy.IsFinished || dogMoreBuy.SymbolName != symbol.BaseCurrency)
+                    {
+                        continue;
+                    }
+
+                    if (dogMoreBuy.BuyTradePrice * percent > nowPrice)
+                    {
+                        continue;
+                    }
+
+                    var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(dogMoreBuy.BuyOrderId);
+                    if (dogMoreSellList.Count > 0 &&
+                        dogMoreSellList.Find(it =>
+                            it.SellState != StateConst.Canceled.ToString()
+                            && it.SellState != StateConst.PartialFilled.ToString()
+                            && it.SellState != StateConst.Filled.ToString()) != null)
+                    {
+                        // 存在操作中的,则不操作
+                        continue;
+                    }
+
+                    ShouGeMore(dogMoreBuy, percent);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+
+            try
+            {
+                // 做空指令
+                var list = new OrderReapDao().List(ReapType.MakeEmpty);
+                foreach (var item in list)
+                {
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
             }
         }
 

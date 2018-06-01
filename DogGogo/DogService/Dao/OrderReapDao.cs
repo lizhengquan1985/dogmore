@@ -39,7 +39,7 @@ namespace DogService.Dao
 
         public List<OrderReap> List(ReapType reapType)
         {
-            var sql = $"select * from t_order_reap where ReapType={(int)reapType}";
+            var sql = $"select * from t_order_reap where IsFinished=0 and ReapType={(int)reapType}";
             return Database.Query<OrderReap>(sql).ToList();
         }
     }

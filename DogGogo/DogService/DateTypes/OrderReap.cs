@@ -18,18 +18,18 @@ namespace DogService.DateTypes
         public ReapType ReapType { get; set; }
         public long OrderId { get; set; }
         public DateTime CreateTime { get; set; }
-        public bool IsMore { get; set; }
         public decimal Percent { get; set; }
+        public bool IsFinished { get; set; }
     }
 
     public enum ReapType
     {
         /// <summary>
-        /// 收割
+        /// 收割多单
         /// </summary>
         ShougeMore = 0,
         /// <summary>
-        /// 强制收割
+        /// 收割空单
         /// </summary>
         ShougeEmpty = 1,
         /// <summary>

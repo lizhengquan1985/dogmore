@@ -20,12 +20,17 @@ namespace DogApi.Controller
         {
             try
             {
+                if (orderReap.Percent < (decimal)1.0005 || orderReap.Percent > (decimal)1.2)
+                {
+                    throw new ApplicationException("不要随意下指令");
+                }
                 new OrderReapDao().Create(orderReap);
 
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+                throw ex;
             }
         }
     }

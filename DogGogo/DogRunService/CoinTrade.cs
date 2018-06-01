@@ -662,18 +662,80 @@ namespace DogRunService
             {
                 logger.Error(ex.Message, ex);
             }
+        }
 
-            try
+        public static void DoEmpty(CommonSymbols symbol, string userName, string accountId)
+        {
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
+            if (analyzeResult == null)
             {
-                // 做空指令
-                var list = new OrderReapDao().List(ReapType.MakeEmpty);
-                foreach (var item in list)
-                {
-                }
+                throw new ApplicationException("做空失败，分析出错");
             }
-            catch (Exception ex)
+            var flexPointList = analyzeResult.FlexPointList;
+            var nowPrice = analyzeResult.NowPrice;
+            if (!flexPointList[0].isHigh)
             {
-                logger.Error(ex.Message, ex);
+                // 最低点 不适合出售
+                throw new ApplicationException("做空失败， 最近不是最高");
+            }
+
+            if (nowPrice * (decimal)1.03 < flexPointList[0].close)
+            {
+                throw new ApplicationException("已经降低了3%， 不要做空，谨慎起见");
+            }
+
+            decimal sellQuantity = 5 / nowPrice; // 暂定每次做空5美元
+            sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+            if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
+            {
+                sellQuantity = 1;
+            }
+
+            // 出售
+            decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
+            OrderPlaceRequest req = new OrderPlaceRequest();
+            req.account_id = accountId;
+            req.amount = sellQuantity.ToString();
+            req.price = sellPrice.ToString();
+            req.source = "api";
+            req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
+            req.type = "sell-limit";
+            PlatformApi api = PlatformApi.GetInstance(userName);
+            HBResponse<long> order = api.OrderPlace(req);
+            logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
+            if (order.Status == "ok")
+            {
+                try
+                {
+                    DogEmptySell dogEmptySell = new DogEmptySell()
+                    {
+                        AccountId = accountId,
+                        UserName = userName,
+                        SellOrderId = order.Data,
+                        SellOrderResult = JsonConvert.SerializeObject(order),
+                        SellDate = DateTime.Now,
+                        SellFlex = JsonConvert.SerializeObject(flexPointList),
+                        SellQuantity = sellQuantity,
+                        SellOrderPrice = sellPrice,
+                        SellState = StateConst.Submitted,
+                        SellTradePrice = 0,
+                        SymbolName = symbol.BaseCurrency,
+                        SellMemo = "",
+                        SellOrderDetail = "",
+                        SellOrderMatchResults = "",
+                        FlexPercent = (decimal)1.04,
+                        IsFinished = false
+                    };
+                    new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("------RunSell----危险-----------");
+                    logger.Error(ex.Message, ex);
+                }
+
+                // 下单成功马上去查一次
+                QueryEmptySellDetailAndUpdate(userName, order.Data);
             }
         }
 

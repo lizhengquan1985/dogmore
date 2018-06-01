@@ -32,9 +32,5 @@ namespace DogService.DateTypes
         /// 收割空单
         /// </summary>
         ShougeEmpty = 1,
-        /// <summary>
-        /// 做空指令
-        /// </summary>
-        MakeEmpty = 2
     }
 }

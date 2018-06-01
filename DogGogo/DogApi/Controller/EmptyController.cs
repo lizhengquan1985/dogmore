@@ -3,6 +3,7 @@ using DogPlatform;
 using DogPlatform.Model;
 using DogRunService;
 using DogService;
+using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
 using Newtonsoft.Json;
@@ -187,9 +188,21 @@ namespace DogApi.Controller
             return new { balanceItem, list, totalQuantity };
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="symbolName"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [ActionName("doEmpty")]
         public async Task DoEmpty(string userName, string symbolName)
         {
-            // 加入一个做空指令， 来决定是否做空。
+            // 立马空单
+
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
+            CoinTrade.DoEmpty(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
         }
     }
 }

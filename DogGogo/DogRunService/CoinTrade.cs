@@ -19,9 +19,15 @@ namespace DogRunService
 {
     public class AnalyzeResult
     {
+        /// <summary>
+        /// 分析后的拐点数据
+        /// </summary>
         public List<FlexPoint> FlexPointList { get; set; }
         public decimal NowPrice { get; set; }
         public decimal LastLowPrice { get; set; }
+        /// <summary>
+        /// 原始数据
+        /// </summary>
         public List<HistoryKline> HistoryKlines { get; set; }
         public decimal FlexPercent { get; set; }
 
@@ -101,7 +107,6 @@ namespace DogRunService
 
         public static void Run(CommonSymbols symbol)
         {
-
             try
             {
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
@@ -116,6 +121,7 @@ namespace DogRunService
                 logger.Error("---> 购买异常: " + ex.Message, ex);
                 //Thread.Sleep(1000 * 60 * 60);
             }
+
             try
             {
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
@@ -533,7 +539,6 @@ namespace DogRunService
             if (!flexPointList[0].isHigh)
             {
                 // 最低点 不适合出售
-                //logger.Error($"最低点 不适合出售 {symbol.BaseCurrency}-{flexPercent},lastLowPrice:{lastLowPrice}, nowPrice:{nowPrice}, flexPointList:{JsonConvert.SerializeObject(flexPointList)}");
                 return;
             }
 
@@ -564,65 +569,64 @@ namespace DogRunService
                     }
 
                     var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyOrderPrice, afterBuyHighClosePrice, nowPrice, gaoyuPercentSell, needHuitou);
-
-                    if (canSell)
+                    if (!canSell)
                     {
-                        decimal sellQuantity = needSellDogMoreBuyItem.BuyQuantity * (decimal)0.99;
-                        sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                        if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
-                        {
-                            sellQuantity = 1;
-                        }
-                        // 出售
-                        decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
-                        OrderPlaceRequest req = new OrderPlaceRequest();
-                        req.account_id = accountId;
-                        req.amount = sellQuantity.ToString();
-                        req.price = sellPrice.ToString();
-                        req.source = "api";
-                        req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
-                        req.type = "sell-limit";
-                        PlatformApi api = PlatformApi.GetInstance(userName);
-                        HBResponse<long> order = api.OrderPlace(req);
-                        logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
-                        if (order.Status == "ok")
-                        {
-                            try
-                            {
-                                DogMoreSell dogMoreSell = new DogMoreSell()
-                                {
-                                    AccountId = accountId,
-                                    UserName = userName,
-                                    BuyOrderId = needSellDogMoreBuyItem.BuyOrderId,
-                                    SellOrderId = order.Data,
-                                    SellOrderResult = JsonConvert.SerializeObject(order),
-                                    SellDate = DateTime.Now,
-                                    SellFlex = JsonConvert.SerializeObject(flexPointList),
-                                    SellQuantity = sellQuantity,
-                                    SellOrderPrice = sellPrice,
-                                    SellState = StateConst.Submitted,
-                                    SellTradePrice = 0,
-                                    SymbolName = symbol.BaseCurrency,
-                                    SellMemo = "",
-                                    SellOrderDetail = "",
-                                    SellOrderMatchResults = ""
-                                };
-                                new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);
-                            }
-                            catch (Exception ex)
-                            {
-                                logger.Error("------RunSell----危险-----------");
-                                logger.Error(ex.Message, ex);
-                                Thread.Sleep(1000 * 60 * 60);
-                            }
-
-                            // 下单成功马上去查一次
-                            QuerySellDetailAndUpdate(userName, order.Data);
-                        }
-
-                        logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice} higher：{afterBuyHighClosePrice}，accountId：{accountId}");
-                        logger.Error($"下单出售结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
+                        continue;
                     }
+
+                    decimal sellQuantity = needSellDogMoreBuyItem.BuyQuantity * (decimal)0.99;
+                    sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+                    if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
+                    {
+                        sellQuantity = 1;
+                    }
+                    // 出售
+                    decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
+                    OrderPlaceRequest req = new OrderPlaceRequest();
+                    req.account_id = accountId;
+                    req.amount = sellQuantity.ToString();
+                    req.price = sellPrice.ToString();
+                    req.source = "api";
+                    req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
+                    req.type = "sell-limit";
+                    PlatformApi api = PlatformApi.GetInstance(userName);
+                    HBResponse<long> orderResult = api.OrderPlace(req);
+                    logger.Error($"auto 下单出售结果 req:{JsonConvert.SerializeObject(req)}, orderResult::{JsonConvert.SerializeObject(orderResult)},nowPrice：{nowPrice} higher：{afterBuyHighClosePrice}，accountId：{accountId}");
+                    if (orderResult.Status == "ok")
+                    {
+                        try
+                        {
+                            DogMoreSell dogMoreSell = new DogMoreSell()
+                            {
+                                AccountId = accountId,
+                                UserName = userName,
+                                BuyOrderId = needSellDogMoreBuyItem.BuyOrderId,
+                                SellOrderId = orderResult.Data,
+                                SellOrderResult = JsonConvert.SerializeObject(orderResult),
+                                SellDate = DateTime.Now,
+                                SellFlex = JsonConvert.SerializeObject(flexPointList),
+                                SellQuantity = sellQuantity,
+                                SellOrderPrice = sellPrice,
+                                SellState = StateConst.Submitted,
+                                SellTradePrice = 0,
+                                SymbolName = symbol.BaseCurrency,
+                                SellMemo = "",
+                                SellOrderDetail = "",
+                                SellOrderMatchResults = ""
+                            };
+                            new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error("------RunSell----危险-----------");
+                            logger.Error(ex.Message, ex);
+                            Thread.Sleep(1000 * 60 * 60);
+                        }
+
+                        // 下单成功马上去查一次
+                        QuerySellDetailAndUpdate(userName, orderResult.Data);
+                    }
+
                 }
             }
 

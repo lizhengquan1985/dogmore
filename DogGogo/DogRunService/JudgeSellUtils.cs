@@ -16,9 +16,9 @@ namespace DogRunService
 
         public static bool CheckCanSell(decimal buyPrice, decimal afterBuyHighClosePrice, decimal nowPrice, decimal gaoyuPercentSell = (decimal)1.03, bool needHuitou = true)
         {
-            if (nowPrice < buyPrice * gaoyuPercentSell)
+            if (nowPrice < buyPrice * gaoyuPercentSell || nowPrice < buyPrice * (decimal)1.02)
             {
-                // 如果不高于 3% 没有意义
+                // 如果不高于 2% 没有意义, 其中 gaoyuPercentSell用来管控的.
                 return false;
             }
 

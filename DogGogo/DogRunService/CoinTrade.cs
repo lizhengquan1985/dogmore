@@ -172,7 +172,7 @@ namespace DogRunService
                 }
 
                 var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency);
-                if (nowPrice * ladderBuyPercent > minBuyPrice)
+                if (nowPrice * ladderBuyPercent > minBuyPrice || nowPrice * (decimal)1.01 >= minBuyPrice)
                 {
                     // 最近一次购入,没有低于3%
                     continue;

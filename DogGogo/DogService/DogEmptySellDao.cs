@@ -79,7 +79,7 @@ namespace DogService
 
         public List<DogEmptySell> ListDogEmptySellFinished(string userName, string symbolName)
         {
-            var sql = $"select * from t_dog_empty_sell where IsFinished=1 and SymbolName=@symbolName ";
+            var sql = $"select * from t_dog_empty_sell where IsFinished=1 and SymbolName like @symbolName ";
             if (!string.IsNullOrEmpty(userName))
             {
                 sql += $" and UserName=@userName";

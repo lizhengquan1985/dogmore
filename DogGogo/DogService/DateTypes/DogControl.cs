@@ -34,14 +34,14 @@ namespace DogService.DateTypes
         public decimal MaxInputPrice { get; set; }
         public DateTime MaxInputPriceExpiredTime { get; set; }
         /// <summary>
-        /// 购买阶梯数， 2~6， 一般情况是3， 3代表3%
+        /// 购买阶梯数， 2%~6%， 一般情况是3%
         /// </summary>
-        public int LadderBuy { get; set; }
+        public decimal LadderBuyPercent { get; set; }
         public DateTime LadderBuyExpiredTime { get; set; }
         /// <summary>
-        /// 出售阶梯数， 2.5~8， 一般情况是3.5， 3.5代表3.5%
+        /// 出售阶梯数， 2.5%~8%， 一般情况是3.5%
         /// </summary>
-        public int LadderSell { get; set; }
+        public decimal LadderSellPercent { get; set; }
         public DateTime LadderSellExpiredTime { get; set; }
         /// <summary>
         /// 每点击一次保持，都会把过去的设置改成false

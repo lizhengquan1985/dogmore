@@ -171,7 +171,8 @@ namespace DogRunService
                     minBuyPrice = 25000;
                 }
 
-                if (nowPrice * (decimal)1.03 > minBuyPrice)
+                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency);
+                if (nowPrice * ladderBuyPercent > minBuyPrice)
                 {
                     // 最近一次购入,没有低于3%
                     continue;
@@ -555,12 +556,12 @@ namespace DogRunService
                     // 分析是否 大于
                     decimal afterBuyHighClosePrice = JudgeSellUtils.AnalyzeNeedSell(needSellDogMoreBuyItem.BuyOrderPrice, needSellDogMoreBuyItem.BuyDate, historyKlines);
 
-                    decimal gaoyuPercentSell = (decimal)1.035;
+                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName); //(decimal)1.035;
 
                     bool needHuitou = true;// 如果很久没有出售过,则要考虑不需要回头
                     if (flexPercent < (decimal)1.04)
                     {
-                        gaoyuPercentSell = (decimal)1.035;
+                        gaoyuPercentSell -= (decimal)0.005;
                         if (flexPointList.Count <= 2 && needSellDogMoreBuyList.Where(it => it.BuyDate > DateTime.Now.AddDays(-1)).ToList().Count == 0)
                         {
                             // 1天都没有交易. 并且波动比较小. 则不需要回头

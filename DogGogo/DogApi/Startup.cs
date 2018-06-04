@@ -2,6 +2,7 @@
 using Autofac.Integration.WebApi;
 using Beginor.Owin.StaticFile;
 using DogService;
+using DogService.Dao;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Owin;

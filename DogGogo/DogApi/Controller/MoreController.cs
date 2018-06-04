@@ -1,6 +1,7 @@
 ﻿using DogPlatform.Model;
 using DogRunService;
 using DogService;
+using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
 using Newtonsoft.Json;

@@ -29,8 +29,16 @@ namespace DogService.Dao
 
         public async Task<List<DogControl>> ListDogControl()
         {
-            //var sql = $"select * from t_dog_control where IsValid=1";
-            return (await Database.QueryAsync<DogControl>(new { IsValid = 1})).ToList();
+            return (await Database.QueryAsync<DogControl>(new { IsValid = 1 })).ToList();
+        }
+
+        public async Task SetUnvalid(string symbolName)
+        {
+            using (var tx = Database.BeginTransaction())
+            {
+                await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { SymbolName = symbolName });
+                tx.Commit();
+            }
         }
     }
 }

@@ -81,7 +81,7 @@ namespace DogApi.Controller
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
-                return ex.Message;
+                throw ex;
             }
         }
 
@@ -95,7 +95,8 @@ namespace DogApi.Controller
             }
             catch (Exception ex)
             {
-                return null;
+                logger.Error(ex.Message, ex);
+                throw ex;
             }
         }
 
@@ -121,7 +122,7 @@ namespace DogApi.Controller
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
-                return null;
+                throw ex;
             }
         }
     }

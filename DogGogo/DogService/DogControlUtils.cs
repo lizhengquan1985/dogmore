@@ -89,7 +89,7 @@ namespace DogService
             try
             {
                 var control = new DogControlDao().GetDogControl(symbolName);
-                if (control != null || control.LadderBuyExpiredTime > DateTime.Now)
+                if (control != null && control.LadderBuyExpiredTime > DateTime.Now)
                 {
                     defaultLadderBuyPercent = control.LadderBuyPercent;
                 }
@@ -109,7 +109,7 @@ namespace DogService
             try
             {
                 var control = new DogControlDao().GetDogControl(symbolName);
-                if (control != null || control.LadderSellExpiredTime > DateTime.Now)
+                if (control != null && control.LadderSellExpiredTime > DateTime.Now)
                 {
                     defaultLadderSellPercent = control.LadderSellPercent;
                 }

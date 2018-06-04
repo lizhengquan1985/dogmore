@@ -22,11 +22,11 @@ namespace DogApi.Controller
             try
             {
                 await new DogControlDao().CreateDogControl(dogControl);
-
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+                throw ex;
             }
         }
 
@@ -36,31 +36,27 @@ namespace DogApi.Controller
         {
             try
             {
-                var res = await new DogControlDao().ListDogControl();
-                var symbols = CoinUtils.GetAllCommonSymbols();
-                var baseSymbols = symbols.Select(it => it.BaseCurrency).ToList();
-                foreach (var itemSymbol in baseSymbols)
-                {
-                    if (res.Find(it => it.SymbolName == itemSymbol) != null)
-                    {
-                        continue;
-                    }
-                    res.Add(new DogControl()
-                    {
-                        SymbolName = itemSymbol,
-                        AvgInputExpiredTime = DateTime.Now,
-                        EmptyExpiredTime = DateTime.Now,
-                        MaxInputPriceExpiredTime = DateTime.Now,
-                        PredictExpiredTime = DateTime.Now,
-                        CreateTime = DateTime.Now
-                    });
-                }
-                return res;
+                return await new DogControlDao().ListDogControl();
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
-                return null;
+                throw ex;
+            }
+        }
+
+        [HttpPut]
+        [ActionName("setUnvalid")]
+        public async Task SetUnvalid(string symbolName)
+        {
+            try
+            {
+                await new DogControlDao().SetUnvalid(symbolName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
             }
         }
 

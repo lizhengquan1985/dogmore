@@ -20,10 +20,11 @@ namespace DogService.Dao
 
         public void Create(OrderReap orderReap)
         {
+            orderReap.IsFinished = false;
+
             var sql = $"select * from t_order_reap where OrderId={orderReap.OrderId}";
             if(Database.Query<OrderReap>(sql).FirstOrDefault() != null)
             {
-                logger.Error("---------------------------------");
                 sql = $"update t_order_reap set ReapType={(int)orderReap.ReapType} where OrderId={orderReap.OrderId}";
                 Database.Execute(sql);
             }

@@ -689,6 +689,12 @@ namespace DogRunService
                 throw new ApplicationException("已经降低了3%， 不要做空，谨慎起见");
             }
 
+            var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
+            if(maxSellTradePrice != null && nowPrice < maxSellTradePrice)
+            {
+                throw new ApplicationException("有价格比这个更高得还没有收割。不能重新做空。");
+            }
+
             decimal sellQuantity = 5 / nowPrice; // 暂定每次做空5美元
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
             if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)

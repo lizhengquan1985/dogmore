@@ -77,6 +77,12 @@ namespace DogService.Dao
             return Database.Query<DogEmptySell>(sql, new { symbolName }).ToList();
         }
 
+        public decimal? GetMaxSellTradePrice(string userName, string symbolName)
+        {
+            var sql = $"select max(SellTradePrice) from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and UserName=@userName";
+            return Database.Query<decimal>(sql, new { symbolName, userName }).FirstOrDefault();
+        }
+
         public List<DogEmptySell> ListDogEmptySellFinished(string userName, string symbolName)
         {
             var sql = $"select * from t_dog_empty_sell where IsFinished=1 and SymbolName like @symbolName ";

@@ -199,7 +199,6 @@ namespace DogApi.Controller
         public async Task DoEmpty(string userName, string symbolName)
         {
             // 立马空单
-
             var symbols = CoinUtils.GetAllCommonSymbols();
             var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
             CoinTrade.DoEmpty(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);

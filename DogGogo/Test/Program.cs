@@ -1,6 +1,7 @@
 ﻿using DogAccount;
 using DogPlatform;
 using DogService;
+using DogService.Dao;
 using DogService.DateTypes;
 using Newtonsoft.Json;
 using System;

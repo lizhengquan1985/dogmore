@@ -1,4 +1,5 @@
 ﻿using DogService;
+using DogService.Dao;
 using log4net;
 using System;
 using System.Collections.Generic;

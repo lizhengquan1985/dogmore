@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DogService
+namespace DogService.Dao
 {
     public class KlineDao : BaseDao
     {

@@ -690,7 +690,7 @@ namespace DogRunService
             }
 
             var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
-            if(maxSellTradePrice != null && nowPrice < maxSellTradePrice)
+            if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.02)
             {
                 throw new ApplicationException("有价格比这个更高得还没有收割。不能重新做空。");
             }

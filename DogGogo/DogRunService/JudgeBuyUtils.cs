@@ -1,4 +1,5 @@
 ﻿using DogPlatform.Model;
+using DogService;
 using DogService.Dao;
 using log4net;
 using System;
@@ -78,16 +79,16 @@ namespace DogRunService
 
         public static bool ControlCanBuy(string symbolName, decimal nowPrice)
         {
-            var control = new DogControlDao().GetDogControl(symbolName);
-            if (control == null)
+            var maxInputPrice = DogControlUtils.GetMaxInputPrice(symbolName);
+            if (maxInputPrice == null)
             {
                 // 没有控制的,默认可以购买
                 return true;
             }
 
-            if(nowPrice > control.MaxInputPrice && control.MaxInputPriceExpiredTime > DateTime.Now)
+            if (nowPrice > maxInputPrice)
             {
-                logger.Error($"由于管控,不能购入 MaxInputPrice:{control.MaxInputPrice}, nowPrice:{nowPrice}, MaxInputPriceExpiredTime:{control.MaxInputPriceExpiredTime}");
+                logger.Error($"由于管控,不能购入 MaxInputPrice:{maxInputPrice}, nowPrice:{nowPrice}");
                 return false;
             }
 

@@ -61,12 +61,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDao.cs" />
-    <Compile Include="Dao\ControlAvgInputDao.cs" />
-    <Compile Include="Dao\ControlBuyCriticalDao.cs" />
     <Compile Include="Dao\DogControlDao.cs" />
     <Compile Include="Dao\OrderReapDao.cs" />
-    <Compile Include="DateTypes\ControlAvgInput.cs" />
-    <Compile Include="DateTypes\ControlBuyCritical.cs" />
     <Compile Include="DateTypes\DogControl.cs" />
     <Compile Include="DateTypes\DogEmpty.cs" />
     <Compile Include="DateTypes\DogMore.cs" />

@@ -277,12 +277,12 @@ namespace DogRunService
                     continue;
                 }
 
+                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency);
                 PlatformApi api = PlatformApi.GetInstance(userName);
-                //var accountInfo = api.GetAccountBalance(accountId);
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
                 {
-                    if (nowPrice * (decimal)1.02 > needBuyDogEmptySellItem.SellTradePrice)
+                    if (nowPrice * ladderBuyPercent > needBuyDogEmptySellItem.SellTradePrice)
                     {
                         continue;
                     }

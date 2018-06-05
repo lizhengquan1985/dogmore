@@ -16,10 +16,7 @@ namespace DogRunService
 
         public static bool CheckCanBuy(decimal nowOpen, decimal nearLowOpen)
         {
-            //nowOpen > flexPointList[0].open * (decimal)1.005 && nowOpen < flexPointList[0].open * (decimal)1.01
-            var canbuy = nowOpen > nearLowOpen * (decimal)1.005 && nowOpen < nearLowOpen * (decimal)1.01;
-            //logger.Error($"------- {canbuy}还不能购买 nowOpen:{nowOpen}, nearLowOpen:{nearLowOpen}");
-            return canbuy;
+            return nowOpen > nearLowOpen * (decimal)1.005 && nowOpen < nearLowOpen * (decimal)1.01;
         }
 
         public static bool CheckFlexPoint(decimal nowOpen, decimal nearLowOpen, decimal percent)

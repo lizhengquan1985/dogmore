@@ -85,15 +85,15 @@ namespace DogRunService
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
             if (sellQuantity == buyQuantity)
             {
-                if (symbol.AmountPrecision == 4)
+                if (symbol.AmountPrecision == 4 && buyQuantity > (decimal)0.0055)
                 {
                     sellQuantity -= (decimal)0.0001;
                 }
-                else if (symbol.AmountPrecision == 3)
+                else if (symbol.AmountPrecision == 3 && buyQuantity > (decimal)0.055)
                 {
                     sellQuantity -= (decimal)0.001;
                 }
-                if (symbol.AmountPrecision == 2)
+                if (symbol.AmountPrecision == 2 && buyQuantity > (decimal)0.55)
                 {
                     sellQuantity -= (decimal)0.01;
                 }

@@ -435,9 +435,11 @@ namespace DogRunService
 
         public static void ShouGeMore(DogMoreBuy dogMoreBuy, decimal percent = (decimal)1.02)
         {
-            CommonSymbols symbol = new CommonSymbols();
-            symbol.BaseCurrency = dogMoreBuy.SymbolName;
-            symbol.QuoteCurrency = "usdt";
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName);
+            //CommonSymbols symbol = new CommonSymbols();
+            //symbol.BaseCurrency = dogMoreBuy.SymbolName;
+            //symbol.QuoteCurrency = "usdt";
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             var nowPrice = analyzeResult.NowPrice;
@@ -447,12 +449,13 @@ namespace DogRunService
                 return;
             }
 
-            decimal sellQuantity = dogMoreBuy.BuyQuantity * (decimal)0.99;
-            sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-            if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
-            {
-                sellQuantity = 1;
-            }
+            decimal sellQuantity = JudgeSellUtils.CalcSellQuantity(dogMoreBuy.BuyQuantity, symbol);
+            //decimal sellQuantity = dogMoreBuy.BuyQuantity * (decimal)0.99;
+            //sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+            //if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
+            //{
+            //    sellQuantity = 1;
+            //}
 
             // 出售
             decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
@@ -574,13 +577,13 @@ namespace DogRunService
                     {
                         continue;
                     }
-
-                    decimal sellQuantity = needSellDogMoreBuyItem.BuyQuantity * (decimal)0.99;
-                    sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                    if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
-                    {
-                        sellQuantity = 1;
-                    }
+                    decimal sellQuantity = JudgeSellUtils.CalcSellQuantity(needSellDogMoreBuyItem.BuyQuantity, symbol);
+                    //decimal sellQuantity = needSellDogMoreBuyItem.BuyQuantity * (decimal)0.99;
+                    //sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+                    //if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
+                    //{
+                    //    sellQuantity = 1;
+                    //}
                     // 出售
                     decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
                     OrderPlaceRequest req = new OrderPlaceRequest();

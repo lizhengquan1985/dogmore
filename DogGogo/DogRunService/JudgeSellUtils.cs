@@ -78,5 +78,32 @@ namespace DogRunService
             }
             return higher;
         }
+
+        public static decimal CalcSellQuantity(decimal buyQuantity, CommonSymbols symbol)
+        {
+            decimal sellQuantity = buyQuantity * (decimal)0.99;
+            sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+            if (sellQuantity == buyQuantity)
+            {
+                if (symbol.AmountPrecision == 4)
+                {
+                    sellQuantity -= (decimal)0.0001;
+                }
+                else if (symbol.AmountPrecision == 3)
+                {
+                    sellQuantity -= (decimal)0.001;
+                }
+                if (symbol.AmountPrecision == 2)
+                {
+                    sellQuantity -= (decimal)0.01;
+                }
+            }
+            if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
+            {
+                sellQuantity = 1;
+            }
+
+            return sellQuantity;
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DogPlatform.Model;
+﻿using DogApi.DTO;
+using DogPlatform.Model;
 using DogRunService;
 using DogService;
 using DogService.Dao;
@@ -123,53 +124,82 @@ namespace DogApi.Controller
         {
             try
             {
-                var dogMoreBuy = new DogMoreBuyDao().GetByBuyOrderId(buyOrderId);
-                var orderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(dogMoreBuy.BuyOrderMatchResults);
-                var buyQuantity = (decimal)0;
-                var buyAmount = (decimal)0;
-                var buyFees = (decimal)0;
-                foreach (var item in orderMatchResult.Data)
-                {
-                    buyAmount += item.FilledAmount * item.price;
-                    buyQuantity += item.FilledAmount;
-                    buyFees += item.FilledFees;
-                }
-
-                // 交易量，交易总额，  出售总额 出售数量， 
-                var sellQuantity = (decimal)0;
-                var sellAmount = (decimal)0;
-                var sellFees = (decimal)0;
-                var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(buyOrderId);
-
-                foreach (var sell in dogMoreSellList)
-                {
-                    var sellOrderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(sell.SellOrderMatchResults);
-                    foreach (var item in sellOrderMatchResult.Data)
-                    {
-                        sellAmount += item.FilledAmount * item.price;
-                        sellQuantity += item.FilledAmount;
-                        sellFees += item.FilledFees;
-                    }
-                }
-                return new
-                {
-                    buyOrderId,
-                    symbolName = dogMoreBuy.SymbolName,
-                    buyQuantity,
-                    buyAmount,
-                    buyFees,
-                    sellAmount,
-                    sellQuantity,
-                    sellFees,
-                    usdt = sellAmount - buyAmount - sellFees,
-                    baseSymbol = buyQuantity - sellQuantity - buyFees
-                };
+                return await GetDogMoreFinishedDTO(buyOrderId);
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
                 return null;
             }
+        }
+
+        [HttpGet]
+        [ActionName("listMoreBuyIsFinishedDetail")]
+        public async Task<List<DogMoreFinishedDTO>> listMoreBuyIsFinishedDetail(string userName, string symbolName, int pageIndex, int pageSize)
+        {
+            try
+            {
+                var buyOrderIds = new DogMoreSellDao().listDogMoreSell(userName, symbolName, pageIndex, pageSize);
+                var result = new List<DogMoreFinishedDTO>();
+                foreach (var buyOrderId in buyOrderIds)
+                {
+                    var item = await GetDogMoreFinishedDTO(buyOrderId);
+                    result.Add(item);
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return null;
+            }
+        }
+
+        private async Task<DogMoreFinishedDTO> GetDogMoreFinishedDTO(long buyOrderId)
+        {
+            var dogMoreBuy = new DogMoreBuyDao().GetByBuyOrderId(buyOrderId);
+            var orderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(dogMoreBuy.BuyOrderMatchResults);
+            var buyQuantity = (decimal)0;
+            var buyAmount = (decimal)0;
+            var buyFees = (decimal)0;
+            foreach (var item in orderMatchResult.Data)
+            {
+                buyAmount += item.FilledAmount * item.price;
+                buyQuantity += item.FilledAmount;
+                buyFees += item.FilledFees;
+            }
+
+            // 交易量，交易总额，  出售总额 出售数量， 
+            var sellQuantity = (decimal)0;
+            var sellAmount = (decimal)0;
+            var sellFees = (decimal)0;
+            var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(buyOrderId);
+
+            foreach (var sell in dogMoreSellList)
+            {
+                var sellOrderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(sell.SellOrderMatchResults);
+                foreach (var item in sellOrderMatchResult.Data)
+                {
+                    sellAmount += item.FilledAmount * item.price;
+                    sellQuantity += item.FilledAmount;
+                    sellFees += item.FilledFees;
+                }
+            }
+            return new DogMoreFinishedDTO
+            {
+                BuyOrderId = buyOrderId,
+                SymbolName = dogMoreBuy.SymbolName,
+                UserName = dogMoreBuy.UserName,
+                BuyTradePrice = dogMoreBuy.BuyTradePrice,
+                BuyQuantity =buyQuantity,
+                BuyAmount =buyAmount,
+                BuyFees =buyFees,
+                SellAmount =sellAmount,
+                SellQuantity =sellQuantity,
+                SellFees =sellFees,
+                Usdt = sellAmount - buyAmount - sellFees,
+                BaseSymbol = buyQuantity - sellQuantity - buyFees
+            };
         }
 
         [HttpGet]

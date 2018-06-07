@@ -80,5 +80,16 @@ namespace DogService.Dao
         }
 
         #endregion
+
+        public List<long> listDogMoreSell(string userName, string symbolName, int pageIndex, int pageSize)
+        {
+            var where = $" where SymbolName like @symbolName ";
+            if (!string.IsNullOrEmpty(userName))
+            {
+                where += $" and UserName=@userName";
+            }
+            var sql = $"select BuyOrderId from (select BuyOrderId,max(Id) Id from t_dog_more_sell {where} group by BuyOrderId order by Id Desc limit {pageIndex * pageSize},{pageSize})";
+            return Database.Query<long>(sql, new { symbolName = LikeStr(symbolName), userName }).ToList();
+        }
     }
 }

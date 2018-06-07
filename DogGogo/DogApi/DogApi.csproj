@@ -101,6 +101,7 @@
     <Compile Include="Controller\EmptyController.cs" />
     <Compile Include="Controller\MoreController.cs" />
     <Compile Include="Controller\OrderReapController.cs" />
+    <Compile Include="DTO\DogMoreFinishedDTO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -130,8 +131,6 @@
       <Name>DogService</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DTO\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

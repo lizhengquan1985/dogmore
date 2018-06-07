@@ -124,7 +124,7 @@ namespace DogApi.Controller
         {
             try
             {
-                return await GetDogMoreFinishedDTO(buyOrderId);
+                return GetDogMoreFinishedDTO(buyOrderId);
             }
             catch (Exception ex)
             {
@@ -185,12 +185,15 @@ namespace DogApi.Controller
                     sellFees += item.FilledFees;
                 }
             }
+
             return new DogMoreFinishedDTO
             {
                 BuyOrderId = buyOrderId,
                 SymbolName = dogMoreBuy.SymbolName,
                 UserName = dogMoreBuy.UserName,
                 BuyTradePrice = dogMoreBuy.BuyTradePrice,
+                BuyDate = dogMoreBuy.BuyDate,
+                BuyState = dogMoreBuy.BuyState,
                 BuyQuantity =buyQuantity,
                 BuyAmount =buyAmount,
                 BuyFees =buyFees,

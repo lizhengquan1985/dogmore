@@ -63,5 +63,16 @@ namespace DogService.Dao
                 tx.Commit();
             }
         }
+
+        public List<long> ListDogEmptyBuy(string userName, string symbolName, int pageIndex, int pageSize)
+        {
+            var where = $" where SymbolName like @symbolName ";
+            if (!string.IsNullOrEmpty(userName))
+            {
+                where += $" and UserName=@userName";
+            }
+            var sql = $"select SellOrderId from (select SellOrderId,max(Id) Id from t_dog_empty_buy {where} group by SellOrderId order by Id Desc limit {pageIndex * pageSize},{pageSize})";
+            return Database.Query<long>(sql, new { symbolName = LikeStr(symbolName), userName }).ToList();
+        }
     }
 }

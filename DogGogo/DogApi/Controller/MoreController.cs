@@ -96,10 +96,10 @@ namespace DogApi.Controller
             var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
 
             var symbols = CoinUtils.GetAllCommonSymbols();
-            var key = HistoryKlinePools.GetKey(symbols.Find(it=>it.BaseCurrency == symbolName), "1min");
+            var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
             var historyKlineData = HistoryKlinePools.Get(key);
             var close = historyKlineData.Data[0].Close;
-            return new { list, close};
+            return new { list, close };
         }
 
         [HttpGet]
@@ -177,6 +177,8 @@ namespace DogApi.Controller
             var sellQuantity = (decimal)0;
             var sellAmount = (decimal)0;
             var sellFees = (decimal)0;
+            var sellTradePrice = (decimal)0;
+            var sellDate = DateTime.MinValue;
             var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(buyOrderId);
 
             foreach (var sell in dogMoreSellList)
@@ -187,6 +189,14 @@ namespace DogApi.Controller
                     sellAmount += item.FilledAmount * item.price;
                     sellQuantity += item.FilledAmount;
                     sellFees += item.FilledFees;
+                    if (item.price < sellTradePrice)
+                    {
+                        sellTradePrice = item.price;
+                    }
+                }
+                if(sell.SellDate > sellDate)
+                {
+                    sellDate = sell.SellDate;
                 }
             }
 
@@ -198,12 +208,14 @@ namespace DogApi.Controller
                 BuyTradePrice = dogMoreBuy.BuyTradePrice,
                 BuyDate = dogMoreBuy.BuyDate,
                 BuyState = dogMoreBuy.BuyState,
-                BuyQuantity =buyQuantity,
-                BuyAmount =buyAmount,
-                BuyFees =buyFees,
-                SellAmount =sellAmount,
-                SellQuantity =sellQuantity,
-                SellFees =sellFees,
+                BuyQuantity = buyQuantity,
+                BuyAmount = buyAmount,
+                BuyFees = buyFees,
+                SellAmount = sellAmount,
+                SellQuantity = sellQuantity,
+                SellTradePrice = sellTradePrice,
+                SellFees = sellFees,
+                SellDate = sellDate,
                 Usdt = sellAmount - buyAmount - sellFees,
                 BaseSymbol = buyQuantity - sellQuantity - buyFees
             };

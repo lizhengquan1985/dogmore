@@ -22,6 +22,8 @@ namespace DogApi.DTO
         public decimal BuyTradePrice { get; set; }
         public DateTime BuyDate { get; set; }
         public string BuyState { get; set; }
+        public decimal SellTradePrice { get; set; }
+        public DateTime SellDate { get; set; }
     }
 
     public class DogEmptyFinishedDTO
@@ -40,5 +42,7 @@ namespace DogApi.DTO
         public decimal SellTradePrice { get; set; }
         public DateTime SellDate { get; set; }
         public string SellState { get; set; }
+        public decimal BuyTradePrice { get; set; }
+        public DateTime BuyDate { get; set; }
     }
 }

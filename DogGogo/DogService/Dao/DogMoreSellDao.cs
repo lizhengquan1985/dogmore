@@ -88,7 +88,7 @@ namespace DogService.Dao
             {
                 where += $" and UserName=@userName";
             }
-            var sql = $"select BuyOrderId from (select BuyOrderId,max(Id) Id from t_dog_more_sell {where} group by BuyOrderId order by Id Desc limit {pageIndex * pageSize},{pageSize})";
+            var sql = $"select BuyOrderId from (select BuyOrderId,max(Id) Id from t_dog_more_sell {where} group by BuyOrderId order by Id Desc limit {pageIndex * pageSize},{pageSize}) t";
             return Database.Query<long>(sql, new { symbolName = LikeStr(symbolName), userName }).ToList();
         }
     }

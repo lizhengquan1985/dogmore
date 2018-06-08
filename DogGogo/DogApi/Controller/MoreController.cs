@@ -1,4 +1,5 @@
 ﻿using DogApi.DTO;
+using DogPlatform;
 using DogPlatform.Model;
 using DogRunService;
 using DogService;
@@ -83,19 +84,22 @@ namespace DogApi.Controller
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="symbolName"></param>
+        /// <returns></returns>
         [HttpGet]
         [ActionName("listMoreBuyIsNotFinished")]
         public async Task<object> listMoreBuyIsNotFinished(string symbolName)
         {
-            try
-            {
-                return new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return null;
-            }
+            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
+
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            var key = HistoryKlinePools.GetKey(symbols.Find(it=>it.BaseCurrency == symbolName), "1min");
+            var historyKlineData = HistoryKlinePools.Get(key);
+            var close = historyKlineData.Data[0].Close;
+            return new { list, close};
         }
 
         [HttpGet]

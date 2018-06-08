@@ -177,7 +177,7 @@ namespace DogApi.Controller
             var sellQuantity = (decimal)0;
             var sellAmount = (decimal)0;
             var sellFees = (decimal)0;
-            var sellTradePrice = (decimal)0;
+            var sellTradePrice = (decimal)999999;
             var sellDate = DateTime.MinValue;
             var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(buyOrderId);
 

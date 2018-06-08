@@ -213,7 +213,7 @@ namespace DogApi.Controller
             var buyQuantity = (decimal)0;
             var buyAmount = (decimal)0;
             var buyFees = (decimal)0;
-            var buyTradePrice = (decimal)99999;
+            var buyTradePrice = (decimal)0;
             var buyDate = DateTime.MaxValue;
             var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(sellOrderId);
 
@@ -225,7 +225,7 @@ namespace DogApi.Controller
                     buyAmount += item.FilledAmount * item.price;
                     buyQuantity += item.FilledAmount;
                     buyFees += item.FilledFees;
-                    if(buyTradePrice > item.price)
+                    if(buyTradePrice < item.price)
                     {
                         buyTradePrice = item.price;
                     }

@@ -84,7 +84,7 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderBuy(string symbolName, decimal defaultLadderBuyPercent = (decimal)1.03)
+        public static decimal GetLadderBuy(string symbolName, decimal defaultLadderBuyPercent = (decimal)1.04)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderSell(string symbolName, decimal defaultLadderSellPercent = (decimal)1.04)
+        public static decimal GetLadderSell(string symbolName, decimal defaultLadderSellPercent = (decimal)1.045)
         {
             try
             {

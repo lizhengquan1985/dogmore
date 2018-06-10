@@ -67,7 +67,7 @@ namespace DogService.Dao
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
             var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{symbolName}' and BuyState in({states}) and IsFinished=0 " +
                 $" and UserName='{userName}' and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where AccountId='{accountId}' and UserName='{userName}' and SellState not in({states})) " +
-                $" order by BuyOrderPrice asc limit 0,8";
+                $" order by BuyTradePrice asc limit 0,8";
             return Database.Query<DogMoreBuy>(sql).ToList();
         }
 
@@ -112,6 +112,12 @@ namespace DogService.Dao
         {
             var sql = $"select * from t_dog_more_buy where IsFinished=0 and SymbolName=@symbolName order by BuyTradePrice asc";
             return Database.Query<DogMoreBuy>(sql, new { symbolName }).ToList();
+        }
+
+        public List<DogMoreBuy> listErvryMinPriceMoreBuyIsNotFinished()
+        {
+            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from  ( select max(BuyOrderId) BuyOrderId,SymbolName from t_dog_more_buy where IsFinished=0 group by SymbolName) t)  ";
+            return Database.Query<DogMoreBuy>(sql).ToList();
         }
 
         public List<DogMoreBuy> listMoreBuyIsNotFinished(string symbolName, string userName)

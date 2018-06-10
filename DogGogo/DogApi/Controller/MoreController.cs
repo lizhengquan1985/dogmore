@@ -93,13 +93,36 @@ namespace DogApi.Controller
         [ActionName("listMoreBuyIsNotFinished")]
         public async Task<object> listMoreBuyIsNotFinished(string symbolName)
         {
-            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
-
+            var list = new List<DogMoreBuy>();
             var symbols = CoinUtils.GetAllCommonSymbols();
-            var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
-            var historyKlineData = HistoryKlinePools.Get(key);
-            var close = historyKlineData.Data[0].Close;
-            return new { list, close };
+            Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+            if (string.IsNullOrEmpty(symbolName))
+            {
+                list = new DogMoreBuyDao().listErvryMinPriceMoreBuyIsNotFinished();
+                foreach (var symbol in symbols)
+                {
+                    try
+                    {
+                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
+                        var historyKlineData = HistoryKlinePools.Get(key);
+                        var close = historyKlineData.Data[0].Close;
+                        closeDic.Add(symbol.BaseCurrency, close);
+                    }
+                    catch(Exception ex)
+                    {
+                        
+                    }
+                }
+            }
+            else
+            {
+                list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName); var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
+                var historyKlineData = HistoryKlinePools.Get(key);
+                var close = historyKlineData.Data[0].Close;
+                closeDic.Add(symbolName, close);
+            }
+
+            return new { list, closeDic };
         }
 
         [HttpGet]
@@ -194,7 +217,7 @@ namespace DogApi.Controller
                         sellTradePrice = item.price;
                     }
                 }
-                if(sell.SellDate > sellDate)
+                if (sell.SellDate > sellDate)
                 {
                     sellDate = sell.SellDate;
                 }

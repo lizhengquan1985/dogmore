@@ -548,7 +548,7 @@ namespace DogRunService
                 foreach (var needSellDogMoreBuyItem in needSellDogMoreBuyList)
                 {
                     // 分析是否 大于
-                    decimal afterBuyHighClosePrice = JudgeSellUtils.AnalyzeNeedSell(needSellDogMoreBuyItem.BuyOrderPrice, needSellDogMoreBuyItem.BuyDate, historyKlines);
+                    decimal afterBuyHighClosePrice = JudgeSellUtils.AnalyzeNeedSell(needSellDogMoreBuyItem.BuyTradePrice, needSellDogMoreBuyItem.BuyDate, historyKlines);
 
                     decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName); //(decimal)1.035;
 
@@ -563,7 +563,7 @@ namespace DogRunService
                         }
                     }
 
-                    var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyOrderPrice, afterBuyHighClosePrice, nowPrice, gaoyuPercentSell, needHuitou);
+                    var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyTradePrice, afterBuyHighClosePrice, nowPrice, gaoyuPercentSell, needHuitou);
                     if (!canSell)
                     {
                         continue;

@@ -54,5 +54,12 @@ namespace DogService.Dao
             var sql = $"select * from t_coin_{name} where CreateTime>=@Begin and CreateTime<=@End";
             return Database.Query<HistoryKline>(sql, new { Begin = begin, End = end }).ToList(); ;
         }
+
+        public List<HistoryKline> List24HourKline(string symbolName)
+        {
+            var date = DateTime.Now.AddDays(-1);
+            var sql = $"select * from t_coin_{symbolName} where CreateTime>=@date order by RecordId desc";
+            return Database.Query<HistoryKline>(sql, new { date }).ToList();
+        }
     }
 }

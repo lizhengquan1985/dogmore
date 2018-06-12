@@ -181,7 +181,7 @@ namespace DogRunService
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 var accountInfo = api.GetAccountBalance(accountId);
                 var usdt = accountInfo.Data.list.Find(it => it.currency == "usdt");
-                decimal recommendAmount = usdt.balance / 220; // TODO 测试阶段，暂定低一些，
+                decimal recommendAmount = usdt.balance / 250; // TODO 测试阶段，暂定低一些，
 
                 if (recommendAmount < (decimal)1.1)
                 {

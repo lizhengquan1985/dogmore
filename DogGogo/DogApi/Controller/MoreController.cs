@@ -100,6 +100,7 @@ namespace DogApi.Controller
             if (string.IsNullOrEmpty(symbolName))
             {
                 list = new DogMoreBuyDao().listErvryMinPriceMoreBuyIsNotFinished();
+                list = list.Where(it => it.SymbolName != "btc").ToList();
                 foreach (var symbol in symbols)
                 {
                     try

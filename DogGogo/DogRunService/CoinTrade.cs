@@ -710,7 +710,6 @@ namespace DogRunService
             req.source = "api";
             req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
             req.type = "sell-limit";
-            PlatformApi api = PlatformApi.GetInstance(userName);
             HBResponse<long> order = api.OrderPlace(req);
             logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
             if (order.Status == "ok")

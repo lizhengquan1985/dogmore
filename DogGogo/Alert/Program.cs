@@ -13,24 +13,30 @@ namespace Alert
     {
         static void Main(string[] args)
         {
+            // 大起大落
+            Task.Run(() =>
+            {
+                Price24Alert.RunAlert();
+            });
+
             var symbols = CoinUtils.GetAllCommonSymbols();
 
             // 空
-            EmptyOrderTask.Run(symbols);
+            //EmptyOrderTask.Run(symbols);
 
-            ReadAutoBuySellText(symbols);
+            //ReadAutoBuySellText(symbols);
 
-            while (true)
-            {
-                Console.WriteLine("请输入symbol");
-                var symbol = Console.ReadLine();
-                Console.WriteLine("请输入big");
-                var big = Console.ReadLine();
-                Console.WriteLine("请输入small");
-                var small = Console.ReadLine();
+            //while (true)
+            //{
+            //    Console.WriteLine("请输入symbol");
+            //    var symbol = Console.ReadLine();
+            //    Console.WriteLine("请输入big");
+            //    var big = Console.ReadLine();
+            //    Console.WriteLine("请输入small");
+            //    var small = Console.ReadLine();
 
-                PriceAlert.RunAlert(symbols.Find(it => it.BaseCurrency == symbol), decimal.Parse(big), decimal.Parse(small));
-            }
+            //    PriceAlert.RunAlert(symbols.Find(it => it.BaseCurrency == symbol), decimal.Parse(big), decimal.Parse(small));
+            //}
 
             Console.WriteLine("over - over - over");
             Console.ReadLine();

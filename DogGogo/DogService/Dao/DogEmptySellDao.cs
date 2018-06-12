@@ -107,5 +107,11 @@ namespace DogService.Dao
             sql = $"delete from t_dog_empty_sell where SellOrderId={sellOrderId}";
             Database.Execute(sql);
         }
+
+        public List<DogEmptySell> listEveryMaxPriceEmptySellIsNotFinished()
+        {
+            var sql = $"select * from t_dog_empty_sell where SellOrderId in( select SellOrderId from  ( select max(SellOrderId) SellOrderId,SymbolName from t_dog_empty_sell where IsFinished=0 group by SymbolName) t)  ";
+            return Database.Query<DogEmptySell>(sql).ToList();
+        }
     }
 }

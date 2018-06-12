@@ -19,7 +19,10 @@ namespace DogPlatform
             foreach (var item in commonSymbols)
             {
                 item.LeastBuyQuantity = 1; // TODO 改进
-                coins.Add(item.BaseCurrency, item);
+                if (!coins.ContainsKey(item.BaseCurrency))
+                {
+                    coins.Add(item.BaseCurrency, item);
+                }
             }
         }
 

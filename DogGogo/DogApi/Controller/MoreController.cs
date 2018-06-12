@@ -95,16 +95,14 @@ namespace DogApi.Controller
         {
             var list = new List<DogMoreBuy>();
             var symbols = CoinUtils.GetAllCommonSymbols();
+            symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
             if (string.IsNullOrEmpty(symbolName))
             {
                 list = new DogMoreBuyDao().listErvryMinPriceMoreBuyIsNotFinished();
+                list = list.Where(it => it.SymbolName != "btc").ToList();
                 foreach (var symbol in symbols)
                 {
-                    if (symbol.BaseCurrency == "btc")
-                    {
-                        continue;
-                    }
                     try
                     {
                         var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
@@ -120,7 +118,8 @@ namespace DogApi.Controller
             }
             else
             {
-                list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName); var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
+                list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
+                var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
                 var historyKlineData = HistoryKlinePools.Get(key);
                 var close = historyKlineData.Data[0].Close;
                 closeDic.Add(symbolName, close);

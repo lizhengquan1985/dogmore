@@ -656,6 +656,8 @@ namespace DogRunService
             {
                 logger.Error(ex.Message, ex);
             }
+
+            // 自动做空
         }
 
         public static void DoEmpty(CommonSymbols symbol, string userName, string accountId)
@@ -684,7 +686,15 @@ namespace DogRunService
                 throw new ApplicationException("有价格比这个更高得还没有收割。不能重新做空。");
             }
 
-            decimal sellQuantity = 5 / nowPrice; // 暂定每次做空5美元
+            PlatformApi api = PlatformApi.GetInstance(userName);
+
+            var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+            var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
+            var amount = balanceItem.balance * nowPrice;
+            var sellAmout = Math.Max(amount / 20, 5);
+            sellAmout = Math.Min(sellAmout, 10);
+
+            decimal sellQuantity = sellAmout / nowPrice; // 暂定每次做空5美元
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
             if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
             {
@@ -700,7 +710,6 @@ namespace DogRunService
             req.source = "api";
             req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
             req.type = "sell-limit";
-            PlatformApi api = PlatformApi.GetInstance(userName);
             HBResponse<long> order = api.OrderPlace(req);
             logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
             if (order.Status == "ok")

@@ -79,15 +79,40 @@ namespace DogApi.Controller
         [ActionName("listEmptySellIsNotFinished")]
         public async Task<object> listEmptySellIsNotFinished(string symbolName)
         {
-            try
+            var list = new List<DogEmptySell>();
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+            Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+            if (string.IsNullOrEmpty(symbolName))
             {
-                return new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName);
+                list = new DogEmptySellDao().listEveryMaxPriceEmptySellIsNotFinished();
+                list = list.Where(it => it.SymbolName != "btc").ToList();
+                foreach (var symbol in symbols)
+                {
+                    try
+                    {
+                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
+                        var historyKlineData = HistoryKlinePools.Get(key);
+                        var close = historyKlineData.Data[0].Close;
+                        closeDic.Add(symbol.BaseCurrency, close);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
             }
-            catch (Exception ex)
+            else
             {
-                logger.Error(ex.Message, ex);
-                return null;
+                list = new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName);
+
+                var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
+                var historyKlineData = HistoryKlinePools.Get(key);
+                var close = historyKlineData.Data[0].Close;
+                closeDic.Add(symbolName, close);
             }
+
+            return new { list, closeDic };
         }
 
         [HttpGet]
@@ -225,12 +250,12 @@ namespace DogApi.Controller
                     buyAmount += item.FilledAmount * item.price;
                     buyQuantity += item.FilledAmount;
                     buyFees += item.FilledFees;
-                    if(buyTradePrice < item.price)
+                    if (buyTradePrice < item.price)
                     {
                         buyTradePrice = item.price;
                     }
                 }
-                if(buy.BuyDate < buyDate)
+                if (buy.BuyDate < buyDate)
                 {
                     buyDate = buy.BuyDate;
                 }
@@ -287,12 +312,33 @@ namespace DogApi.Controller
         /// <returns></returns>
         [HttpPost]
         [ActionName("doEmpty")]
-        public async Task DoEmpty(string userName, string symbolName)
+        public async Task<object> DoEmpty(string userName, string symbolName)
         {
             // 立马空单
             var symbols = CoinUtils.GetAllCommonSymbols();
             var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
-            CoinTrade.DoEmpty(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+            var dao = new KlineDao();
+            var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+            // 大于今天最小值15%才行 or 大于24小时20%
+            var nowPrice = lastKlines[0].Close;
+            var min24 = decimal.MaxValue;
+            var minToday = decimal.MaxValue;
+            foreach (var item in lastKlines)
+            {
+                if (item.Close < min24)
+                {
+                    min24 = item.Close;
+                }
+                if (item.Close < minToday && Utils.GetDateById(item.Id) > DateTime.Today)
+                {
+                    minToday = item.Close;
+                }
+            }
+            if (nowPrice / min24 > (decimal)1.20 || nowPrice / minToday > (decimal)1.15)
+            {
+                CoinTrade.DoEmpty(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+            }
+            return new { nowPrice, min24, minToday };
         }
     }
 }

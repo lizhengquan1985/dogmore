@@ -79,15 +79,39 @@ namespace DogApi.Controller
         [ActionName("listEmptySellIsNotFinished")]
         public async Task<object> listEmptySellIsNotFinished(string symbolName)
         {
-            try
+            var list = new List<DogEmptySell>();
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+            Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+            if (string.IsNullOrEmpty(symbolName))
             {
-                return new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName);
+                list = new DogEmptySellDao().listEveryMaxPriceEmptySellIsNotFinished();
+                foreach (var symbol in symbols)
+                {
+                    try
+                    {
+                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
+                        var historyKlineData = HistoryKlinePools.Get(key);
+                        var close = historyKlineData.Data[0].Close;
+                        closeDic.Add(symbol.BaseCurrency, close);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
             }
-            catch (Exception ex)
+            else
             {
-                logger.Error(ex.Message, ex);
-                return null;
+                list = new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName);
+
+                var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
+                var historyKlineData = HistoryKlinePools.Get(key);
+                var close = historyKlineData.Data[0].Close;
+                closeDic.Add(symbolName, close);
             }
+
+            return new { list, closeDic };
         }
 
         [HttpGet]

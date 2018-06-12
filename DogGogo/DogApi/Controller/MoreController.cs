@@ -101,6 +101,10 @@ namespace DogApi.Controller
                 list = new DogMoreBuyDao().listErvryMinPriceMoreBuyIsNotFinished();
                 foreach (var symbol in symbols)
                 {
+                    if (symbol.BaseCurrency == "btc")
+                    {
+                        continue;
+                    }
                     try
                     {
                         var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
@@ -108,9 +112,9 @@ namespace DogApi.Controller
                         var close = historyKlineData.Data[0].Close;
                         closeDic.Add(symbol.BaseCurrency, close);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        
+
                     }
                 }
             }

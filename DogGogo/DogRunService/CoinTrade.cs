@@ -569,12 +569,7 @@ namespace DogRunService
                         continue;
                     }
                     decimal sellQuantity = JudgeSellUtils.CalcSellQuantity(needSellDogMoreBuyItem.BuyQuantity, symbol);
-                    //decimal sellQuantity = needSellDogMoreBuyItem.BuyQuantity * (decimal)0.99;
-                    //sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                    //if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
-                    //{
-                    //    sellQuantity = 1;
-                    //}
+
                     // 出售
                     decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
                     OrderPlaceRequest req = new OrderPlaceRequest();

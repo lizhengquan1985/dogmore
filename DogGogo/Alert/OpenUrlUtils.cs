@@ -13,7 +13,7 @@ namespace Alert
         {
             if ((DateTime.Now - dt).TotalSeconds > 60)
             {
-                System.Diagnostics.Process.Start("explorer.exe", "http://blog.csdn.net/testcs_dn");
+                System.Diagnostics.Process.Start("explorer.exe", "http://music.baidu.com/song/567299854");
                 dt = DateTime.Now;
             }
         }

@@ -34,15 +34,17 @@ namespace Alert
                             // 5分钟内有5%， 或者 15分钟内有10%
                             foreach (var item in klines)
                             {
-                                if ( Utils.GetDateById(item.Id) > DateTime.Now.AddMinutes(-5) && (
-                                    item.Close / nowPrice > (decimal)1.05 || nowPrice / item.Close  > (decimal)1.05))
+                                if (Utils.GetDateById(item.Id) > DateTime.Now.AddMinutes(-5) && (
+                                    item.Close / nowPrice > (decimal)1.05 || nowPrice / item.Close > (decimal)1.05))
                                 {
+                                    Console.WriteLine($"{symbol.BaseCurrency}, now:{nowPrice} ->{ item.Close} ");
                                     OpenUrlUtils.Open();
                                 }
 
                                 if (Utils.GetDateById(item.Id) > DateTime.Now.AddMinutes(-15) && (
                                     item.Close / nowPrice > (decimal)1.10 || nowPrice / item.Close > (decimal)1.10))
                                 {
+                                    Console.WriteLine($"{symbol.BaseCurrency}, now:{nowPrice} ->{ item.Close} ");
                                     OpenUrlUtils.Open();
                                 }
                             }

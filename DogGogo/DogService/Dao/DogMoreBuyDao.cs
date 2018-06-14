@@ -59,6 +59,16 @@ namespace DogService.Dao
             }
         }
 
+        public void UpdateDogMoreBuyWhenCancel(long buyOrderId)
+        {
+            using (var tx = Database.BeginTransaction())
+            {
+                var sql = $"update t_dog_more_buy set BuyState='{StateConst.Canceled}' where BuyOrderId ='{buyOrderId}'";
+                Database.Execute(sql);
+                tx.Commit();
+            }
+        }
+
         #endregion
 
         public List<DogMoreBuy> GetNeedSellDogMoreBuy(string accountId, string userName, string symbolName)

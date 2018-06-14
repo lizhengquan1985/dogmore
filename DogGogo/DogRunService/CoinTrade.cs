@@ -521,6 +521,12 @@ namespace DogRunService
                     new DogMoreBuyDao().UpdateDogMoreBuySuccess(orderId, orderDetail, orderMatchResult, maxPrice);
                 }
             }
+
+            if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.Canceled)
+            {
+                // 完成
+                new DogMoreBuyDao().UpdateDogMoreBuyWhenCancel(orderId);
+            }
         }
 
         private static void RunSell(CommonSymbols symbol, AnalyzeResult analyzeResult)

@@ -181,7 +181,13 @@ namespace DogRunService
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 var accountInfo = api.GetAccountBalance(accountId);
                 var usdt = accountInfo.Data.list.Find(it => it.currency == "usdt");
-                decimal recommendAmount = usdt.balance / 220; // TODO 测试阶段，暂定低一些，
+                // 要减去空单未收割得额度总和
+                var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName);
+                if (notShougeEmptySellAmount >= usdt.balance)
+                {
+                    continue;
+                }
+                decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / 220; // TODO 测试阶段，暂定低一些，
 
                 if (recommendAmount < (decimal)1.1)
                 {
@@ -668,10 +674,10 @@ namespace DogRunService
                 var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
                 foreach (var userName in userNames)
                 {
-                    if (control == null || control.EmptyExpiredTime < DateTime.Now || nowPrice <= control.EmptyPrice)
-                    {
-                        continue;
-                    }
+                    //if (control == null || control.EmptyExpiredTime < DateTime.Now || nowPrice <= control.EmptyPrice)
+                    //{
+                    //    continue;
+                    //}
 
                     // 和上次做空价格要相差5%
                     var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
@@ -679,13 +685,14 @@ namespace DogRunService
 
                     if (nowPrice * (decimal)1.02 < flexPointList[0].close || nowPrice * (decimal)1.005 > flexPointList[0].close)
                     {
-                        // 不是拐点
+                        // 过了拐点， 或者还不确定是拐点
                         continue;
                     }
 
                     var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
                     if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.08)
                     {
+                        // 上一次还没收割得，相差8%， 要等等
                         continue;
                     }
 
@@ -694,13 +701,14 @@ namespace DogRunService
                     var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
                     var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
                     // 要减去未收割得。
-                    var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(symbol.BaseCurrency);
+                    var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
                     if (notShougeQuantity <= balanceItem.balance)
                     {
+                        logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
                         continue;
                     }
 
-                    decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / 10; // 暂定每次做空1/10
+                    decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / 12; // 暂定每次做空1/12
                     if (sellQuantity * nowPrice > 10)
                     {
                         sellQuantity = 10 / nowPrice;

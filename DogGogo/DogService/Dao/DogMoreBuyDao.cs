@@ -26,11 +26,11 @@ namespace DogService.Dao
             return Database.Query<DogMoreBuy>(sql).FirstOrDefault();
         }
 
-        public decimal GetBuyQuantityNotShouge(string symbolName)
+        public decimal GetBuyQuantityNotShouge(string userName, string symbolName)
         {
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select sum(BuyQuantity) from t_dog_more_buy where SymbolName=@symbolName and BuyStat not in(states2)";
-            return Database.Query<decimal>(sql).FirstOrDefault();
+            var sql = $"select sum(BuyQuantity) from t_dog_more_buy where UserName=@userName and SymbolName=@symbolName and BuyStat not in(states2)";
+            return Database.Query<decimal>(sql, new { userName, symbolName }).FirstOrDefault();
         }
 
         public void CreateDogMoreBuy(DogMoreBuy dogMoreBuy)

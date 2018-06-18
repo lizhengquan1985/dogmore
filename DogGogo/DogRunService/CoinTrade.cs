@@ -683,7 +683,7 @@ namespace DogRunService
                     //{
                     //    continue;
                     //}
-                    if(symbol.BaseCurrency != "gnt")
+                    if(symbol.BaseCurrency != "gnt" && symbol.BaseCurrency != "btm" && symbol.BaseCurrency != "ht")
                     {
                         continue;
                     }

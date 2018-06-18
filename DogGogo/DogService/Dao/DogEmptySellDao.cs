@@ -33,10 +33,10 @@ namespace DogService.Dao
         /// <returns></returns>
         public decimal GetSumNotShougeDogEmptySell(string userName)
         {
-            var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select sum(SellQuantity*SellTradePrice) from t_dog_empty_sell where UserName=@userName and SellState not in({states2})";
+            var sql = $"select sum(SellQuantity*SellTradePrice) Total from t_dog_empty_sell where IsFinished=0 and UserName=@userName";
             var res = Database.Query<decimal?>(sql, new { userName }).FirstOrDefault();
-            if(res == null)
+            logger.Error($"{sql}, {userName}, {res}");
+            if (res == null)
             {
                 return 0;
             }
@@ -96,8 +96,10 @@ namespace DogService.Dao
 
         public decimal? GetMaxSellTradePrice(string userName, string symbolName)
         {
-            var sql = $"select max(SellTradePrice) from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and UserName=@userName";
-            return Database.Query<decimal?>(sql, new { symbolName, userName }).FirstOrDefault();
+            var sql = $"select max(SellTradePrice) MaxPrice from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and UserName=@userName";
+            var res = Database.Query<decimal?>(sql, new { symbolName, userName }).FirstOrDefault();
+            logger.Error($"{sql}, {userName}, {symbolName}, {res}");
+            return res;
         }
 
         public List<DogEmptySell> ListDogEmptySellFinished(string userName, string symbolName)

@@ -264,7 +264,7 @@ namespace DogRunService
                         Thread.Sleep(1000 * 60 * 60);
                     }
                 }
-                logger.Error($"下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyPrice},nowPrice：{nowPrice}, accountId：{accountId}");
+                logger.Error($"下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyPrice},nowPrice：{nowPrice}, accountId：{accountId}");
                 logger.Error($"下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
             }
 
@@ -682,7 +682,7 @@ namespace DogRunService
                     //{
                     //    continue;
                     //}
-                    if(symbol.BaseCurrency != "gnt" && symbol.BaseCurrency != "btm" && symbol.BaseCurrency != "ht")
+                    if (symbol.BaseCurrency != "gnt" && symbol.BaseCurrency != "btm" && symbol.BaseCurrency != "ht")
                     {
                         continue;
                     }
@@ -710,7 +710,7 @@ namespace DogRunService
                     var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
                     // 要减去未收割得。
                     var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
-                    if (notShougeQuantity <= balanceItem.balance)
+                    if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
                     {
                         logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
                         continue;

@@ -51,8 +51,13 @@ namespace DogRunService
             decimal lastLowPrice;
             decimal nowPrice = historyKlines[0].Close;
             // 分析是否下跌， 下跌超过一定数据，可以考虑
-            decimal flexPercent = (decimal)1.045;
+            decimal flexPercent = (decimal)1.050;
             var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
+            {
+                flexPercent = (decimal)1.045;
+                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+            }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.040;
@@ -678,6 +683,10 @@ namespace DogRunService
                     //{
                     //    continue;
                     //}
+                    if(symbol.BaseCurrency != "gnt")
+                    {
+                        continue;
+                    }
 
                     // 和上次做空价格要相差5%
                     var accountConfig = AccountConfigUtils.GetAccountConfig(userName);

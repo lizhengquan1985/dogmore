@@ -29,7 +29,7 @@ namespace DogService.Dao
         public decimal GetBuyQuantityNotShouge(string userName, string symbolName)
         {
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select sum(BuyQuantity) from t_dog_more_buy where UserName=@userName and SymbolName=@symbolName and BuyStat not in(states2)";
+            var sql = $"select sum(BuyQuantity) from t_dog_more_buy where UserName=@userName and SymbolName=@symbolName and BuyState not in(states2)";
             return Database.Query<decimal>(sql, new { userName, symbolName }).FirstOrDefault();
         }
 

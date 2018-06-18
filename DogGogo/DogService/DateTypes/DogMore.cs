@@ -17,8 +17,17 @@ namespace DogService.DateTypes
         public string UserName { get; set; }
         public long BuyOrderId { get; set; }
         public string BuyOrderResult { get; set; }
+        /// <summary>
+        /// 入手数量
+        /// </summary>
         public decimal BuyQuantity { get; set; }
+        /// <summary>
+        /// 下单价格
+        /// </summary>
         public decimal BuyOrderPrice { get; set; }
+        /// <summary>
+        /// 最差成交价
+        /// </summary>
         public decimal BuyTradePrice { get; set; }
         public string BuyState { get; set; }
         public string BuyFlex { get; set; }

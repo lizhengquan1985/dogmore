@@ -230,7 +230,6 @@ namespace DogRunService
                 }
 
                 HBResponse<long> order = api.OrderPlace(req);
-                logger.Error("下单购买结果：" + JsonConvert.SerializeObject(order));
                 if (order.Status == "ok")
                 {
                     try
@@ -782,6 +781,7 @@ namespace DogRunService
         {
             try
             {
+                PlatformApi api = PlatformApi.GetInstance(userName);
                 OrderPlaceRequest req = new OrderPlaceRequest();
                 req.account_id = accountId;
                 req.amount = sellQuantity.ToString();

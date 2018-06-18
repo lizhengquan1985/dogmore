@@ -34,8 +34,13 @@ namespace DogService.Dao
         public decimal GetSumNotShougeDogEmptySell(string userName)
         {
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select sum(SellQuantity*SellTradePrice) from t_dog_empty_sell where UserName=@userName and SellState not in({states2}))";
-            return Database.Query<decimal>(sql, new { userName }).FirstOrDefault();
+            var sql = $"select sum(SellQuantity*SellTradePrice) from t_dog_empty_sell where UserName=@userName and SellState not in({states2})";
+            var res = Database.Query<decimal?>(sql, new { userName }).FirstOrDefault();
+            if(res == null)
+            {
+                return 0;
+            }
+            return (decimal)res;
         }
 
         public List<DogEmptySell> GetNeedBuyDogEmptySell(string accountId, string userName, string symbolName)

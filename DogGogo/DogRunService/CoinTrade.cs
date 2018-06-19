@@ -673,107 +673,54 @@ namespace DogRunService
             }
 
             // 自动做空
-            try
+            // 要求  1. 进入拐点区域, 2. 受管控未过期
+            var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
+            if (nowPrice * (decimal)1.02 > flexPointList[0].close && nowPrice * (decimal)1.005 < flexPointList[0].close
+                && control != null && nowPrice >= control.EmptyPrice && control.EmptyExpiredTime > DateTime.Now)
             {
-                var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
                 foreach (var userName in userNames)
                 {
-                    //if (control == null || control.EmptyExpiredTime < DateTime.Now || nowPrice <= control.EmptyPrice)
-                    //{
-                    //    continue;
-                    //}
-                    if (symbol.BaseCurrency != "gnt" && symbol.BaseCurrency != "btm" && symbol.BaseCurrency != "ht")
+                    try
                     {
-                        continue;
+                        // 和上次做空价格要相差8%
+                        var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
+                        if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.08)
+                        {
+                            // 上一次还没收割得，相差8%， 要等等
+                            continue;
+                        }
+
+                        var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
+                        var accountId = accountConfig.MainAccountId;
+                        PlatformApi api = PlatformApi.GetInstance(userName);
+
+                        var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+                        var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
+                        // 要减去未收割得。
+                        var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
+                        if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
+                        {
+                            logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
+                            continue;
+                        }
+
+                        decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / 12; // 暂定每次做空1/12
+                        if (sellQuantity * nowPrice > 10)
+                        {
+                            sellQuantity = 10 / nowPrice;
+                        }
+                        sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+
+                        // 出售
+                        decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
+                        EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
+
                     }
-
-                    // 和上次做空价格要相差5%
-                    var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
-                    var accountId = accountConfig.MainAccountId;
-
-                    if (nowPrice * (decimal)1.02 < flexPointList[0].close || nowPrice * (decimal)1.005 > flexPointList[0].close)
+                    catch (Exception ex)
                     {
-                        // 过了拐点， 或者还不确定是拐点
-                        continue;
+                        logger.Error(ex.Message, ex);
                     }
-
-                    var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
-                    if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.08)
-                    {
-                        // 上一次还没收割得，相差8%， 要等等
-                        continue;
-                    }
-
-                    PlatformApi api = PlatformApi.GetInstance(userName);
-
-                    var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
-                    var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
-                    // 要减去未收割得。
-                    var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
-                    if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
-                    {
-                        logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
-                        continue;
-                    }
-
-                    decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / 12; // 暂定每次做空1/12
-                    if (sellQuantity * nowPrice > 10)
-                    {
-                        sellQuantity = 10 / nowPrice;
-                    }
-                    sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-
-                    // 出售
-                    decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
-                    EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
-                    //OrderPlaceRequest req = new OrderPlaceRequest();
-                    //req.account_id = accountId;
-                    //req.amount = sellQuantity.ToString();
-                    //req.price = sellPrice.ToString();
-                    //req.source = "api";
-                    //req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
-                    //req.type = "sell-limit";
-                    //HBResponse<long> order = api.OrderPlace(req);
-                    //logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
-                    //if (order.Status == "ok")
-                    //{
-                    //    try
-                    //    {
-                    //        DogEmptySell dogEmptySell = new DogEmptySell()
-                    //        {
-                    //            AccountId = accountId,
-                    //            UserName = userName,
-                    //            SellOrderId = order.Data,
-                    //            SellOrderResult = JsonConvert.SerializeObject(order),
-                    //            SellDate = DateTime.Now,
-                    //            SellFlex = JsonConvert.SerializeObject(flexPointList),
-                    //            SellQuantity = sellQuantity,
-                    //            SellOrderPrice = sellPrice,
-                    //            SellState = StateConst.Submitted,
-                    //            SellTradePrice = 0,
-                    //            SymbolName = symbol.BaseCurrency,
-                    //            SellMemo = "",
-                    //            SellOrderDetail = "",
-                    //            SellOrderMatchResults = "",
-                    //            FlexPercent = (decimal)1.04,
-                    //            IsFinished = false
-                    //        };
-                    //        new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        logger.Error("------RunSell----危险-----------");
-                    //        logger.Error(ex.Message, ex);
-                    //    }
-
-                    //    // 下单成功马上去查一次
-                    //    QueryEmptySellDetailAndUpdate(userName, order.Data);
-                    //}
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
             }
         }
 

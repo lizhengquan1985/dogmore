@@ -705,6 +705,10 @@ namespace DogRunService
                         }
 
                         decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / 12; // 暂定每次做空1/12
+                        if(sellQuantity * nowPrice < 1)
+                        {
+                            sellQuantity = (balanceItem.balance - notShougeQuantity) / 6;
+                        }
                         if (sellQuantity * nowPrice > 10)
                         {
                             sellQuantity = 10 / nowPrice;

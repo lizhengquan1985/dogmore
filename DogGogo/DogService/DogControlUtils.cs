@@ -84,7 +84,7 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderBuy(string symbolName, decimal defaultLadderBuyPercent = (decimal)1.04)
+        public static decimal GetLadderBuy(string symbolName, decimal defaultLadderBuyPercent = (decimal)1.06)
         {
             try
             {
@@ -93,8 +93,8 @@ namespace DogService
                 {
                     defaultLadderBuyPercent = control.LadderBuyPercent;
                 }
-                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, (decimal)1.02);
-                defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, (decimal)1.08);
+                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, (decimal)1.04);
+                defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, (decimal)1.09);
                 return defaultLadderBuyPercent;
             }
             catch (Exception ex)
@@ -113,8 +113,8 @@ namespace DogService
                 {
                     defaultLadderSellPercent = control.LadderSellPercent;
                 }
-                defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, (decimal)1.025);
-                defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, (decimal)1.08);
+                defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, (decimal)1.035);
+                defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, (decimal)1.12);
                 return defaultLadderSellPercent;
             }
             catch (Exception ex)

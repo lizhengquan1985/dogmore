@@ -297,9 +297,7 @@ namespace DogRunService
                         continue;
                     }
 
-                    decimal buyQuantity = needBuyDogEmptySellItem.SellQuantity * (decimal)1.005;
-                    buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
-
+                    decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(needBuyDogEmptySellItem.SellQuantity, needBuyDogEmptySellItem.SellTradePrice, nowPrice, symbol.AmountPrecision);
                     decimal orderPrice = decimal.Round(nowPrice * (decimal)1.005, symbol.PricePrecision);
 
                     OrderPlaceRequest req = new OrderPlaceRequest();
@@ -705,7 +703,7 @@ namespace DogRunService
                         }
 
                         decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / 12; // 暂定每次做空1/12
-                        if(sellQuantity * nowPrice < 1)
+                        if (sellQuantity * nowPrice < 1)
                         {
                             sellQuantity = (balanceItem.balance - notShougeQuantity) / 6;
                         }

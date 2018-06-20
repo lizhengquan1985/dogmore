@@ -84,7 +84,7 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderBuy(string symbolName, decimal defaultLadderBuyPercent = (decimal)1.06)
+        public static decimal GetLadderBuy(string symbolName, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.06)
         {
             try
             {
@@ -93,8 +93,24 @@ namespace DogService
                 {
                     defaultLadderBuyPercent = control.LadderBuyPercent;
                 }
-                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, (decimal)1.04);
-                defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, (decimal)1.09);
+                else if (control != null && nowPrice <= control.HistoryMax && nowPrice >= control.HistoryMin)
+                {
+                    // 计算出来阶梯
+                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                    var max = (decimal)1.12;
+                    var min = (decimal)1.05;
+                    defaultLadderBuyPercent = max - Convert.ToInt32(percent * (max - min));
+                    if (defaultLadderBuyPercent > max)
+                    {
+                        defaultLadderBuyPercent = max;
+                    }
+                    if (defaultLadderBuyPercent < min)
+                    {
+                        defaultLadderBuyPercent = min;
+                    }
+                }
+                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, (decimal)1.05);
+                defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, (decimal)1.12);
                 return defaultLadderBuyPercent;
             }
             catch (Exception ex)
@@ -121,6 +137,37 @@ namespace DogService
             {
                 logger.Error(ex.Message, ex);
                 return defaultLadderSellPercent;
+            }
+        }
+
+        public static int GetRecommendDivide(string symbolName, decimal nowPrice, int divide = 250)
+        {
+            try
+            {
+                var control = new DogControlDao().GetDogControl(symbolName);
+                if (control == null || control.HistoryMax <= control.HistoryMin || nowPrice > control.HistoryMax || nowPrice < control.HistoryMin)
+                {
+                    return divide;
+                }
+
+                var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                var max = 300;
+                var min = 220;
+                divide = max - Convert.ToInt32(percent * (max - min));
+                if (divide > max)
+                {
+                    divide = max;
+                }
+                if (divide < min)
+                {
+                    divide = min;
+                }
+                return divide;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return divide;
             }
         }
     }

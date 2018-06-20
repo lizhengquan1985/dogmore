@@ -48,5 +48,8 @@ namespace DogService.DateTypes
         /// </summary>
         public bool IsValid { get; set; }
         public DateTime CreateTime { get; set; }
+
+        public decimal HistoryMax { get; set; }
+        public decimal HistoryMin { get; set; }
     }
 }

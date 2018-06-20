@@ -176,7 +176,7 @@ namespace DogRunService
                     minBuyPrice = 25000;
                 }
 
-                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency);
+                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
                 if (nowPrice * ladderBuyPercent > minBuyPrice || nowPrice * (decimal)1.01 >= minBuyPrice)
                 {
                     // 最近一次购入,没有低于3%
@@ -192,7 +192,7 @@ namespace DogRunService
                 {
                     continue;
                 }
-                decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / 220; // TODO 测试阶段，暂定低一些，
+                decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivide(symbol.BaseCurrency, nowPrice); // TODO 测试阶段，暂定低一些，
 
                 if (recommendAmount < (decimal)1.1)
                 {
@@ -287,7 +287,7 @@ namespace DogRunService
                     continue;
                 }
 
-                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency);
+                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
                 PlatformApi api = PlatformApi.GetInstance(userName);
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)

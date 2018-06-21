@@ -87,6 +87,7 @@ namespace DogApi.Controller
                 {
                     inDB = new DogControl()
                     {
+                        SymbolName = symbolName,
                         HistoryMax = max,
                         HistoryMin = min
                     };

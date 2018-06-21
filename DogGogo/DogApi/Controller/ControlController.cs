@@ -1,4 +1,5 @@
 ﻿using DogPlatform;
+using DogRunService;
 using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
@@ -37,7 +38,26 @@ namespace DogApi.Controller
             try
             {
                 var res = await new DogControlDao().ListDogControl();
-                return res.OrderByDescending(it => it.SymbolName);
+                res = res.OrderBy(it => it.SymbolName).ToList();
+
+                var symbols = CoinUtils.GetAllCommonSymbols();
+                symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+                Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+                foreach (var symbol in symbols)
+                {
+                    try
+                    {
+                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
+                        var historyKlineData = HistoryKlinePools.Get(key);
+                        var close = historyKlineData.Data[0].Close;
+                        closeDic.Add(symbol.BaseCurrency, close);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                return new { list = res, closeDic };
             }
             catch (Exception ex)
             {

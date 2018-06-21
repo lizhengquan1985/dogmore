@@ -91,7 +91,7 @@ namespace DogRunService.Helper
                 }
 
                 totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;
-                if ((DateTime.Now - begin).TotalSeconds > 3)
+                if ((DateTime.Now - begin).TotalSeconds > 4)
                 {
                     logger.Error("一次请求时间太长 含插入数据库,达到：" + totalMilliseconds);
                 }

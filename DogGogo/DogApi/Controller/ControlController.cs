@@ -71,14 +71,57 @@ namespace DogApi.Controller
                 var period = "4hour";
                 var klines = api.GetHistoryKline(symbolName + "usdt", period, 1000);
                 var min = decimal.MaxValue;
+                var min1 = decimal.MaxValue;
+                var min2 = decimal.MaxValue;
+                var min3 = decimal.MaxValue;
                 var max = decimal.MinValue;
+                var max1 = decimal.MinValue;
+                var max2 = decimal.MinValue;
+                var max3 = decimal.MinValue;
                 foreach (var item in klines)
                 {
-                    if (item.Low < min)
+                    if (item.Low < min3)
+                    {
+                        min = min1;
+                        min1 = min2;
+                        min2 = min3;
+                        min3 = item.Low;
+                    }
+                    else if (item.Low < min2)
+                    {
+                        min = min1;
+                        min1 = min2;
+                        min2 = item.Low;
+                    }
+                    else if (item.Low < min1)
+                    {
+                        min = min1;
+                        min1 = item.Low;
+                    }
+                    else if (item.Low < min)
                     {
                         min = item.Low;
                     }
-                    if (item.High > max)
+
+                    if (item.High >= max3)
+                    {
+                        max = max1;
+                        max1 = max2;
+                        max2 = max3;
+                        max3 = item.High;
+                    }
+                    else if (item.High >= max2)
+                    {
+                        max = max1;
+                        max1 = max2;
+                        max2 = item.High;
+                    }
+                    else if (item.High >= max1)
+                    {
+                        max = max1;
+                        max1 = item.High;
+                    }
+                    else if (item.High >= max)
                     {
                         max = item.High;
                     }

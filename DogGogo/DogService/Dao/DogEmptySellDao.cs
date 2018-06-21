@@ -35,7 +35,6 @@ namespace DogService.Dao
         {
             var sql = $"select sum(SellQuantity*SellTradePrice) Total from t_dog_empty_sell where IsFinished=0 and UserName=@userName";
             var res = Database.Query<decimal?>(sql, new { userName }).FirstOrDefault();
-            logger.Error($"{sql}, {userName}, {res}");
             if (res == null)
             {
                 return 0;
@@ -98,7 +97,6 @@ namespace DogService.Dao
         {
             var sql = $"select max(SellTradePrice) MaxPrice from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and UserName=@userName";
             var res = Database.Query<decimal?>(sql, new { symbolName, userName }).FirstOrDefault();
-            logger.Error($"{sql}, {userName}, {symbolName}, {res}");
             return res;
         }
 

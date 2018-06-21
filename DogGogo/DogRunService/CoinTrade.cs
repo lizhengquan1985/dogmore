@@ -674,7 +674,8 @@ namespace DogRunService
             // 要求  1. 进入拐点区域, 2. 受管控未过期
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
             if (nowPrice * (decimal)1.02 > flexPointList[0].close && nowPrice * (decimal)1.005 < flexPointList[0].close
-                && control != null && nowPrice >= control.EmptyPrice && control.EmptyExpiredTime > DateTime.Now && nowPrice >= control.HistoryMin * (decimal)1.2 && control.HistoryMin > 0)
+                && control != null && nowPrice >= control.EmptyPrice && control.EmptyExpiredTime > DateTime.Now 
+                && nowPrice >= control.HistoryMin * (decimal)1.2 && control.HistoryMin > 0 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin)
             {
                 foreach (var userName in userNames)
                 {

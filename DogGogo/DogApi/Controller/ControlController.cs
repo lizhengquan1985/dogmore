@@ -36,7 +36,8 @@ namespace DogApi.Controller
         {
             try
             {
-                return await new DogControlDao().ListDogControl();
+                var res = await new DogControlDao().ListDogControl();
+                return res.OrderByDescending(it => it.SymbolName);
             }
             catch (Exception ex)
             {

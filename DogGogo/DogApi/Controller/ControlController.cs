@@ -60,5 +60,50 @@ namespace DogApi.Controller
             }
         }
 
+        [HttpGet]
+        [ActionName("refreshHistoryMaxMin")]
+        public async Task RefreshHistoryMaxMin(string symbolName)
+        {
+            try
+            {
+                PlatformApi api = PlatformApi.GetInstance("xx");
+                var period = "4hour";
+                var klines = api.GetHistoryKline(symbolName + "usdt", period, 1000);
+                var min = decimal.MaxValue;
+                var max = decimal.MinValue;
+                foreach (var item in klines)
+                {
+                    if (item.Low < min)
+                    {
+                        min = item.Low;
+                    }
+                    if (item.High > max)
+                    {
+                        max = item.High;
+                    }
+                }
+                var inDB = new DogControlDao().GetDogControl(symbolName);
+                if (inDB == null)
+                {
+                    inDB = new DogControl()
+                    {
+                        HistoryMax = max,
+                        HistoryMin = min
+                    };
+                    await new DogControlDao().CreateDogControl(inDB);
+                }
+                else
+                {
+                    inDB.HistoryMax = max;
+                    inDB.HistoryMin = min;
+                    await new DogControlDao().CreateDogControl(inDB);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+        }
     }
 }

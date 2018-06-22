@@ -20,13 +20,13 @@ namespace DogRunService.Helper
         {
             decimal buyQuantity = sellQuantity * (decimal)1.005;
             buyQuantity = decimal.Round(buyQuantity, amountPrecision);
-            if (buyQuantity > sellQuantity && buyQuantity * nowPrice < sellQuantity * sellTradePrice)
+            if (buyQuantity > sellQuantity && buyQuantity * nowPrice <= sellQuantity * sellTradePrice)
             {
                 return buyQuantity;
             }
 
             var newBuyQuantity = buyQuantity;
-            if (buyQuantity == sellQuantity)
+            if (newBuyQuantity == sellQuantity)
             {
                 if (amountPrecision == 1)
                 {
@@ -45,7 +45,7 @@ namespace DogRunService.Helper
                     newBuyQuantity += (decimal)0.0001;
                 }
             }
-            if (newBuyQuantity > sellQuantity && newBuyQuantity * nowPrice < sellQuantity * sellTradePrice)
+            if (newBuyQuantity > sellQuantity && newBuyQuantity * nowPrice <= sellQuantity * sellTradePrice)
             {
                 return newBuyQuantity;
             }

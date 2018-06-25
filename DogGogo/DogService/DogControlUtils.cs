@@ -120,7 +120,7 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderSell(string symbolName, decimal defaultLadderSellPercent = (decimal)1.045)
+        public static decimal GetLadderSell(string symbolName, decimal defaultLadderSellPercent = (decimal)1.05)
         {
             try
             {
@@ -129,7 +129,7 @@ namespace DogService
                 {
                     defaultLadderSellPercent = control.LadderSellPercent;
                 }
-                defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, (decimal)1.035);
+                defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, (decimal)1.04);
                 defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, (decimal)1.12);
                 return defaultLadderSellPercent;
             }

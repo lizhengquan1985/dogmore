@@ -375,17 +375,16 @@ namespace DogRunService
                     BuyState = StateConst.PreSubmitted,
                     BuyTradePrice = 0,
                     BuyOrderId = order.Data,
-                    BuyFlex = "",
-                    BuyMemo = "手动",
+                    BuyFlex = JsonConvert.SerializeObject(analyzeResult.FlexPointList),
+                    BuyMemo = "",
                     BuyOrderDetail = "",
                     BuyOrderMatchResults = "",
                 });
                 // 下单成功马上去查一次
                 QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
             }
-            //        BuyFlex = JsonConvert.SerializeObject(flexPointList),
-            //logger.Error($"空-下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
-            logger.Error($"收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
+            logger.Error($"空单收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
+            logger.Error($"空单收割-下单购买结果 分析 {JsonConvert.SerializeObject(analyzeResult.FlexPointList)}");
         }
 
         public static void ShouGeMore(DogMoreBuy dogMoreBuy, decimal percent = (decimal)1.02)

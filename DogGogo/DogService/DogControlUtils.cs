@@ -140,7 +140,7 @@ namespace DogService
             }
         }
 
-        public static int GetRecommendDivide(string symbolName, decimal nowPrice, int divide = 250)
+        public static int GetRecommendDivide(string symbolName, decimal nowPrice, int divide = 220)
         {
             try
             {

@@ -453,7 +453,7 @@ namespace DogRunService
                 return;
             }
 
-            decimal sellQuantity = JudgeSellUtils.CalcSellQuantity(dogMoreBuy.BuyQuantity, symbol);
+            decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
 
             // 出售
             decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
@@ -581,7 +581,7 @@ namespace DogRunService
                     {
                         continue;
                     }
-                    decimal sellQuantity = JudgeSellUtils.CalcSellQuantity(needSellDogMoreBuyItem.BuyQuantity, symbol);
+                    decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(needSellDogMoreBuyItem.BuyQuantity, needSellDogMoreBuyItem.BuyTradePrice, nowPrice, symbol);
 
                     // 出售
                     decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
@@ -673,7 +673,7 @@ namespace DogRunService
             // 要求  1. 进入拐点区域, 2. 受管控未过期
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
             if (nowPrice * (decimal)1.02 > flexPointList[0].close && nowPrice * (decimal)1.005 < flexPointList[0].close
-                && control != null && nowPrice >= control.EmptyPrice && control.EmptyExpiredTime > DateTime.Now 
+                && control != null && nowPrice >= control.EmptyPrice && control.EmptyExpiredTime > DateTime.Now
                 && nowPrice >= control.HistoryMin * (decimal)1.2 && control.HistoryMin > 0 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin)
             {
                 foreach (var userName in userNames)

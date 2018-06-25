@@ -79,30 +79,41 @@ namespace DogRunService
             return higher;
         }
 
-        public static decimal CalcSellQuantity(decimal buyQuantity, CommonSymbols symbol)
+        public static decimal CalcSellQuantityForMoreShouge(decimal buyQuantity, decimal buyTradePrice, decimal nowPrice, CommonSymbols symbol)
         {
+
             decimal sellQuantity = buyQuantity * (decimal)0.99;
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-            if (sellQuantity == buyQuantity)
+
+            if (buyQuantity > sellQuantity && buyQuantity * buyTradePrice < sellQuantity * nowPrice)
             {
-                if (symbol.AmountPrecision == 4 && buyQuantity > (decimal)0.0055)
-                {
-                    sellQuantity -= (decimal)0.0001;
-                }
-                else if (symbol.AmountPrecision == 3 && buyQuantity > (decimal)0.055)
-                {
-                    sellQuantity -= (decimal)0.001;
-                }
-                if (symbol.AmountPrecision == 2 && buyQuantity > (decimal)0.55)
-                {
-                    sellQuantity -= (decimal)0.01;
-                }
-            }
-            if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
-            {
-                sellQuantity = 1;
+                return sellQuantity;
             }
 
+            var newSellQuantity = sellQuantity;
+            if (newSellQuantity == buyQuantity)
+            {
+                if (symbol.AmountPrecision == 4)
+                {
+                    newSellQuantity -= (decimal)0.0001;
+                }
+                else if (symbol.AmountPrecision == 3)
+                {
+                    newSellQuantity -= (decimal)0.001;
+                }
+                else if (symbol.AmountPrecision == 2)
+                {
+                    newSellQuantity -= (decimal)0.01;
+                }
+                else if (symbol.AmountPrecision == 1)
+                {
+                    newSellQuantity -= (decimal)0.1;
+                }
+            }
+            if (buyQuantity > newSellQuantity && buyQuantity * buyTradePrice < newSellQuantity * nowPrice)
+            {
+                return newSellQuantity;
+            }
             return sellQuantity;
         }
     }

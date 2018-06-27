@@ -333,7 +333,10 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
             if (nowPrice * percent > dogEmptySell.SellTradePrice)
             {
-                logger.Error($"{dogEmptySell.SymbolName}, --> nowPrice:{nowPrice}, tradePrice:{dogEmptySell.SellTradePrice} 收割不了");
+                //if (nowPrice < dogEmptySell.SellTradePrice)
+                //{
+                //    logger.Error($"{dogEmptySell.SymbolName}, --> nowPrice:{nowPrice}, tradePrice:{dogEmptySell.SellTradePrice} 收割不了");
+                //}
                 return;
             }
 

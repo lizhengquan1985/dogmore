@@ -151,9 +151,40 @@ namespace DogService
                 }
 
                 var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                var max = 320;
-                var min = 200;
+                var max = 360;
+                var min = 160;
                 divide = max - Convert.ToInt32(percent * (max - min));
+                if (divide > max)
+                {
+                    divide = max;
+                }
+                if (divide < min)
+                {
+                    divide = min;
+                }
+                return divide;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return divide;
+            }
+        }
+
+        public static int GetEmptySellDivide(string symbolName, decimal nowPrice, int divide = 12)
+        {
+            try
+            {
+                var control = new DogControlDao().GetDogControl(symbolName);
+                if (control == null || control.HistoryMax <= control.HistoryMin || nowPrice > control.HistoryMax || nowPrice < control.HistoryMin)
+                {
+                    return divide;
+                }
+
+                var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                var max = 52;
+                var min = 12;
+                divide = min + Convert.ToInt32(percent * (max - min));
                 if (divide > max)
                 {
                     divide = max;

@@ -655,7 +655,7 @@ namespace DogRunService
                         decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / DogControlUtils.GetEmptySellDivide(symbol.BaseCurrency, nowPrice); ; // 暂定每次做空1/12
                         if (sellQuantity * nowPrice < 1)
                         {
-                            if(balanceItem.balance * nowPrice > 6)
+                            if((balanceItem.balance - notShougeQuantity) * nowPrice > 6)
                             {
                                 sellQuantity = 1 / nowPrice;
                             }
@@ -663,6 +663,7 @@ namespace DogRunService
                             {
                                 sellQuantity = (decimal)0.5 / nowPrice;
                             }
+                            sellQuantity = (decimal)0.5 / nowPrice;
                         }
                         if (sellQuantity * nowPrice > 10)
                         {

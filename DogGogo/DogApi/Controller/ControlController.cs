@@ -31,6 +31,21 @@ namespace DogApi.Controller
             }
         }
 
+        [HttpPut]
+        [ActionName("initEmpty30Percent")]
+        public async Task UpdateEmpty30Percent(string symbolName)
+        {
+            var control = new DogControlDao().GetDogControl(symbolName);
+            if (control == null)
+            {
+                return;
+            }
+            control.EmptyPrice = (control.HistoryMax - control.HistoryMin) * (decimal)0.3 + control.HistoryMin;
+            control.EmptyExpiredTime = DateTime.Now.AddYears(2);
+            await new DogControlDao().CreateDogControl(control);
+            return;
+        }
+
         [HttpGet]
         [ActionName("list")]
         public async Task<object> List()

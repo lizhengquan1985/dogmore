@@ -624,7 +624,7 @@ namespace DogRunService
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
             if (nowPrice * (decimal)1.02 > flexPointList[0].close && nowPrice * (decimal)1.005 < flexPointList[0].close
                 && control != null && nowPrice >= control.EmptyPrice && control.EmptyExpiredTime > DateTime.Now
-                && nowPrice >= control.HistoryMin * (decimal)1.2 && control.HistoryMin > 0 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin)
+                && nowPrice >= control.HistoryMin * (decimal)1.4 && control.HistoryMin > 0 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin)
             {
                 foreach (var userName in userNames)
                 {
@@ -652,19 +652,8 @@ namespace DogRunService
                             continue;
                         }
 
-                        decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / DogControlUtils.GetEmptySellDivide(symbol.BaseCurrency, nowPrice); ; // 暂定每次做空1/12
-                        if (sellQuantity * nowPrice < 1)
-                        {
-                            if((balanceItem.balance - notShougeQuantity) * nowPrice > 6)
-                            {
-                                sellQuantity = 1 / nowPrice;
-                            }
-                            else
-                            {
-                                sellQuantity = (decimal)0.5 / nowPrice;
-                            }
-                            sellQuantity = (decimal)0.5 / nowPrice;
-                        }
+                        var devide = DogControlUtils.GetEmptySellDivide(symbol.BaseCurrency, nowPrice);
+                        decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
                         if (sellQuantity * nowPrice > 10)
                         {
                             sellQuantity = 10 / nowPrice;
@@ -673,7 +662,7 @@ namespace DogRunService
 
                         // 出售
                         decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
-                        EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
+                        EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList, $"device:{devide}");
 
                     }
                     catch (Exception ex)
@@ -684,7 +673,7 @@ namespace DogRunService
             }
         }
 
-        private static void EmtpyTrade(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, List<FlexPoint> flexPointList)
+        private static void EmtpyTrade(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, List<FlexPoint> flexPointList, string sellMemo = "")
         {
             try
             {
@@ -715,7 +704,7 @@ namespace DogRunService
                             SellState = StateConst.Submitted,
                             SellTradePrice = 0,
                             SymbolName = symbol.BaseCurrency,
-                            SellMemo = "",
+                            SellMemo = sellMemo,
                             SellOrderDetail = "",
                             SellOrderMatchResults = "",
                             FlexPercent = (decimal)1.04,

@@ -543,7 +543,7 @@ namespace DogRunService
                     // 分析是否 大于
                     decimal afterBuyHighClosePrice = JudgeSellUtils.AnalyzeNeedSell(needSellDogMoreBuyItem.BuyTradePrice, needSellDogMoreBuyItem.BuyDate, historyKlines);
 
-                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName); //(decimal)1.035;
+                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName, nowPrice); //(decimal)1.035;
 
                     bool needHuitou = true;// 如果很久没有出售过,则要考虑不需要回头
                     if (flexPercent < (decimal)1.04)

@@ -120,14 +120,21 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderSell(string symbolName, decimal defaultLadderSellPercent = (decimal)1.05)
+        public static decimal GetLadderSell(string symbolName, decimal nowPrice, decimal defaultLadderSellPercent = (decimal)1.05)
         {
             try
             {
+                var min = (decimal)1.04;
+                var max = (decimal)1.12;
                 var control = new DogControlDao().GetDogControl(symbolName);
                 if (control != null && control.LadderSellExpiredTime > DateTime.Now)
                 {
                     defaultLadderSellPercent = control.LadderSellPercent;
+                }
+                else if (control != null && control.HistoryMin > 0 && control.HistoryMax > 0 && control.HistoryMax > control.HistoryMin)
+                {
+                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                    defaultLadderSellPercent = (max - min) * percent + min;
                 }
                 defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, (decimal)1.04);
                 defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, (decimal)1.12);

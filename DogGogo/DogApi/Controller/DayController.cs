@@ -106,7 +106,7 @@ namespace DogApi.Controller
         {
             try
             {
-                var begin = date.AddMinutes(-60 * 24);
+                var begin = date.AddMinutes(-60 * 24 * 7);
                 var end = date.AddMinutes(10);
 
                 var buyList = await new DogMoreStatisticsDao().ListBuy(userName, name, begin, end);

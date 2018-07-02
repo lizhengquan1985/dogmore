@@ -97,8 +97,8 @@ namespace DogService
                 {
                     // 计算出来阶梯
                     var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                    var max = (decimal)1.12;
-                    var min = (decimal)1.05;
+                    var max = (decimal)1.08;
+                    var min = (decimal)1.04;
                     defaultLadderBuyPercent = max - Convert.ToInt32(percent * (max - min));
                     if (defaultLadderBuyPercent > max)
                     {

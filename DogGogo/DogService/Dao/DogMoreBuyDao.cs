@@ -176,7 +176,7 @@ namespace DogService.Dao
 
         public List<DogMoreBuyNotFinishedStatistics> ListDogMoreBuyNotFinishedStatistics(string userName)
         {
-            var where = " where IsFinished=0 ";
+            var where = " where IsFinished=0 and SymbolName != 'btc' ";
             if (!string.IsNullOrEmpty(userName))
             {
                 where += $" and UserName=@userName ";

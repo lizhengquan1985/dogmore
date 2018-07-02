@@ -101,7 +101,6 @@
     <Compile Include="Controller\EmptyController.cs" />
     <Compile Include="Controller\MoreController.cs" />
     <Compile Include="Controller\OrderReapController.cs" />
-    <Compile Include="DTO\DogMoreBuyNotFinishedStatistics.cs" />
     <Compile Include="DTO\DogMoreFinishedDTO.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

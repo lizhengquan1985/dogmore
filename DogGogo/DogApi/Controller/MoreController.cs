@@ -255,8 +255,8 @@ namespace DogApi.Controller
         }
 
         [HttpGet]
-        [ActionName("shouge")]
-        public async Task<object> shouge(string userName)
+        [ActionName("listDogMoreBuyNotFinishedStatistics")]
+        public async Task<object> ListDogMoreBuyNotFinishedStatistics(string userName)
         {
             var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName);
 

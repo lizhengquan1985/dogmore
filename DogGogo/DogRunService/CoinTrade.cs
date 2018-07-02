@@ -167,6 +167,7 @@ namespace DogRunService
                 var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
                 if (!canBuy)
                 {
+                    LogNotBuy(symbol.BaseCurrency, $"nowPrice:{nowPrice}   flexPointList[0].close:{flexPointList[0].close}");
                     continue;
                 }
 
@@ -179,6 +180,7 @@ namespace DogRunService
                 var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
                 if (nowPrice * ladderBuyPercent > minBuyPrice || nowPrice * (decimal)1.01 >= minBuyPrice)
                 {
+                    LogNotBuy(symbol.BaseCurrency, $"ladderBuyPercent:{nowPrice}   minBuyPrice:{minBuyPrice}, nowPrice:{nowPrice}");
                     continue;
                 }
 
@@ -189,12 +191,14 @@ namespace DogRunService
                 var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName);
                 if (notShougeEmptySellAmount >= usdt.balance)
                 {
+                    LogNotBuy(symbol.BaseCurrency, $"notShougeEmptySellAmount:{notShougeEmptySellAmount}   usdt.balance:{usdt.balance}");
                     continue;
                 }
                 decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivide(symbol.BaseCurrency, nowPrice); // TODO 测试阶段，暂定低一些，
 
                 if (recommendAmount < (decimal)1.1)
                 {
+                    LogNotBuy(symbol.BaseCurrency, $"recommendAmount:{recommendAmount}   recommendAmount < (decimal)1.1");
                     // 余额要足够，推荐购买的额度要大于1.1
                     continue;
                 }
@@ -320,6 +324,32 @@ namespace DogRunService
                     }
 
                     ShouGeEmpty(dogEmptySell, symbol, analyzeResult, percent);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+        }
+
+        private static Dictionary<string, DateTime> dic = new Dictionary<string, DateTime>();
+        public static void LogNotBuy(string symbolName, string reason)
+        {
+            try
+            {
+
+                if (dic.ContainsKey(symbolName) && dic[symbolName] > DateTime.Now.AddMinutes(-15))
+                {
+                    return;
+                }
+                logger.Error(symbolName + " ------" + reason);
+                if (dic.ContainsKey(symbolName))
+                {
+                    dic[symbolName] = DateTime.Now;
+                }
+                else
+                {
+                    dic.Add(symbolName, DateTime.Now);
                 }
             }
             catch (Exception ex)

@@ -125,7 +125,17 @@ namespace DogApi.Controller
                 closeDic.Add(symbolName, close);
             }
 
-            return new { list, closeDic };
+            Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();
+            foreach(var item in list)
+            {
+                if (!closeDic.ContainsKey(item.SymbolName))
+                {
+                    continue;
+                }
+                ladderDic.Add(item.SymbolName, DogControlUtils.GetLadderSell(item.SymbolName, closeDic[item.SymbolName]));
+            }
+
+            return new { list, closeDic, ladderDic };
         }
 
         [HttpGet]

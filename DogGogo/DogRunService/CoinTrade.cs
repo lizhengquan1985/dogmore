@@ -559,6 +559,7 @@ namespace DogRunService
                     var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyTradePrice, afterBuyHighClosePrice, nowPrice, gaoyuPercentSell, needHuitou);
                     if (!canSell)
                     {
+                        LogNotBuy(symbol.BaseCurrency, $"出售,   BuyTradePrice: {needSellDogMoreBuyItem.BuyTradePrice}, nowPrice{nowPrice}, gaoyuPercentSell{gaoyuPercentSell}, needHuitou{needHuitou}");
                         continue;
                     }
                     decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(needSellDogMoreBuyItem.BuyQuantity, needSellDogMoreBuyItem.BuyTradePrice, nowPrice, symbol);

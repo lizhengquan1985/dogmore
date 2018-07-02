@@ -1,5 +1,6 @@
 ﻿using DogPlatform.Model;
 using DogService.DateTypes;
+using DogService.DTO;
 using log4net;
 using Newtonsoft.Json;
 using SharpDapper;
@@ -171,6 +172,18 @@ namespace DogService.Dao
             Database.Execute(sql);
             sql = $"delete from t_dog_more_buy where BuyOrderId={buyOrderId}";
             Database.Execute(sql);
+        }
+
+        public List<DogMoreBuyNotFinishedStatistics> ListDogMoreBuyNotFinishedStatistics(string userName)
+        {
+            var where = " where IsFinished=0 ";
+            if (!string.IsNullOrEmpty(userName))
+            {
+                where += $" and UserName=@userName ";
+            }
+            var sql = $"select * from ( select SymbolName, min(BuyTradePrice) MinPrice, max(BuyTradePrice) MaxPrice, sum(BuyQuantity) TotalQuantity, sum(BuyQuantity*BuyTradePrice) TotalAmount, count(1) Count" +
+                $" from t_dog_more_buy {where} group by SymbolName ) t order by SymbolName asc";
+            return Database.Query<DogMoreBuyNotFinishedStatistics>(sql).ToList();
         }
     }
 }

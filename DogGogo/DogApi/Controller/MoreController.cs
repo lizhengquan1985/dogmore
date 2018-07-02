@@ -253,5 +253,39 @@ namespace DogApi.Controller
         {
             new DogMoreBuyDao().Delete(buyOrderId);
         }
+
+        [HttpGet]
+        [ActionName("shouge")]
+        public async Task<object> shouge(string userName)
+        {
+            var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName);
+
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+            Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+            foreach (var symbol in symbols)
+            {
+                try
+                {
+                    var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
+                    var historyKlineData = HistoryKlinePools.Get(key);
+                    var close = historyKlineData.Data[0].Close;
+                    closeDic.Add(symbol.BaseCurrency, close);
+                }
+                catch (Exception ex)
+                {
+
+                }
+            }
+            foreach (var item in res)
+            {
+                if (closeDic.ContainsKey(item.SymbolName))
+                {
+                    item.NowPrice = closeDic[item.SymbolName];
+                    item.NowTotalAmount = closeDic[item.SymbolName] * item.TotalQuantity;
+                }
+            }
+            return res;
+        }
     }
 }

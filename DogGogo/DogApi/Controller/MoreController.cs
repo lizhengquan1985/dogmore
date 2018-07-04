@@ -128,7 +128,7 @@ namespace DogApi.Controller
             Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();
             foreach(var item in list)
             {
-                if (!closeDic.ContainsKey(item.SymbolName))
+                if (!ladderDic.ContainsKey(item.SymbolName))
                 {
                     continue;
                 }

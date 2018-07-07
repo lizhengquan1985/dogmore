@@ -72,6 +72,8 @@ namespace DogService.Dao
 
                 sql = $"insert into t_coin_{symbolName}(Id, Open, Close, Low, High, Vol, Count, CreateTime) values({line.Id},{line.Open},{line.Close},{line.Low},{line.High},{line.Vol},{line.Count}, now())";
                 Database.Execute(sql);
+
+                tx.Commit();
             }
         }
     }

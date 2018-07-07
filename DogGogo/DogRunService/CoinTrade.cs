@@ -706,10 +706,10 @@ namespace DogRunService
 
         private static void EmtpyTrade(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, List<FlexPoint> flexPointList, string sellMemo = "")
         {
+            OrderPlaceRequest req = new OrderPlaceRequest();
             try
             {
                 PlatformApi api = PlatformApi.GetInstance(userName);
-                OrderPlaceRequest req = new OrderPlaceRequest();
                 req.account_id = accountId;
                 req.amount = sellQuantity.ToString();
                 req.price = sellPrice.ToString();
@@ -756,6 +756,7 @@ namespace DogRunService
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+                logger.Error("下单出错：" + JsonConvert.SerializeObject(req));
             }
         }
 

@@ -88,6 +88,8 @@ namespace DogService
         {
             try
             {
+                var max = (decimal)1.10;
+                var min = (decimal)1.05;
                 var control = new DogControlDao().GetDogControl(symbolName);
                 if (control != null && control.LadderBuyExpiredTime > DateTime.Now)
                 {
@@ -97,8 +99,6 @@ namespace DogService
                 {
                     // 计算出来阶梯
                     var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                    var max = (decimal)1.08;
-                    var min = (decimal)1.04;
                     defaultLadderBuyPercent = max - percent * (max - min);
                     if (defaultLadderBuyPercent > max)
                     {
@@ -109,8 +109,8 @@ namespace DogService
                         defaultLadderBuyPercent = min;
                     }
                 }
-                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, (decimal)1.05);
-                defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, (decimal)1.12);
+                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, min);
+                defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, max);
                 return defaultLadderBuyPercent;
             }
             catch (Exception ex)

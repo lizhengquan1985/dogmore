@@ -58,7 +58,7 @@ namespace DogService.Dao
         public List<HistoryKline> List24HourKline(string symbolName)
         {
             var date = DateTime.Now.AddDays(-1);
-            var sql = $"select * from t_coin_{symbolName} where CreateTime>=@date order by RecordId desc";
+            var sql = $"select * from t_coin_{symbolName} where CreateTime>=@date order by Id desc";
             return Database.Query<HistoryKline>(sql, new { date }).ToList();
         }
     }

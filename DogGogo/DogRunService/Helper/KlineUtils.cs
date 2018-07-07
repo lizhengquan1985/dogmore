@@ -67,7 +67,7 @@ namespace DogRunService.Helper
                 var begin = DateTime.Now;
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
-                var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 50);
+                var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 20);
                 var key = HistoryKlinePools.GetKey(symbol, period);
                 //HistoryKlinePools.Init(key, klines);
 
@@ -76,11 +76,12 @@ namespace DogRunService.Helper
                 //{
                 //    logger.Error("一次请求时间太长,达到：" + totalMilliseconds);
                 //}
-                // 记录到数据库
+                // 记录到数据库， 记录最近得数据。
                 Record(symbol.BaseCurrency, klines[0]);
 
                 var dao = new KlineDao();
                 var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+
                 if (lastKlines.Count < 900)
                 {
                     logger.Error($"{symbol.BaseCurrency}数据量太少，无法分析啊：" + totalMilliseconds);

@@ -81,6 +81,29 @@ namespace DogRunService.Helper
 
                 var dao = new KlineDao();
                 var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+                var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
+                foreach (var kline in klines)
+                {
+                    var finds = findList.FindAll(it => it.Id == kline.Id);
+                    if (finds.Count > 1)
+                    {
+                        // 删除，新增
+                        new KlineDao().DeleteAndRecordKlines(symbol.BaseCurrency, kline);
+                    }
+                    else if (finds.Count == 1)
+                    {
+                        if (finds[0].Low != kline.Low || finds[0].High != kline.High || finds[0].Open != kline.Open || finds[0].Close != kline.Close)
+                        {
+                            // 删除新增
+                            new KlineDao().DeleteAndRecordKlines(symbol.BaseCurrency, kline);
+                        }
+                    }
+                    else
+                    {
+                        // 直接新增
+                        Record(symbol.BaseCurrency, kline);
+                    }
+                }
 
                 if (lastKlines.Count < 900)
                 {

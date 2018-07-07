@@ -61,5 +61,18 @@ namespace DogService.Dao
             var sql = $"select * from t_coin_{symbolName} where CreateTime>=@date order by Id desc";
             return Database.Query<HistoryKline>(sql, new { date }).ToList();
         }
+
+        public void DeleteAndRecordKlines(string symbolName, HistoryKline line)
+        {
+            long id = line.Id;
+            using (var tx = Database.BeginTransaction())
+            {
+                var sql = $"delete from t_coin_{symbolName} where id={id}";
+                Database.Execute(sql);
+
+                sql = $"insert into t_coin_{symbolName}(Id, Open, Close, Low, High, Vol, Count, CreateTime) values({line.Id},{line.Open},{line.Close},{line.Low},{line.High},{line.Vol},{line.Count}, now())";
+                Database.Execute(sql);
+            }
+        }
     }
 }

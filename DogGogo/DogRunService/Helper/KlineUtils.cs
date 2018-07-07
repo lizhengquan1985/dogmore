@@ -72,10 +72,10 @@ namespace DogRunService.Helper
                 //HistoryKlinePools.Init(key, klines);
 
                 var totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;
-                //if ((DateTime.Now - begin).TotalSeconds > 2)
-                //{
-                //    logger.Error("一次请求时间太长,达到：" + totalMilliseconds);
-                //}
+                if ((DateTime.Now - begin).TotalSeconds > 2)
+                {
+                    logger.Error("一次请求时间太长,达到：" + totalMilliseconds);
+                }
                 // 记录到数据库， 记录最近得数据。
                 Record(symbol.BaseCurrency, klines[0]);
 

@@ -167,7 +167,7 @@ namespace DogRunService
                 var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
                 if (!canBuy)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"nowPrice:{nowPrice}   flexPointList[0].close:{flexPointList[0].close}");
+                    LogNotBuy(symbol.BaseCurrency, $"checkCanBuy -> nowPrice:{nowPrice}   flexPointList[0].close:{flexPointList[0].close}");
                     continue;
                 }
 
@@ -180,7 +180,7 @@ namespace DogRunService
                 var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
                 if (nowPrice * ladderBuyPercent > minBuyPrice || nowPrice * (decimal)1.01 >= minBuyPrice)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"ladderBuyPercent:{nowPrice}   minBuyPrice:{minBuyPrice}, nowPrice:{nowPrice}");
+                    LogNotBuy(symbol.BaseCurrency, $"checkLadderBuy -> ladderBuyPercent:{nowPrice}   minBuyPrice:{minBuyPrice}, nowPrice:{nowPrice}");
                     continue;
                 }
 
@@ -191,22 +191,20 @@ namespace DogRunService
                 var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName);
                 if (notShougeEmptySellAmount >= usdt.balance)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"notShougeEmptySellAmount:{notShougeEmptySellAmount}   usdt.balance:{usdt.balance}");
+                    LogNotBuy(symbol.BaseCurrency, $"checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},usdt.balance:{usdt.balance}");
                     continue;
                 }
                 decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivide(symbol.BaseCurrency, nowPrice); // TODO 测试阶段，暂定低一些，
 
                 if (recommendAmount < (decimal)1.1)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"recommendAmount:{recommendAmount}   recommendAmount < (decimal)1.1");
+                    LogNotBuy(symbol.BaseCurrency, $"checkRecommendAmount -> recommendAmount:{recommendAmount} 小于1.1不能购买");
                     // 余额要足够，推荐购买的额度要大于1.1
                     continue;
                 }
 
                 // 购买的要求
                 // 2. 快速上升的，快速下降情况（如果升的太高， 最一定要回落，或者有5个小时平稳才考虑购入，）
-                // 3. 如果flexpoint 小于等于1.02，则只能考虑买少一点。
-
                 decimal buyQuantity = recommendAmount / nowPrice;
                 buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
                 decimal orderPrice = decimal.Round(nowPrice * (decimal)1.005, symbol.PricePrecision);
@@ -337,7 +335,6 @@ namespace DogRunService
         {
             try
             {
-
                 if (dic.ContainsKey(symbolName) && dic[symbolName] > DateTime.Now.AddMinutes(-15))
                 {
                     return;

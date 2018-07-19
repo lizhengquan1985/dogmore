@@ -335,7 +335,7 @@ namespace DogRunService
         {
             try
             {
-                if (dic.ContainsKey(symbolName) && dic[symbolName] > DateTime.Now.AddMinutes(-15))
+                if (dic.ContainsKey(symbolName) && dic[symbolName] > DateTime.Now.AddMinutes(-20))
                 {
                     return;
                 }
@@ -484,32 +484,39 @@ namespace DogRunService
 
         private static void QueryBuyDetailAndUpdate(string userName, long orderId)
         {
-            PlatformApi api = PlatformApi.GetInstance(userName);
-
-            var orderDetail = api.QueryOrderDetail(orderId);
-            if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
+            try
             {
-                logger.Error(JsonConvert.SerializeObject(orderDetail));
-                var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                logger.Error("------------> " + JsonConvert.SerializeObject(orderMatchResult));
-                decimal maxPrice = 0;
-                foreach (var item in orderMatchResult.Data)
+                PlatformApi api = PlatformApi.GetInstance(userName);
+
+                var orderDetail = api.QueryOrderDetail(orderId);
+                if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
-                    if (maxPrice < item.price)
+                    logger.Error(JsonConvert.SerializeObject(orderDetail));
+                    var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                    logger.Error("------------> " + JsonConvert.SerializeObject(orderMatchResult));
+                    decimal maxPrice = 0;
+                    foreach (var item in orderMatchResult.Data)
                     {
-                        maxPrice = item.price;
+                        if (maxPrice < item.price)
+                        {
+                            maxPrice = item.price;
+                        }
+                    }
+                    if (orderMatchResult.Status == "ok")
+                    {
+                        new DogMoreBuyDao().UpdateDogMoreBuySuccess(orderId, orderDetail, orderMatchResult, maxPrice);
                     }
                 }
-                if (orderMatchResult.Status == "ok")
+
+                if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.Canceled)
                 {
-                    new DogMoreBuyDao().UpdateDogMoreBuySuccess(orderId, orderDetail, orderMatchResult, maxPrice);
+                    // 完成
+                    new DogMoreBuyDao().UpdateDogMoreBuyWhenCancel(orderId);
                 }
             }
-
-            if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.Canceled)
+            catch (Exception ex)
             {
-                // 完成
-                new DogMoreBuyDao().UpdateDogMoreBuyWhenCancel(orderId);
+                logger.Error(ex.Message, ex);
             }
         }
 
@@ -848,31 +855,38 @@ namespace DogRunService
 
         private static void QuerySellDetailAndUpdate(string userName, long orderId)
         {
-            PlatformApi api = PlatformApi.GetInstance(userName);
-
-            var orderDetail = api.QueryOrderDetail(orderId);
-            if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
+            try
             {
-                var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                decimal minPrice = 25000;
-                foreach (var item in orderMatchResult.Data)
+                PlatformApi api = PlatformApi.GetInstance(userName);
+
+                var orderDetail = api.QueryOrderDetail(orderId);
+                if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
-                    if (minPrice > item.price)
+                    var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                    decimal minPrice = 25000;
+                    foreach (var item in orderMatchResult.Data)
                     {
-                        minPrice = item.price;
+                        if (minPrice > item.price)
+                        {
+                            minPrice = item.price;
+                        }
+                    }
+                    if (orderMatchResult.Status == "ok")
+                    {
+                        // 完成
+                        new DogMoreSellDao().UpdateDogMoreSellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);
                     }
                 }
-                if (orderMatchResult.Status == "ok")
+
+                if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.Canceled)
                 {
                     // 完成
-                    new DogMoreSellDao().UpdateDogMoreSellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);
+                    new DogMoreSellDao().UpdateDogMoreSellWhenCancel(orderId);
                 }
             }
-
-            if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.Canceled)
+            catch (Exception ex)
             {
-                // 完成
-                new DogMoreSellDao().UpdateDogMoreSellWhenCancel(orderId);
+                logger.Error(ex.Message, ex);
             }
         }
 

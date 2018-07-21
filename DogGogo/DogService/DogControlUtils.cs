@@ -88,8 +88,8 @@ namespace DogService
         {
             try
             {
-                var max = (decimal)1.10;
-                var min = (decimal)1.05;
+                var max = (decimal)1.12;
+                var min = (decimal)1.06;
                 var control = new DogControlDao().GetDogControl(symbolName);
                 if (control != null && control.LadderBuyExpiredTime > DateTime.Now)
                 {
@@ -168,8 +168,8 @@ namespace DogService
                 }
 
                 var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                var max = 360;
-                var min = 160;
+                var max = 400;
+                var min = 200;
                 divide = max - Convert.ToInt32(percent * (max - min));
                 if (divide > max)
                 {

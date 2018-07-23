@@ -137,10 +137,10 @@ namespace DogService.Dao
             return Database.Query<DogMoreBuy>(sql, new { symbolName }).ToList();
         }
 
-        public List<DogMoreBuy> listErvryMinPriceMoreBuyIsNotFinished()
+        public List<DogMoreBuy> listEveryMinPriceMoreBuyIsNotFinished(string userName)
         {
-            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from  ( select max(BuyOrderId) BuyOrderId,SymbolName from t_dog_more_buy where IsFinished=0 group by SymbolName) t)  ";
-            return Database.Query<DogMoreBuy>(sql).ToList();
+            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from  ( select max(BuyOrderId) BuyOrderId,SymbolName from t_dog_more_buy where UserName=@userName and IsFinished=0 group by SymbolName) t)  ";
+            return Database.Query<DogMoreBuy>(sql, new { userName }).ToList();
         }
 
         public List<DogMoreBuy> listMoreBuyIsNotFinished(string symbolName, string userName)

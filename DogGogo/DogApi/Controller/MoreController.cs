@@ -91,7 +91,7 @@ namespace DogApi.Controller
         /// <returns></returns>
         [HttpGet]
         [ActionName("listMoreBuyIsNotFinished")]
-        public async Task<object> listMoreBuyIsNotFinished(string symbolName)
+        public async Task<object> listMoreBuyIsNotFinished(string userName, string symbolName)
         {
             var list = new List<DogMoreBuy>();
             var symbols = CoinUtils.GetAllCommonSymbols();
@@ -99,7 +99,7 @@ namespace DogApi.Controller
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
             if (string.IsNullOrEmpty(symbolName))
             {
-                list = new DogMoreBuyDao().listErvryMinPriceMoreBuyIsNotFinished();
+                list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName);
                 list = list.Where(it => it.SymbolName != "btc").ToList();
                 foreach (var symbol in symbols)
                 {

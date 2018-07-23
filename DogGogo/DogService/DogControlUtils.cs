@@ -168,7 +168,7 @@ namespace DogService
                 }
 
                 var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                var max = 400;
+                var max = 800;
                 var min = 200;
                 divide = max - Convert.ToInt32(percent * (max - min));
                 if (divide > max)

@@ -1,5 +1,7 @@
 ﻿using DogPlatform;
+using DogPlatform.Model;
 using DogRunService;
+using DogRunService.Helper;
 using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
@@ -184,6 +186,35 @@ namespace DogApi.Controller
                 logger.Error(ex.Message, ex);
                 throw ex;
             }
+        }
+
+        [HttpGet]
+        [ActionName("getFlexCount")]
+        public async Task<Object> GetFlexCount(string symbolName)
+        {
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == symbolName);
+            KlineUtils.InitOneKine(symbol);
+            var key = HistoryKlinePools.GetKey(symbol, "1min");
+            var historyKlineData = HistoryKlinePools.Get(key);
+            
+            var historyKlines = historyKlineData.Data;
+            return GetFlexpointCount(historyKlines);
+        }
+
+        private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines)
+        {
+            Dictionary<decimal, int> result = new Dictionary<decimal, int>();
+            decimal lastLowPrice = 0;
+            decimal flexPercent = (decimal)1.02;
+            for(int i=0; i< 30; i++)
+            {
+                var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                result.Add(flexPercent, flexPointList.Count);
+
+                flexPercent += (decimal)0.005;
+            }
+            return result;
         }
     }
 }

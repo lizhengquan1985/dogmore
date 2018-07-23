@@ -197,19 +197,31 @@ namespace DogApi.Controller
             KlineUtils.InitOneKine(symbol);
             var key = HistoryKlinePools.GetKey(symbol, "1min");
             var historyKlineData = HistoryKlinePools.Get(key);
-            
+
             var historyKlines = historyKlineData.Data;
-            return GetFlexpointCount(historyKlines);
+            var outFlexPercent = (decimal)0;
+            var flexCount = GetFlexpointCount(historyKlines, out outFlexPercent);
+            var inDB = new DogControlDao().GetDogControl(symbolName);
+            inDB.LadderSellPercent = outFlexPercent;
+            inDB.LadderSellExpiredTime = DateTime.Now.AddYears(1);
+            await new DogControlDao().CreateDogControl(inDB);
+
+            return flexCount;
         }
 
-        private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines)
+        private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines, out decimal outFlexPercent)
         {
             Dictionary<decimal, int> result = new Dictionary<decimal, int>();
             decimal lastLowPrice = 0;
             decimal flexPercent = (decimal)1.02;
-            for(int i=0; i< 30; i++)
+            outFlexPercent = flexPercent;
+            for (int i = 0; i < 30; i++)
             {
                 var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                if (flexPointList.Count != 0)
+                {
+                    outFlexPercent = flexPercent;
+                }
                 result.Add(flexPercent, flexPointList.Count);
 
                 flexPercent += (decimal)0.005;

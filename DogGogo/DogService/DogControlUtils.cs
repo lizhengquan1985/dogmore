@@ -127,11 +127,7 @@ namespace DogService
                 var min = (decimal)1.04;
                 var max = (decimal)1.08;
                 var control = new DogControlDao().GetDogControl(symbolName);
-                if (control != null && control.LadderSellExpiredTime > DateTime.Now)
-                {
-                    defaultLadderSellPercent = control.LadderSellPercent;
-                }
-                else if (control != null && control.HistoryMin > 0 && control.HistoryMax > 0 && control.HistoryMax > control.HistoryMin)
+                if (control != null && control.HistoryMin > 0 && control.HistoryMax > 0 && control.HistoryMax > control.HistoryMin)
                 {
                     max = max + (control.HistoryMax / control.HistoryMin - 2) / 180;
                     if (max > (decimal)1.12)
@@ -145,6 +141,11 @@ namespace DogService
 
                     var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
                     defaultLadderSellPercent = (max - min) * percent + min;
+
+                    if (control.LadderSellExpiredTime > DateTime.Now && control.LadderSellPercent > min && control.LadderSellPercent < defaultLadderSellPercent)
+                    {
+                        defaultLadderSellPercent = control.LadderSellPercent;
+                    }
                 }
                 defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, min);
                 defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, max);

@@ -142,9 +142,9 @@ namespace DogService
                     var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
                     defaultLadderSellPercent = (max - min) * percent + min;
 
-                    if (control.LadderSellExpiredTime > DateTime.Now && control.LadderSellPercent > min && control.LadderSellPercent < defaultLadderSellPercent)
+                    if (control.LadderSellExpiredTime > DateTime.Now && control.LadderSellPercent < defaultLadderSellPercent)
                     {
-                        defaultLadderSellPercent = control.LadderSellPercent;
+                        defaultLadderSellPercent = control.LadderSellPercent > min ? control.LadderSellPercent : min;
                     }
                 }
                 defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, min);

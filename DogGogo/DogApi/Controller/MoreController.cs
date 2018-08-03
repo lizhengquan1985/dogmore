@@ -1,4 +1,5 @@
-﻿using DogApi.DTO;
+﻿using DogAccount;
+using DogApi.DTO;
 using DogPlatform;
 using DogPlatform.Model;
 using DogRunService;
@@ -306,6 +307,26 @@ namespace DogApi.Controller
                 }
             }
             return res;
+        }
+
+        [HttpPost]
+        [ActionName("doMore")]
+        public async Task DoMore(string userName, string symbolName)
+        {
+            try
+            {
+                // 立马空单
+                var symbols = CoinUtils.GetAllCommonSymbols();
+                var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
+                var dao = new KlineDao();
+                var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+
+                CoinTrade.DoMore(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
         }
     }
 }

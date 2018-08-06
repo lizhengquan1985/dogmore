@@ -90,7 +90,7 @@ namespace DogRunService
             }
             if (flexPointList.Count == 0 && flexPointList.Count == 0)
             {
-                logger.Error($"--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
+                //logger.Error($"--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
                 return null;
             }
 

@@ -103,10 +103,6 @@ namespace DogService.Dao
         /// <returns></returns>
         public decimal GetMinPriceOfNotSellFinished(string accountId, string userName, string coin)
         {
-            //var sql = $"select case when min(BuyTradePrice) is null then 25000 else min(BuyTradePrice) END from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' " +
-            //    $" and BuyState!='({StateConst.Canceled.ToString()})' and IsFinished=0 and UserName='{userName}' ";
-            //return Database.Query<decimal>(sql).FirstOrDefault();
-
             var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' and BuyState!='({StateConst.Canceled.ToString()})' " +
                 $" and IsFinished=0 and UserName='{userName}'";
             var list = Database.Query<DogMoreBuy>(sql).ToList();
@@ -123,6 +119,26 @@ namespace DogService.Dao
                 }
             }
             return minPrice;
+        }
+
+        public decimal GetAllMaxPriceOfNotSellFinished(string symbolName)
+        {
+            var sql = $"select * from t_dog_more_buy where SymbolName =@SymbolName and BuyState!='({StateConst.Canceled.ToString()})' " +
+                $" and IsFinished=0 ";
+            var list = Database.Query<DogMoreBuy>(sql, new { SymbolName  = symbolName }).ToList();
+            var maxPrice = (decimal)0;
+            foreach (var item in list)
+            {
+                if (item.BuyTradePrice > 0 && item.BuyTradePrice > maxPrice)
+                {
+                    maxPrice = item.BuyTradePrice;
+                }
+                if (item.BuyTradePrice <= 0 && item.BuyOrderPrice > maxPrice)
+                {
+                    maxPrice = item.BuyOrderPrice;
+                }
+            }
+            return maxPrice;
         }
 
         public DogMoreBuy GetByBuyOrderId(long buyOrderId)

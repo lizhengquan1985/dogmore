@@ -163,6 +163,14 @@ namespace DogApi.Controller
                         max = item.High;
                     }
                 }
+
+                // 判断max
+                var maxNotSell = new DogMoreBuyDao().GetAllMaxPriceOfNotSellFinished(symbolName);
+                if(maxNotSell > max)
+                {
+                    max = maxNotSell;
+                }
+
                 var inDB = new DogControlDao().GetDogControl(symbolName);
                 if (inDB == null)
                 {

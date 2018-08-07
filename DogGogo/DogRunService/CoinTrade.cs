@@ -167,7 +167,7 @@ namespace DogRunService
                 var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
                 if (!canBuy)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"checkCanBuy -> nowPrice:{nowPrice}   flexPointList[0].close:{flexPointList[0].close}");
+                    //LogNotBuy(symbol.BaseCurrency, $"checkCanBuy -> nowPrice:{nowPrice}   flexPointList[0].close:{flexPointList[0].close}");
                     continue;
                 }
 
@@ -180,7 +180,7 @@ namespace DogRunService
                 var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
                 if (nowPrice * ladderBuyPercent > minBuyPrice || nowPrice * (decimal)1.01 >= minBuyPrice)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"checkLadderBuy -> ladderBuyPercent:{nowPrice}   minBuyPrice:{minBuyPrice}, nowPrice:{nowPrice}");
+                    //LogNotBuy(symbol.BaseCurrency, $"checkLadderBuy -> ladderBuyPercent:{nowPrice}   minBuyPrice:{minBuyPrice}, nowPrice:{nowPrice}");
                     continue;
                 }
 
@@ -431,6 +431,12 @@ namespace DogRunService
             }
 
             decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
+            if(sellQuantity >= dogMoreBuy.BuyQuantity)
+            {
+                // 一定要赚才能出售
+                logger.Error($"{dogMoreBuy.SymbolName} sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}");
+                return;
+            }
 
             // 出售
             decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
@@ -713,6 +719,12 @@ namespace DogRunService
             OrderPlaceRequest req = new OrderPlaceRequest();
             try
             {
+                if(sellQuantity < symbol.AmountPrecision)
+                {
+                    logger.Error($"sell 出错,{symbol.BaseCurrency} 的精度为 {symbol.AmountPrecision}, 但是却要出售{sellQuantity}  ");
+                    return;
+                }
+
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 req.account_id = accountId;
                 req.amount = sellQuantity.ToString();

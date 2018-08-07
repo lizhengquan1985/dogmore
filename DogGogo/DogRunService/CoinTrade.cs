@@ -759,8 +759,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
-                logger.Error("下单出错：" + JsonConvert.SerializeObject(req));
+                logger.Error("sell下单出错：" + JsonConvert.SerializeObject(req) + "--> " + ex.Message);
             }
         }
 

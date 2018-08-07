@@ -31,8 +31,10 @@ namespace DogRunService.Helper
                 while (true)
                 {
                     var begin = DateTime.Now;
-                    foreach (var symbol in symbols)
+                    for (var i = 0; i < symbols.Count; i++)
                     {
+                        var symbol = symbols[i];
+                        Console.WriteLine($"---> {i}   {symbol.BaseCurrency}");
                         try
                         {
                             // 判断kline存不存在, 不存在读取一次.

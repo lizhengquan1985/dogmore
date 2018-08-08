@@ -427,7 +427,7 @@ namespace DogRunService
             }
 
             decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
-            if(sellQuantity >= dogMoreBuy.BuyQuantity)
+            if (sellQuantity >= dogMoreBuy.BuyQuantity)
             {
                 // 一定要赚才能出售
                 logger.Error($"{dogMoreBuy.SymbolName} sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}");
@@ -510,6 +510,27 @@ namespace DogRunService
                     }
                 }
 
+                if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.PartialCanceled)
+                {
+                    logger.Error(JsonConvert.SerializeObject(orderDetail));
+                    var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                    logger.Error("------------> " + JsonConvert.SerializeObject(orderMatchResult));
+                    decimal maxPrice = 0;
+                    decimal buyQuantity = 0;
+                    foreach (var item in orderMatchResult.Data)
+                    {
+                        if (maxPrice < item.price)
+                        {
+                            maxPrice = item.price;
+                        }
+                        buyQuantity += item.FilledAmount;
+                    }
+                    if (orderMatchResult.Status == "ok")
+                    {
+                        new DogMoreBuyDao().UpdateDogMoreBuySuccess(orderId, buyQuantity, orderDetail, orderMatchResult, maxPrice);
+                    }
+                }
+
                 if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.Canceled)
                 {
                     // 完成
@@ -569,7 +590,7 @@ namespace DogRunService
                         continue;
                     }
                     decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(needSellDogMoreBuyItem.BuyQuantity, needSellDogMoreBuyItem.BuyTradePrice, nowPrice, symbol);
-                    if(sellQuantity >= needSellDogMoreBuyItem.BuyQuantity)
+                    if (sellQuantity >= needSellDogMoreBuyItem.BuyQuantity)
                     {
                         continue;
                     }
@@ -719,7 +740,7 @@ namespace DogRunService
             OrderPlaceRequest req = new OrderPlaceRequest();
             try
             {
-                if(sellQuantity < symbol.AmountPrecision)
+                if (sellQuantity < symbol.AmountPrecision)
                 {
                     logger.Error($"sell 出错,{symbol.BaseCurrency} 的精度为 {symbol.AmountPrecision}, 但是却要出售{sellQuantity}  ");
                     return;

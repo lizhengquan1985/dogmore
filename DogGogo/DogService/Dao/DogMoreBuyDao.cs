@@ -72,6 +72,16 @@ namespace DogService.Dao
             }
         }
 
+        public void UpdateDogMoreBuySuccess(long buyOrderId, decimal buyQuantity, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal buyTradePrice)
+        {
+            using (var tx = Database.BeginTransaction())
+            {
+                var sql = $"update t_dog_more_buy set BuyQuantity={buyQuantity}, BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where BuyOrderId ='{buyOrderId}'";
+                Database.Execute(sql);
+                tx.Commit();
+            }
+        }
+
         public void UpdateDogMoreBuyWhenCancel(long buyOrderId)
         {
             using (var tx = Database.BeginTransaction())

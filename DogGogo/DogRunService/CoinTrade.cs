@@ -360,10 +360,6 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
             if (nowPrice * percent > dogEmptySell.SellTradePrice)
             {
-                //if (nowPrice < dogEmptySell.SellTradePrice)
-                //{
-                //    logger.Error($"{dogEmptySell.SymbolName}, --> nowPrice:{nowPrice}, tradePrice:{dogEmptySell.SellTradePrice} 收割不了");
-                //}
                 return;
             }
 
@@ -573,6 +569,10 @@ namespace DogRunService
                         continue;
                     }
                     decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(needSellDogMoreBuyItem.BuyQuantity, needSellDogMoreBuyItem.BuyTradePrice, nowPrice, symbol);
+                    if(sellQuantity >= needSellDogMoreBuyItem.BuyQuantity)
+                    {
+                        continue;
+                    }
 
                     // 出售
                     decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
@@ -673,9 +673,9 @@ namespace DogRunService
                     {
                         // 和上次做空价格要相差8%
                         var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
-                        if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.08)
+                        if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.10)
                         {
-                            // 上一次还没收割得，相差8%， 要等等
+                            // 上一次还没收割得，相差10%， 要等等
                             continue;
                         }
 
@@ -830,13 +830,8 @@ namespace DogRunService
             }
             var flexPointList = analyzeResult.FlexPointList;
             var nowPrice = analyzeResult.NowPrice;
-            //if (flexPointList[0].isHigh)
-            //{
-            //    // 最低点 不适合出售
-            //    throw new ApplicationException("做多失败， 最近不是最低");
-            //}
 
-            var minBuyTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
+            var minBuyTradePrice = new DogMoreBuyDao().GetMinPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
             if (minBuyTradePrice != null && nowPrice * (decimal)1.06 > minBuyTradePrice)
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");

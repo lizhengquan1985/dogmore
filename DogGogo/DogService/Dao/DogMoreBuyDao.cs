@@ -57,7 +57,7 @@ namespace DogService.Dao
         /// <returns></returns>
         public List<DogMoreBuy> ListNeedChangeBuyStateDogMoreBuy()
         {
-            var states = $"'{StateConst.PartialFilled}','{StateConst.Filled}'";
+            var states = $"'{StateConst.PartialCanceled}','{StateConst.Filled}'";
             var sql = $"select * from t_dog_more_buy where BuyState not in({states})";
             return Database.Query<DogMoreBuy>(sql).ToList();
         }

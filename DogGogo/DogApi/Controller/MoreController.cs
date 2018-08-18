@@ -315,23 +315,23 @@ namespace DogApi.Controller
             }
             if (sort == "maxmin")
             {
-                res.Sort((a, b) => (int)(a.MaxPrice / a.MaxPrice - b.MaxPrice / b.MinPrice));
+                res.Sort((b, a) => (int)(a.MaxPrice / a.MaxPrice - b.MaxPrice / b.MinPrice));
             }
             if (sort == "amount")
             {
-                res.Sort((a, b) => (int)(a.TotalAmount - b.TotalAmount));
+                res.Sort((b, a) => (int)(a.TotalAmount - b.TotalAmount));
             }
             if (sort == "nowamount")
             {
-                res.Sort((a, b) => (int)(a.NowTotalAmount - b.NowTotalAmount));
+                res.Sort((b, a) => (int)(a.NowTotalAmount - b.NowTotalAmount));
             }
             if (sort == "diffamount")
             {
-                res.Sort((a, b) => (int)(a.TotalAmount - a.NowTotalAmount - (b.TotalAmount - b.NowTotalAmount)));
+                res.Sort((b, a) => (int)(a.TotalAmount - a.NowTotalAmount - (b.TotalAmount - b.NowTotalAmount)));
             }
             if (sort == "count")
             {
-                res.Sort((a, b) => a.Count - b.Count);
+                res.Sort((b, a) => a.Count - b.Count);
             }
             return res;
         }

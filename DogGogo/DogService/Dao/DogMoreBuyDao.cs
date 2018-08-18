@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DogService.Dao
@@ -41,10 +42,19 @@ namespace DogService.Dao
 
         public void CreateDogMoreBuy(DogMoreBuy dogMoreBuy)
         {
-            using (var tx = Database.BeginTransaction())
+            try
             {
-                Database.Insert(dogMoreBuy);
-                tx.Commit();
+                using (var tx = Database.BeginTransaction())
+                {
+                    Database.Insert(dogMoreBuy);
+                    tx.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("----RunBuy------危险----- CreateDogMoreBuy ------ 防止出错时候, 无限购买. 业务上不能出错");
+                logger.Error(ex.Message, ex);
+                Thread.Sleep(1000 * 60 * 60);
             }
         }
 
@@ -105,13 +115,13 @@ namespace DogService.Dao
         }
 
         /// <summary>
-        /// 为了下一笔购买做好判断的.
+        /// 获取最小的购买价格.
         /// </summary>
         /// <param name="accountId"></param>
         /// <param name="userName"></param>
         /// <param name="coin"></param>
         /// <returns></returns>
-        public decimal GetMinPriceOfNotSellFinished(string accountId, string userName, string coin)
+        public decimal GetMinBuyPriceOfNotSellFinished(string accountId, string userName, string coin)
         {
             var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' and BuyState!='({StateConst.Canceled.ToString()})' " +
                 $" and IsFinished=0 and UserName='{userName}'";
@@ -135,7 +145,7 @@ namespace DogService.Dao
         {
             var sql = $"select * from t_dog_more_buy where SymbolName =@SymbolName and BuyState!='({StateConst.Canceled.ToString()})' " +
                 $" and IsFinished=0 ";
-            var list = Database.Query<DogMoreBuy>(sql, new { SymbolName  = symbolName }).ToList();
+            var list = Database.Query<DogMoreBuy>(sql, new { SymbolName = symbolName }).ToList();
             var maxPrice = (decimal)0;
             foreach (var item in list)
             {

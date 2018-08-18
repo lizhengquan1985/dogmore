@@ -324,10 +324,10 @@ namespace DogApi.Controller
             {
                 var symbols = CoinUtils.GetAllCommonSymbols();
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
-                var dao = new KlineDao();
-                var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+                //var dao = new KlineDao();
+                //var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
 
-                CoinTrade.DoMore(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+                CoinTrade.BuyWhenDoMore(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
             }
             catch (Exception ex)
             {

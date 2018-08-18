@@ -34,6 +34,12 @@ namespace DogRunService
 
         static ILog logger = LogManager.GetLogger(typeof(AnalyzeResult));
 
+        /// <summary>
+        /// 当购买或者出售时候,需要一个分析结果, 供判断是否做多,或者做空
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="isBuy"></param>
+        /// <returns></returns>
         public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol, bool isBuy)
         {
             var key = HistoryKlinePools.GetKey(symbol, "1min");
@@ -171,7 +177,7 @@ namespace DogRunService
                     continue;
                 }
 
-                decimal minBuyPrice = new DogMoreBuyDao().GetMinPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
+                decimal minBuyPrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
                 if (minBuyPrice <= 0)
                 {
                     minBuyPrice = 25000;
@@ -228,37 +234,28 @@ namespace DogRunService
                 HBResponse<long> order = api.OrderPlace(req);
                 if (order.Status == "ok")
                 {
-                    try
+                    new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
                     {
-                        new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
-                        {
-                            SymbolName = symbol.BaseCurrency,
-                            AccountId = accountId,
-                            UserName = accountConfig.UserName,
-                            FlexPercent = flexPercent,
+                        SymbolName = symbol.BaseCurrency,
+                        AccountId = accountId,
+                        UserName = accountConfig.UserName,
+                        FlexPercent = flexPercent,
 
-                            BuyQuantity = buyQuantity,
-                            BuyOrderPrice = orderPrice,
-                            BuyDate = DateTime.Now,
-                            BuyOrderResult = JsonConvert.SerializeObject(order),
-                            BuyState = StateConst.PreSubmitted,
-                            BuyTradePrice = 0,
-                            BuyOrderId = order.Data,
-                            BuyFlex = JsonConvert.SerializeObject(flexPointList),
-                            BuyMemo = "",
-                            BuyOrderDetail = "",
-                            BuyOrderMatchResults = "",
-                            IsFinished = false
-                        });
-                        // 下单成功马上去查一次
-                        QueryBuyDetailAndUpdate(userName, order.Data);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("----RunBuy------危险-----------");
-                        logger.Error(ex.Message, ex);
-                        Thread.Sleep(1000 * 60 * 60);
-                    }
+                        BuyQuantity = buyQuantity,
+                        BuyOrderPrice = orderPrice,
+                        BuyDate = DateTime.Now,
+                        BuyOrderResult = JsonConvert.SerializeObject(order),
+                        BuyState = StateConst.PreSubmitted,
+                        BuyTradePrice = 0,
+                        BuyOrderId = order.Data,
+                        BuyFlex = JsonConvert.SerializeObject(flexPointList),
+                        BuyMemo = "",
+                        BuyOrderDetail = "",
+                        BuyOrderMatchResults = "",
+                        IsFinished = false
+                    });
+                    // 下单成功马上去查一次
+                    QueryBuyDetailAndUpdate(userName, order.Data);
                 }
                 logger.Error($"下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyPrice},nowPrice：{nowPrice}, accountId：{accountId}");
                 logger.Error($"下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
@@ -335,7 +332,7 @@ namespace DogRunService
         {
             try
             {
-                if (dic.ContainsKey(symbolName) && dic[symbolName] > DateTime.Now.AddMinutes(-20))
+                if (dic.ContainsKey(symbolName) && dic[symbolName] > DateTime.Now.AddMinutes(-60))
                 {
                     return;
                 }
@@ -842,18 +839,25 @@ namespace DogRunService
             EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
         }
 
-        public static void DoMore(CommonSymbols symbol, string userName, string accountId)
+        /// <summary>
+        /// 购买,做多的时候
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="userName"></param>
+        /// <param name="accountId"></param>
+        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
             if (analyzeResult == null)
             {
                 throw new ApplicationException("做多失败，分析出错");
             }
+
             var flexPointList = analyzeResult.FlexPointList;
             var nowPrice = analyzeResult.NowPrice;
 
-            var minBuyTradePrice = new DogMoreBuyDao().GetMinPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
-            if (minBuyTradePrice != null && nowPrice * (decimal)1.06 > minBuyTradePrice)
+            var minBuyTradePrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
+            if (nowPrice * (decimal)1.06 > minBuyTradePrice)
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
             }
@@ -865,10 +869,11 @@ namespace DogRunService
             var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName);
             if (notShougeEmptySellAmount >= usdt.balance)
             {
-                LogNotBuy(symbol.BaseCurrency, $"checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},usdt.balance:{usdt.balance}");
+                // 余额不足
+                LogNotBuy(symbol.BaseCurrency, $"余额不足,  checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},usdt.balance:{usdt.balance}");
                 return;
             }
-            decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivide(symbol.BaseCurrency, nowPrice); // TODO 测试阶段，暂定低一些，
+            decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivide(symbol.BaseCurrency, nowPrice);
 
             if (recommendAmount < (decimal)1.1)
             {
@@ -893,44 +898,36 @@ namespace DogRunService
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-                Thread.Sleep(1000 * 5);
+                Thread.Sleep(1000 * 10);
                 return;
             }
 
             HBResponse<long> order = api.OrderPlace(req);
             if (order.Status == "ok")
             {
-                try
+                new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
                 {
-                    new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
-                    {
-                        SymbolName = symbol.BaseCurrency,
-                        AccountId = accountId,
-                        UserName = userName,
-                        FlexPercent = (decimal)1.00,
+                    SymbolName = symbol.BaseCurrency,
+                    AccountId = accountId,
+                    UserName = userName,
+                    FlexPercent = (decimal)1.00,
 
-                        BuyQuantity = buyQuantity,
-                        BuyOrderPrice = orderPrice,
-                        BuyDate = DateTime.Now,
-                        BuyOrderResult = JsonConvert.SerializeObject(order),
-                        BuyState = StateConst.PreSubmitted,
-                        BuyTradePrice = 0,
-                        BuyOrderId = order.Data,
-                        BuyFlex = JsonConvert.SerializeObject(flexPointList),
-                        BuyMemo = "",
-                        BuyOrderDetail = "",
-                        BuyOrderMatchResults = "",
-                        IsFinished = false
-                    });
-                    // 下单成功马上去查一次
-                    QueryBuyDetailAndUpdate(userName, order.Data);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("----RunBuy------危险-----------");
-                    logger.Error(ex.Message, ex);
-                    Thread.Sleep(1000 * 60 * 60);
-                }
+                    BuyQuantity = buyQuantity,
+                    BuyOrderPrice = orderPrice,
+                    BuyDate = DateTime.Now,
+                    BuyOrderResult = JsonConvert.SerializeObject(order),
+                    BuyState = StateConst.PreSubmitted,
+                    BuyTradePrice = 0,
+                    BuyOrderId = order.Data,
+                    BuyFlex = JsonConvert.SerializeObject(flexPointList),
+                    BuyMemo = "",
+                    BuyOrderDetail = "",
+                    BuyOrderMatchResults = "",
+                    IsFinished = false
+                });
+
+                // 下单成功马上去查一次
+                QueryBuyDetailAndUpdate(userName, order.Data);
             }
             logger.Error($"下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId}");
             logger.Error($"下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");

@@ -119,7 +119,7 @@ namespace DogApi.Controller
             }
             else
             {
-                list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName);
+                list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
                 var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
                 var historyKlineData = HistoryKlinePools.Get(key);
                 var close = historyKlineData.Data[0].Close;
@@ -284,7 +284,7 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("listDogMoreBuyNotFinishedStatistics")]
-        public async Task<object> ListDogMoreBuyNotFinishedStatistics(string userName)
+        public async Task<object> ListDogMoreBuyNotFinishedStatistics(string userName, string sort)
         {
             var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName);
 
@@ -312,6 +312,26 @@ namespace DogApi.Controller
                     item.NowPrice = closeDic[item.SymbolName];
                     item.NowTotalAmount = closeDic[item.SymbolName] * item.TotalQuantity;
                 }
+            }
+            if (sort == "maxmin")
+            {
+                res.Sort((a, b) => (int)(a.MaxPrice / a.MaxPrice - b.MaxPrice / b.MinPrice));
+            }
+            if (sort == "amount")
+            {
+                res.Sort((a, b) => (int)(a.TotalAmount - b.TotalAmount));
+            }
+            if (sort == "nowamount")
+            {
+                res.Sort((a, b) => (int)(a.NowTotalAmount - b.NowTotalAmount));
+            }
+            if (sort == "diffamount")
+            {
+                res.Sort((a, b) => (int)(a.TotalAmount - a.NowTotalAmount - (b.TotalAmount - b.NowTotalAmount)));
+            }
+            if (sort == "count")
+            {
+                res.Sort((a, b) => a.Count - b.Count);
             }
             return res;
         }

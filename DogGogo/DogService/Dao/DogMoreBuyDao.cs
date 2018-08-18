@@ -167,22 +167,26 @@ namespace DogService.Dao
             return Database.Query<DogMoreBuy>(sql).FirstOrDefault();
         }
 
-        public List<DogMoreBuy> listMoreBuyIsNotFinished(string symbolName)
+        public List<DogMoreBuy> listMoreBuyIsNotFinished(string userName, string symbolName)
         {
-            var sql = $"select * from t_dog_more_buy where IsFinished=0 and SymbolName=@symbolName order by BuyTradePrice asc";
-            return Database.Query<DogMoreBuy>(sql, new { symbolName }).ToList();
+
+            var where = $" where IsFinished=0 ";
+            if (!string.IsNullOrEmpty(userName))
+            {
+                where += $" and UserName = @userName ";
+            }
+            if (!string.IsNullOrEmpty(symbolName))
+            {
+                where += $" and SymbolName = @symbolName ";
+            }
+            var sql = $"select * from t_dog_more_buy {where} order by BuyTradePrice asc";
+            return Database.Query<DogMoreBuy>(sql, new { symbolName , userName }).ToList();
         }
 
         public List<DogMoreBuy> listEveryMinPriceMoreBuyIsNotFinished(string userName)
         {
-            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from ( select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where UserName=@userName and IsFinished=0 group by SymbolName) t)  ";
+            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from ( select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where {(string.IsNullOrEmpty(userName)?"":$" UserName = @userName and ")} IsFinished=0 group by SymbolName) t)  ";
             return Database.Query<DogMoreBuy>(sql, new { userName }).ToList();
-        }
-
-        public List<DogMoreBuy> listMoreBuyIsNotFinished(string symbolName, string userName)
-        {
-            var sql = $"select * from t_dog_more_buy where IsFinished=0 and SymbolName=@symbolName and UserName=@userName order by BuyTradePrice asc";
-            return Database.Query<DogMoreBuy>(sql, new { symbolName, userName }).ToList();
         }
 
         public List<DogMoreBuy> listDogMoreBuyIsFinished(string userName, string symbolName)

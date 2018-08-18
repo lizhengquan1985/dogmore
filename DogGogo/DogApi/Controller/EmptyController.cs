@@ -303,7 +303,7 @@ namespace DogApi.Controller
             var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
             var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbolName);
 
-            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(symbolName, userName);
+            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
             var totalQuantity = (decimal)0;
             list.ForEach(it => totalQuantity += it.BuyQuantity);
 

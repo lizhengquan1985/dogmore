@@ -127,7 +127,7 @@ namespace DogApi.Controller
             }
 
             Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();
-            foreach(var item in list)
+            foreach (var item in list)
             {
                 if (ladderDic.ContainsKey(item.SymbolName))
                 {
@@ -216,7 +216,14 @@ namespace DogApi.Controller
             foreach (var item in orderMatchResult.Data)
             {
                 buyAmount += item.FilledAmount * item.price;
-                buyQuantity += item.FilledAmount;
+                if (item.symbol.IndexOf("ven") >= 0)
+                {
+                    buyQuantity += item.FilledAmount * 100;
+                }
+                else
+                {
+                    buyQuantity += item.FilledAmount;
+                }
                 buyFees += item.FilledFees;
             }
 
@@ -315,7 +322,6 @@ namespace DogApi.Controller
         {
             try
             {
-                // 立马空单
                 var symbols = CoinUtils.GetAllCommonSymbols();
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
                 var dao = new KlineDao();

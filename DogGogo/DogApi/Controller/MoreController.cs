@@ -315,7 +315,14 @@ namespace DogApi.Controller
             }
             if (sort == "maxmin")
             {
-                res.Sort((b, a) => (int)(a.MaxPrice / a.MaxPrice - b.MaxPrice / b.MinPrice));
+                res.Sort((b, a) =>
+                {
+                    if (a.MinPrice == 0 || b.MinPrice == 0)
+                    {
+                        return 0;
+                    }
+                    return (int)(a.MaxPrice / a.MinPrice - b.MaxPrice / b.MinPrice);
+                });
             }
             if (sort == "amount")
             {

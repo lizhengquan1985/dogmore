@@ -204,9 +204,7 @@ namespace DogRunService
 
                 if (recommendAmount < (decimal)1.1)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"checkRecommendAmount -> recommendAmount:{recommendAmount} 小于1.1不能购买");
-                    // 余额要足够，推荐购买的额度要大于1.1
-                    continue;
+                    recommendAmount = (decimal)1.1;
                 }
 
                 // 购买的要求

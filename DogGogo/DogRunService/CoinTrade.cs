@@ -413,8 +413,8 @@ namespace DogRunService
                 // 下单成功马上去查一次
                 QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
             }
-            logger.Error($"空单收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
-            logger.Error($"空单收割-下单购买结果 分析 {JsonConvert.SerializeObject(analyzeResult.FlexPointList)}");
+            logger.Error($"下单 --> 空单收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
+            logger.Error($"下单 --> 空单收割-下单购买结果 分析 {JsonConvert.SerializeObject(analyzeResult.FlexPointList)}");
         }
 
         public static void ShouGeMore(DogMoreBuy dogMoreBuy, decimal percent = (decimal)1.02)
@@ -449,7 +449,7 @@ namespace DogRunService
             req.type = "sell-limit";
             PlatformApi api = PlatformApi.GetInstance(dogMoreBuy.UserName);
             HBResponse<long> order = api.OrderPlace(req);
-            logger.Error("收割-下单出售结果：" + JsonConvert.SerializeObject(order));
+            logger.Error("下单 --> 收割-下单出售结果：" + JsonConvert.SerializeObject(order));
             if (order.Status == "ok")
             {
                 try
@@ -485,7 +485,7 @@ namespace DogRunService
                 QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
             }
 
-            logger.Error($"下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice}，accountId：{dogMoreBuy.AccountId}");
+            logger.Error($"下单 --> 下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice}，accountId：{dogMoreBuy.AccountId}");
         }
 
         private static void QueryBuyDetailAndUpdate(string userName, long orderId)
@@ -590,7 +590,7 @@ namespace DogRunService
                     var canSell = JudgeSellUtils.CheckCanSell(needSellDogMoreBuyItem.BuyTradePrice, afterBuyHighClosePrice, nowPrice, gaoyuPercentSell, needHuitou);
                     if (!canSell)
                     {
-                        LogNotBuy(symbol.BaseCurrency, $"出售,   BuyTradePrice: {needSellDogMoreBuyItem.BuyTradePrice}, nowPrice{nowPrice}, gaoyuPercentSell{gaoyuPercentSell}, needHuitou{needHuitou}");
+                        //LogNotBuy(symbol.BaseCurrency, $"出售,   BuyTradePrice: {needSellDogMoreBuyItem.BuyTradePrice}, nowPrice{nowPrice}, gaoyuPercentSell{gaoyuPercentSell}, needHuitou{needHuitou}");
                         continue;
                     }
                     decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(needSellDogMoreBuyItem.BuyQuantity, needSellDogMoreBuyItem.BuyTradePrice, nowPrice, symbol);
@@ -610,7 +610,7 @@ namespace DogRunService
                     req.type = "sell-limit";
                     PlatformApi api = PlatformApi.GetInstance(userName);
                     HBResponse<long> orderResult = api.OrderPlace(req);
-                    logger.Error($"auto 下单出售结果 req:{JsonConvert.SerializeObject(req)}, orderResult::{JsonConvert.SerializeObject(orderResult)},nowPrice：{nowPrice} higher：{afterBuyHighClosePrice}，accountId：{accountId}");
+                    logger.Error($"下单 --> auto 下单出售结果 req:{JsonConvert.SerializeObject(req)}, orderResult::{JsonConvert.SerializeObject(orderResult)},nowPrice：{nowPrice} higher：{afterBuyHighClosePrice}，accountId：{accountId}");
                     if (orderResult.Status == "ok")
                     {
                         try
@@ -763,7 +763,7 @@ namespace DogRunService
                 req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
                 req.type = "sell-limit";
                 HBResponse<long> order = api.OrderPlace(req);
-                logger.Error("下单出售结果：" + JsonConvert.SerializeObject(order));
+                logger.Error("下单 --> 下单出售结果：" + JsonConvert.SerializeObject(order));
                 if (order.Status == "ok")
                 {
                     try
@@ -952,8 +952,8 @@ namespace DogRunService
                 // 下单成功马上去查一次
                 QueryBuyDetailAndUpdate(userName, order.Data);
             }
-            logger.Error($"下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId}");
-            logger.Error($"下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
+            logger.Error($"下单 --> 下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId}");
+            logger.Error($"下单 --> 下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
         }
 
         private static void QuerySellDetailAndUpdate(string userName, long orderId)

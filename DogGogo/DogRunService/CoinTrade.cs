@@ -725,9 +725,9 @@ namespace DogRunService
                             sellQuantity = 10 / nowPrice;
                         }
                         sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                        if(sellQuantity * nowPrice < 2)
+                        if (sellQuantity * nowPrice < 2)
                         {
-                            logger.Error($"收益不超过2usdt");
+                            LogNotBuy(symbol.BaseCurrency, $"收益不超过2usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
                             continue;
                         }
 

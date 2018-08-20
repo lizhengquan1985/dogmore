@@ -16,7 +16,7 @@ namespace DogRunService
 
         public static bool CheckCanBuy(decimal nowOpen, decimal nearLowOpen)
         {
-            return nowOpen > nearLowOpen * (decimal)1.005 && nowOpen < nearLowOpen * (decimal)1.012;
+            return nowOpen > nearLowOpen * (decimal)1.005 && nowOpen < nearLowOpen * (decimal)1.02;
         }
 
         public static bool CheckFlexPoint(decimal nowOpen, decimal nearLowOpen, decimal percent)

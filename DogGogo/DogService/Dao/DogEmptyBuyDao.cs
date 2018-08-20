@@ -8,11 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DogService.Dao
 {
-    public class DogEmptyBuyDao:BaseDao
+    public class DogEmptyBuyDao : BaseDao
     {
         static ILog logger = LogManager.GetLogger(typeof(DogEmptyBuyDao));
 
@@ -22,10 +23,18 @@ namespace DogService.Dao
 
         public void CreateDogEmptyBuy(DogEmptyBuy dogEmptyBuy)
         {
-            using (var tx = Database.BeginTransaction())
+            try
             {
-                Database.Insert(dogEmptyBuy);
-                tx.Commit();
+                using (var tx = Database.BeginTransaction())
+                {
+                    Database.Insert(dogEmptyBuy);
+                    tx.Commit();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                Thread.Sleep(1000 * 60 * 60);
             }
         }
 

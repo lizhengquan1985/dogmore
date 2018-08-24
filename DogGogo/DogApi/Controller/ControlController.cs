@@ -1,4 +1,5 @@
-﻿using DogPlatform;
+﻿using DogAccount;
+using DogPlatform;
 using DogPlatform.Model;
 using DogRunService;
 using DogRunService.Helper;

@@ -167,7 +167,7 @@ namespace DogApi.Controller
 
                 // 判断max
                 var maxNotSell = new DogMoreBuyDao().GetAllMaxPriceOfNotSellFinished(symbolName);
-                if(maxNotSell > max)
+                if (maxNotSell > max)
                 {
                     max = maxNotSell;
                 }
@@ -242,37 +242,57 @@ namespace DogApi.Controller
         [ActionName("initAccountInfo")]
         public async Task<object> InitAccountInfo(string userName)
         {
-            PlatformApi api = PlatformApi.GetInstance(userName);
-            var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
-
-            var result = new List<Dictionary<string, object>>();
-
-            var symbols = CoinUtils.GetAllCommonSymbols();
-            foreach (var symbol in symbols)
+            try
             {
-                var symbolName = symbol.BaseCurrency;
 
-                var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbolName);
+                PlatformApi api = PlatformApi.GetInstance(userName);
+                var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
 
-                var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
-                var totalQuantity = list.Sum(it => it.BuyQuantity);
+                var result = new List<Dictionary<string, object>>();
 
-                var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
-                var historyKlineData = HistoryKlinePools.Get(key);
-                var close = historyKlineData.Data[0].Close;
+                var symbols = CoinUtils.GetAllCommonSymbols();
+                foreach (var symbol in symbols)
+                {
+                    var symbolName = symbol.BaseCurrency;
+                    if (symbolName == "btc")
+                    {
+                        continue;
+                    }
 
-                Dictionary<string, object> item = new Dictionary<string, object>();
-                item.Add("coin", symbol.BaseCurrency);
-                item.Add("buyQuantity", totalQuantity);
-                item.Add("balance", balanceItem.balance);
-                item.Add("nowPrice", close);
-                item.Add("canEmptyQuantity", balanceItem.balance - totalQuantity);
-                item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * close);
+                    try
+                    {
+                        var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbolName);
 
-                result.Add(item);
+                        var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
+                        var totalQuantity = list.Sum(it => it.BuyQuantity);
+
+                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
+                        var historyKlineData = HistoryKlinePools.Get(key);
+                        var close = historyKlineData.Data[0].Close;
+
+                        Dictionary<string, object> item = new Dictionary<string, object>();
+                        item.Add("coin", symbol.BaseCurrency);
+                        item.Add("buyQuantity", totalQuantity);
+                        item.Add("balance", balanceItem.balance);
+                        item.Add("nowPrice", close);
+                        item.Add("canEmptyQuantity", balanceItem.balance - totalQuantity);
+                        item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * close);
+
+                        result.Add(item);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex.Message, ex);
+                    }
+                }
+
+                return result;
             }
-
-            return result;
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
         }
     }
 }

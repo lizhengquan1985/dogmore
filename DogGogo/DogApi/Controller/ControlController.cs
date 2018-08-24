@@ -236,5 +236,42 @@ namespace DogApi.Controller
             }
             return result;
         }
+
+        [HttpGet]
+        [ActionName("initAccountInfo")]
+        public async Task<object> InitAccountInfo(string userName)
+        {
+            PlatformApi api = PlatformApi.GetInstance(userName);
+            var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+
+            var result = new List<Dictionary<string, object>>();
+
+            var symbols = CoinUtils.GetAllCommonSymbols();
+            foreach (var symbol in symbols)
+            {
+                var symbolName = symbol.BaseCurrency;
+
+                var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbolName);
+
+                var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
+                var totalQuantity = list.Sum(it => it.BuyQuantity);
+
+                var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
+                var historyKlineData = HistoryKlinePools.Get(key);
+                var close = historyKlineData.Data[0].Close;
+
+                Dictionary<string, object> item = new Dictionary<string, object>();
+                item.Add("coin", symbol.BaseCurrency);
+                item.Add("buyQuantity", totalQuantity);
+                item.Add("balance", balanceItem.balance);
+                item.Add("nowPrice", close);
+                item.Add("canEmptyQuantity", balanceItem.balance - totalQuantity);
+                item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * close);
+
+                result.Add(item);
+            }
+
+            return result;
+        }
     }
 }

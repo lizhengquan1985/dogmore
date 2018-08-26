@@ -523,43 +523,6 @@ namespace DogRunService
                 }
             }
 
-            try
-            {
-                // 多单的指令收割
-                var list = new OrderReapDao().List(ReapType.ShougeMore);
-                foreach (var item in list)
-                {
-                    var percent = item.Percent;
-                    var dogMoreBuy = new DogMoreBuyDao().GetByBuyOrderId(item.OrderId);
-                    if (dogMoreBuy.IsFinished || dogMoreBuy.SymbolName != symbol.BaseCurrency)
-                    {
-                        continue;
-                    }
-
-                    if (dogMoreBuy.BuyTradePrice * percent > nowPrice)
-                    {
-                        continue;
-                    }
-
-                    var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(dogMoreBuy.BuyOrderId);
-                    if (dogMoreSellList.Count > 0 &&
-                        dogMoreSellList.Find(it =>
-                            it.SellState != StateConst.Canceled.ToString()
-                            && it.SellState != StateConst.PartialFilled.ToString()
-                            && it.SellState != StateConst.Filled.ToString()) != null)
-                    {
-                        // 存在操作中的,则不操作
-                        continue;
-                    }
-
-                    ShouGeMore(dogMoreBuy, percent);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-            }
-
             // 自动做空
             // 要求  1. 进入拐点区域, 2. 受管控未过期
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);

@@ -20,17 +20,18 @@ namespace DogRunService
     public class AnalyzeResult
     {
         /// <summary>
+        /// 拐点判断标准
+        /// </summary>
+        public decimal FlexPercent { get; set; }
+        /// <summary>
         /// 分析后的拐点数据
         /// </summary>
         public List<FlexPoint> FlexPointList { get; set; }
         public decimal NowPrice { get; set; }
-        public decimal LastLowPrice { get; set; }
         /// <summary>
         /// 原始数据
         /// </summary>
         public List<HistoryKline> HistoryKlines { get; set; }
-        public decimal FlexPercent { get; set; }
-
 
         static ILog logger = LogManager.GetLogger(typeof(AnalyzeResult));
 
@@ -44,57 +45,60 @@ namespace DogRunService
         {
             var key = HistoryKlinePools.GetKey(symbol, "1min");
             var historyKlineData = HistoryKlinePools.Get(key);
-            if (historyKlineData == null || historyKlineData.Data == null
-                || historyKlineData.Data.Count == 0 || historyKlineData.Date < DateTime.Now.AddMinutes(-1)) // TODO
+            if (historyKlineData == null
+                || historyKlineData.Data == null
+                || historyKlineData.Data.Count == 0
+                || historyKlineData.Date < DateTime.Now.AddMinutes(-1))
             {
                 logger.Error($"GetAnalyzeResult 数据还未准备好：{symbol.BaseCurrency}");
-                Thread.Sleep(1000 * 3);
                 return null;
             }
             var historyKlines = historyKlineData.Data;
+            if (historyKlines == null
+                || historyKlines.Count < 60)
+            {
+                return null;
+            }
 
             // 获取最近行情
-            decimal lastLowPrice;
-            decimal nowPrice = historyKlines[0].Close;
-            // 分析是否下跌， 下跌超过一定数据，可以考虑
             decimal flexPercent = (decimal)1.050;
-            var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+            var flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.045;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.040;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.035;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.03;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.025;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.02;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             }
             if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
             {
                 flexPercent = (decimal)1.015;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
             }
-            if (flexPointList.Count == 0 && flexPointList.Count == 0)
+            if (flexPointList == null || flexPointList.Count == 0)
             {
                 //logger.Error($"--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
                 return null;
@@ -103,8 +107,7 @@ namespace DogRunService
             AnalyzeResult analyzeResult = new AnalyzeResult()
             {
                 FlexPointList = flexPointList,
-                LastLowPrice = lastLowPrice,
-                NowPrice = nowPrice,
+                NowPrice = historyKlines[0].Close,
                 HistoryKlines = historyKlines,
                 FlexPercent = flexPercent
             };
@@ -431,7 +434,6 @@ namespace DogRunService
             var flexPointList = analyzeResult.FlexPointList;
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
-            var lastLowPrice = analyzeResult.LastLowPrice;
             var flexPercent = analyzeResult.FlexPercent;
 
             if (!flexPointList[0].isHigh)

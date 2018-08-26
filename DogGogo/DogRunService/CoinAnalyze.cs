@@ -14,9 +14,9 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(CoinAnalyze));
 
-        public static List<FlexPoint> Analyze(List<HistoryKline> data, out decimal lastLowPrice, decimal flexPercent)
+        public static List<FlexPoint> Analyze(List<HistoryKline> data, decimal flexPercent)
         {
-            lastLowPrice = 25000;
+            decimal lastLowPrice = 25000;
 
             try
             {

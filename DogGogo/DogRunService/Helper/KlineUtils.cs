@@ -72,7 +72,7 @@ namespace DogRunService.Helper
                 //HistoryKlinePools.Init(key, klines);
 
                 var totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;
-                if ((DateTime.Now - begin).TotalSeconds > 2.5)
+                if ((DateTime.Now - begin).TotalSeconds > 3.5)
                 {
                     logger.Error("一次请求时间太长,达到：" + totalMilliseconds);
                 }
@@ -115,7 +115,7 @@ namespace DogRunService.Helper
                 }
 
                 totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;
-                if ((DateTime.Now - begin).TotalSeconds > 4)
+                if ((DateTime.Now - begin).TotalSeconds > 5)
                 {
                     logger.Error("一次请求时间太长 含插入数据库,达到：" + totalMilliseconds);
                 }

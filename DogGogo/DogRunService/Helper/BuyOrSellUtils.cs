@@ -18,7 +18,7 @@ namespace DogRunService.Helper
         {
             var symbols = CoinUtils.GetAllCommonSymbols();
             //RunCoin(symbols.Where(it => it.BaseCurrency == "let" || it.BaseCurrency == "zec" || it.BaseCurrency == "etc" || it.BaseCurrency == "act" || it.BaseCurrency == "storj").ToList());
-            RunCoin(symbols.Where(it => it.BaseCurrency != "btc").ToList());
+            RunCoin(symbols.Where(it => it.BaseCurrency != "btc" && it.BaseCurrency != "ven").ToList());
             //var splitIndex = 16;
             //RunCoin(symbols.GetRange(0, splitIndex + 1));
             //RunCoin(symbols.GetRange(splitIndex, symbols.Count - splitIndex));
@@ -52,9 +52,17 @@ namespace DogRunService.Helper
                         {
                             logger.Error("RunCoin:  " + ex.Message, ex);
                         }
-                        //Thread.Sleep(1000 * 3);
                     }
-                    Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
+
+                    var useTime = (DateTime.Now - begin).TotalSeconds;
+                    if (useTime > 60)
+                    {
+                        logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
+                    }
+                    else
+                    {
+                        Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
+                    }
                 }
             });
         }

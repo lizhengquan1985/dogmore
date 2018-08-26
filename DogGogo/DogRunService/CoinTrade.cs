@@ -468,7 +468,8 @@ namespace DogRunService
             // 自动做空
             // 要求  1. 进入拐点区域, 2. 受管控未过期
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
-            if (nowPrice * (decimal)1.02 > flexPointList[0].close && nowPrice * (decimal)1.005 < flexPointList[0].close
+            if (nowPrice * (decimal)1.02 > flexPointList[0].close
+                && nowPrice * (decimal)1.005 < flexPointList[0].close
                 && control != null && nowPrice >= control.EmptyPrice && control.EmptyExpiredTime > DateTime.Now
                 && nowPrice >= control.HistoryMin * (decimal)1.4 && control.HistoryMin > 0 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin)
             {
@@ -526,7 +527,6 @@ namespace DogRunService
 
         private static void EmtpyTrade(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, List<FlexPoint> flexPointList, string sellMemo = "")
         {
-            OrderPlaceRequest req = new OrderPlaceRequest();
             try
             {
                 if (sellQuantity < symbol.AmountPrecision)
@@ -535,53 +535,47 @@ namespace DogRunService
                     return;
                 }
 
-                PlatformApi api = PlatformApi.GetInstance(userName);
+                OrderPlaceRequest req = new OrderPlaceRequest();
                 req.account_id = accountId;
                 req.amount = sellQuantity.ToString();
                 req.price = sellPrice.ToString();
                 req.source = "api";
                 req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
                 req.type = "sell-limit";
+
+                PlatformApi api = PlatformApi.GetInstance(userName);
                 HBResponse<long> order = api.OrderPlace(req);
-                logger.Error("下单 --> 下单出售结果：" + JsonConvert.SerializeObject(order));
                 if (order.Status == "ok")
                 {
-                    try
+                    DogEmptySell dogEmptySell = new DogEmptySell()
                     {
-                        DogEmptySell dogEmptySell = new DogEmptySell()
-                        {
-                            AccountId = accountId,
-                            UserName = userName,
-                            SellOrderId = order.Data,
-                            SellOrderResult = JsonConvert.SerializeObject(order),
-                            SellDate = DateTime.Now,
-                            SellFlex = JsonConvert.SerializeObject(flexPointList),
-                            SellQuantity = sellQuantity,
-                            SellOrderPrice = sellPrice,
-                            SellState = StateConst.Submitted,
-                            SellTradePrice = 0,
-                            SymbolName = symbol.BaseCurrency,
-                            SellMemo = sellMemo,
-                            SellOrderDetail = "",
-                            SellOrderMatchResults = "",
-                            FlexPercent = (decimal)1.04,
-                            IsFinished = false
-                        };
-                        new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error("------RunSell----危险-----------");
-                        logger.Error(ex.Message, ex);
-                    }
+                        AccountId = accountId,
+                        UserName = userName,
+                        SellOrderId = order.Data,
+                        SellOrderResult = JsonConvert.SerializeObject(order),
+                        SellDate = DateTime.Now,
+                        SellFlex = JsonConvert.SerializeObject(flexPointList),
+                        SellQuantity = sellQuantity,
+                        SellOrderPrice = sellPrice,
+                        SellState = StateConst.Submitted,
+                        SellTradePrice = 0,
+                        SymbolName = symbol.BaseCurrency,
+                        SellMemo = sellMemo,
+                        SellOrderDetail = "",
+                        SellOrderMatchResults = "",
+                        FlexPercent = (decimal)1.00,
+                        IsFinished = false
+                    };
+                    new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
 
                     // 下单成功马上去查一次
                     QueryEmptySellDetailAndUpdate(userName, order.Data);
                 }
+                logger.Error($"下单 --> req {JsonConvert.SerializeObject(req)}下单出售结果：" + JsonConvert.SerializeObject(order));
             }
             catch (Exception ex)
             {
-                logger.Error("sell下单出错：" + JsonConvert.SerializeObject(req) + "--> " + ex.Message);
+                logger.Error(ex.Message, ex);
             }
         }
 
@@ -872,25 +866,32 @@ namespace DogRunService
 
         private static void QueryEmptySellDetailAndUpdate(string userName, long orderId)
         {
-            PlatformApi api = PlatformApi.GetInstance(userName);
-
-            var orderDetail = api.QueryOrderDetail(orderId);
-            if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
+            try
             {
-                var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                decimal minPrice = 25000;
-                foreach (var item in orderMatchResult.Data)
+                PlatformApi api = PlatformApi.GetInstance(userName);
+
+                var orderDetail = api.QueryOrderDetail(orderId);
+                if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
-                    if (minPrice > item.price)
+                    var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                    decimal minPrice = 25000;
+                    foreach (var item in orderMatchResult.Data)
                     {
-                        minPrice = item.price;
+                        if (minPrice > item.price)
+                        {
+                            minPrice = item.price;
+                        }
+                    }
+                    if (orderMatchResult.Status == "ok")
+                    {
+                        // 完成
+                        new DogEmptySellDao().UpdateDogEmptySellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);
                     }
                 }
-                if (orderMatchResult.Status == "ok")
-                {
-                    // 完成
-                    new DogEmptySellDao().UpdateDogEmptySellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);
-                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
             }
         }
 

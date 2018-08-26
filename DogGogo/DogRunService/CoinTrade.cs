@@ -171,7 +171,6 @@ namespace DogRunService
                 var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
                 if (!canBuy)
                 {
-                    //LogNotBuy(symbol.BaseCurrency, $"checkCanBuy -> nowPrice:{nowPrice}   flexPointList[0].close:{flexPointList[0].close}");
                     continue;
                 }
 
@@ -211,43 +210,6 @@ namespace DogRunService
                 {
                     ShouGeEmpty(needBuyDogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
                 }
-            }
-
-            try
-            {
-                // 空单的指令收割
-                var list = new OrderReapDao().List(ReapType.ShougeEmpty);
-                foreach (var item in list)
-                {
-                    var percent = item.Percent;
-                    var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(item.OrderId);
-                    if (dogEmptySell.IsFinished || dogEmptySell.SymbolName != symbol.BaseCurrency)
-                    {
-                        continue;
-                    }
-
-                    if (dogEmptySell.SellTradePrice < nowPrice * percent)
-                    {
-                        continue;
-                    }
-
-                    var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(dogEmptySell.SellOrderId);
-                    if (dogEmptyBuyList.Count > 0 &&
-                        dogEmptyBuyList.Find(it =>
-                            it.BuyState != StateConst.Canceled.ToString()
-                            && it.BuyState != StateConst.PartialFilled.ToString()
-                            && it.BuyState != StateConst.Filled.ToString()) != null)
-                    {
-                        // 存在操作中的,则不操作
-                        continue;
-                    }
-
-                    ShouGeEmpty(dogEmptySell, symbol, analyzeResult, percent);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
             }
         }
 

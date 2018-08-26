@@ -165,6 +165,8 @@ namespace DogRunService
             }
 
             var userNames = UserPools.GetAllUserName();
+
+            // 自动波动做多
             foreach (var userName in userNames)
             {
                 AccountConfig accountConfig = AccountConfigUtils.GetAccountConfig(userName);
@@ -305,8 +307,6 @@ namespace DogRunService
 
             var flexPointList = analyzeResult.FlexPointList;
             var nowPrice = analyzeResult.NowPrice;
-
-            //decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName, nowPrice); //(decimal)1.035;
 
             // 没有大于预期, 也不能收割
             if (nowPrice < dogMoreBuy.BuyTradePrice * percent || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
@@ -452,55 +452,14 @@ namespace DogRunService
                 {
                     decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName, nowPrice); //(decimal)1.035;
 
-                    ShouGeMore(needSellDogMoreBuyItem, gaoyuPercentSell);
-
-                    // 出售
-                    return;
-                    //decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
-                    //OrderPlaceRequest req = new OrderPlaceRequest();
-                    //req.account_id = accountId;
-                    //req.amount = sellQuantity.ToString();
-                    //req.price = sellPrice.ToString();
-                    //req.source = "api";
-                    //req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
-                    //req.type = "sell-limit";
-                    //PlatformApi api = PlatformApi.GetInstance(userName);
-                    //HBResponse<long> orderResult = api.OrderPlace(req);
-                    //logger.Error($"下单 --> auto 下单出售结果 req:{JsonConvert.SerializeObject(req)}, orderResult::{JsonConvert.SerializeObject(orderResult)},nowPrice：{nowPrice} higher：{afterBuyHighClosePrice}，accountId：{accountId}");
-                    //if (orderResult.Status == "ok")
-                    //{
-                    //    try
-                    //    {
-                    //        DogMoreSell dogMoreSell = new DogMoreSell()
-                    //        {
-                    //            AccountId = accountId,
-                    //            UserName = userName,
-                    //            BuyOrderId = needSellDogMoreBuyItem.BuyOrderId,
-                    //            SellOrderId = orderResult.Data,
-                    //            SellOrderResult = JsonConvert.SerializeObject(orderResult),
-                    //            SellDate = DateTime.Now,
-                    //            SellFlex = JsonConvert.SerializeObject(flexPointList),
-                    //            SellQuantity = sellQuantity,
-                    //            SellOrderPrice = sellPrice,
-                    //            SellState = StateConst.Submitted,
-                    //            SellTradePrice = 0,
-                    //            SymbolName = symbol.BaseCurrency,
-                    //            SellMemo = "",
-                    //            SellOrderDetail = "",
-                    //            SellOrderMatchResults = ""
-                    //        };
-                    //        new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);
-                    //    }
-                    //    catch (Exception ex)
-                    //    {
-                    //        logger.Error("------RunSell----危险-----------");
-                    //        logger.Error(ex.Message, ex);
-                    //        Thread.Sleep(1000 * 60 * 60);
-                    //    }
-
-                    //    // 下单成功马上去查一次
-                    //    QuerySellDetailAndUpdate(userName, orderResult.Data);
-                    //}
+                    try
+                    {
+                        ShouGeMore(needSellDogMoreBuyItem, gaoyuPercentSell);
+                    }
+                    catch (Exception ex)
+                    {
+                        continue;
+                    }
                 }
             }
 

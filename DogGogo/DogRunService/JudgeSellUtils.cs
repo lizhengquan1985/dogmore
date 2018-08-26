@@ -14,6 +14,11 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(JudgeSellUtils));
 
+        public static bool CheckCanSellForHuiDiao(decimal nowPrice, decimal nearHighPrice)
+        {
+            return nowPrice * (decimal)1.005 < nearHighPrice && nowPrice * (decimal)1.06 > nearHighPrice;
+        }
+
         public static bool CheckCanSell(decimal buyPrice, decimal afterBuyHighClosePrice, decimal nowPrice, decimal gaoyuPercentSell = (decimal)1.03, bool needHuitou = true)
         {
             if(nowPrice < buyPrice)
@@ -57,7 +62,14 @@ namespace DogRunService
             return false;
         }
 
-        public static decimal AnalyzeNeedSell(decimal comparePrice, DateTime compareDate, List<HistoryKline> data)
+        /// <summary>
+        /// 获取购买之后的高价
+        /// </summary>
+        /// <param name="comparePrice"></param>
+        /// <param name="compareDate"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static decimal GetHigherPriceAfterByDate(decimal comparePrice, DateTime compareDate, List<HistoryKline> data)
         {
             decimal higher = new decimal(0);
 

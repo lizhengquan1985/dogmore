@@ -154,10 +154,12 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
             var flexPercent = analyzeResult.FlexPercent;
 
-            // 不适合购入的情况 最高点, 快速升高, 大量回落
-            if (flexPointList[0].isHigh || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
-                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice)
-                )//|| JudgeBuyUtils.CheckCalcMaxhuoluo(historyKlines)
+            // 1.最近一次是最高点
+            // 2.不是快速拉升的.
+            // 3.低于管控的购入价
+            if (flexPointList[0].isHigh
+                || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
+                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice))
             {
                 return;
             }

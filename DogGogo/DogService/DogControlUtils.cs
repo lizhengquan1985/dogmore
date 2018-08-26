@@ -223,5 +223,36 @@ namespace DogService
                 return divide;
             }
         }
+
+        /// <summary>
+        /// 做空的阶梯
+        /// </summary>
+        /// <param name="symbolName"></param>
+        /// <param name="nowPrice"></param>
+        /// <param name="defaultLadderSellPercent"></param>
+        /// <returns></returns>
+        public static decimal GetEmptyLadderSell(string symbolName, decimal nowPrice, decimal defaultEmptyLadderSellPercent = (decimal)1.05)
+        {
+            try
+            {
+                var min = (decimal)1.06;
+                var max = (decimal)1.12;
+                var control = new DogControlDao().GetDogControl(symbolName);
+                if (control != null && control.HistoryMin > 0 && control.HistoryMax > 0 && control.HistoryMax > control.HistoryMin)
+                {
+                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                    defaultEmptyLadderSellPercent = (max - min) * percent + min;
+                }
+                defaultEmptyLadderSellPercent = Math.Max(defaultEmptyLadderSellPercent, min);
+                defaultEmptyLadderSellPercent = Math.Min(defaultEmptyLadderSellPercent, max);
+                return defaultEmptyLadderSellPercent;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return defaultEmptyLadderSellPercent;
+            }
+        }
+
     }
 }

@@ -254,7 +254,7 @@ namespace DogApi.Controller
                 foreach (var symbol in symbols)
                 {
                     var symbolName = symbol.BaseCurrency;
-                    if (symbolName == "btc")
+                    if (symbolName == "btc" || symbolName == "ven")
                     {
                         continue;
                     }

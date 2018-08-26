@@ -130,7 +130,6 @@ namespace DogRunService
             catch (Exception ex)
             {
                 logger.Error("---> 购买异常: " + ex.Message, ex);
-                //Thread.Sleep(1000 * 60 * 60);
             }
 
             try
@@ -145,7 +144,6 @@ namespace DogRunService
             catch (Exception ex)
             {
                 logger.Error("---> 出售异常: " + ex.Message, ex);
-                //Thread.Sleep(1000 * 60 * 60);
             }
         }
 
@@ -177,19 +175,6 @@ namespace DogRunService
                     continue;
                 }
 
-                //decimal minBuyPrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
-                //if (minBuyPrice <= 0)
-                //{
-                //    minBuyPrice = 25000;
-                //}
-
-                //var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
-                //if (nowPrice * ladderBuyPercent > minBuyPrice || nowPrice * (decimal)1.01 >= minBuyPrice)
-                //{
-                //    //LogNotBuy(symbol.BaseCurrency, $"checkLadderBuy -> ladderBuyPercent:{nowPrice}   minBuyPrice:{minBuyPrice}, nowPrice:{nowPrice}");
-                //    continue;
-                //}
-
                 try
                 {
                     BuyWhenDoMore(symbol, userName, accountId);
@@ -198,74 +183,6 @@ namespace DogRunService
                 {
                     continue;
                 }
-
-                //PlatformApi api = PlatformApi.GetInstance(userName);
-                //var accountInfo = api.GetAccountBalance(accountId);
-                //var usdt = accountInfo.Data.list.Find(it => it.currency == "usdt");
-                //// 要减去空单未收割得额度总和
-                //var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName);
-                //if (notShougeEmptySellAmount >= usdt.balance)
-                //{
-                //    LogNotBuy(symbol.BaseCurrency, $"checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},usdt.balance:{usdt.balance}");
-                //    continue;
-                //}
-                //decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivide(symbol.BaseCurrency, nowPrice); // TODO 测试阶段，暂定低一些，
-
-                //if (recommendAmount < (decimal)1.1)
-                //{
-                //    recommendAmount = (decimal)1.1;
-                //}
-
-                //// 购买的要求
-                //// 2. 快速上升的，快速下降情况（如果升的太高， 最一定要回落，或者有5个小时平稳才考虑购入，）
-                //decimal buyQuantity = recommendAmount / nowPrice;
-                //buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
-                //decimal orderPrice = decimal.Round(nowPrice * (decimal)1.005, symbol.PricePrecision);
-
-                //OrderPlaceRequest req = new OrderPlaceRequest();
-                //req.account_id = accountId;
-                //req.amount = buyQuantity.ToString();
-                //req.price = orderPrice.ToString();
-                //req.source = "api";
-                //req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
-                //req.type = "buy-limit";
-                //if (BuyLimitUtils.Record(userName, symbol.BaseCurrency))
-                //{
-                //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-                //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-                //    logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-                //    Thread.Sleep(1000 * 5);
-                //    return;
-                //}
-
-                //HBResponse<long> order = api.OrderPlace(req);
-                //if (order.Status == "ok")
-                //{
-                //    new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
-                //    {
-                //        SymbolName = symbol.BaseCurrency,
-                //        AccountId = accountId,
-                //        UserName = accountConfig.UserName,
-                //        FlexPercent = flexPercent,
-
-                //        BuyQuantity = buyQuantity,
-                //        BuyOrderPrice = orderPrice,
-                //        BuyDate = DateTime.Now,
-                //        BuyOrderResult = JsonConvert.SerializeObject(order),
-                //        BuyState = StateConst.PreSubmitted,
-                //        BuyTradePrice = 0,
-                //        BuyOrderId = order.Data,
-                //        BuyFlex = JsonConvert.SerializeObject(flexPointList),
-                //        BuyMemo = "",
-                //        BuyOrderDetail = "",
-                //        BuyOrderMatchResults = "",
-                //        IsFinished = false
-                //    });
-                //    // 下单成功马上去查一次
-                //    QueryBuyDetailAndUpdate(userName, order.Data);
-                //}
-                //logger.Error($"下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyPrice},nowPrice：{nowPrice}, accountId：{accountId}");
-                //logger.Error($"下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
             }
 
             // 空单的自动波动收割

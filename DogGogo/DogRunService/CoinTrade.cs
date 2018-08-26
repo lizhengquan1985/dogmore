@@ -298,7 +298,7 @@ namespace DogRunService
             CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName);
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
-            if(analyzeResult == null)
+            if (analyzeResult == null)
             {
                 return;
             }
@@ -309,13 +309,13 @@ namespace DogRunService
             //decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName, nowPrice); //(decimal)1.035;
 
             // 没有大于预期, 也不能收割
-            if(nowPrice < dogMoreBuy.BuyTradePrice * percent || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * percent || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
             {
                 return;
             }
 
             // 判断是否有回调,以及是否大于percent
-            if(!JudgeSellUtils.CheckCanSellForHuiDiao(nowPrice, flexPointList[0].close))
+            if (!JudgeSellUtils.CheckCanSellForHuiDiao(nowPrice, flexPointList[0].close))
             {
                 return;
             }
@@ -339,43 +339,32 @@ namespace DogRunService
             req.type = "sell-limit";
             PlatformApi api = PlatformApi.GetInstance(dogMoreBuy.UserName);
             HBResponse<long> order = api.OrderPlace(req);
-            logger.Error($"下单 --> auto 下单出售结果 req:{JsonConvert.SerializeObject(req)}, orderResult::{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice} ，accountId：{dogMoreBuy.AccountId}");
             if (order.Status == "ok")
             {
-                try
+                DogMoreSell dogMoreSell = new DogMoreSell()
                 {
-                    DogMoreSell dogMoreSell = new DogMoreSell()
-                    {
-                        AccountId = dogMoreBuy.AccountId,
-                        UserName = dogMoreBuy.UserName,
-                        BuyOrderId = dogMoreBuy.BuyOrderId,
-                        SellOrderId = order.Data,
-                        SellOrderResult = JsonConvert.SerializeObject(order),
-                        SellDate = DateTime.Now,
-                        SellFlex = JsonConvert.SerializeObject(flexPointList),
-                        SellQuantity = sellQuantity,
-                        SellOrderPrice = sellPrice,
-                        SellState = StateConst.Submitted,
-                        SellTradePrice = 0,
-                        SymbolName = symbol.BaseCurrency,
-                        SellMemo = "",
-                        SellOrderDetail = "",
-                        SellOrderMatchResults = ""
-                    };
-                    new DogMoreSellDao().CreateDogMoreBuy(dogMoreSell);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("------RunSell----危险-----------");
-                    logger.Error(ex.Message, ex);
-                    Thread.Sleep(1000 * 60 * 60);
-                }
+                    AccountId = dogMoreBuy.AccountId,
+                    UserName = dogMoreBuy.UserName,
+                    BuyOrderId = dogMoreBuy.BuyOrderId,
+                    SellOrderId = order.Data,
+                    SellOrderResult = JsonConvert.SerializeObject(order),
+                    SellDate = DateTime.Now,
+                    SellFlex = JsonConvert.SerializeObject(flexPointList),
+                    SellQuantity = sellQuantity,
+                    SellOrderPrice = sellPrice,
+                    SellState = StateConst.Submitted,
+                    SellTradePrice = 0,
+                    SymbolName = symbol.BaseCurrency,
+                    SellMemo = "",
+                    SellOrderDetail = "",
+                    SellOrderMatchResults = ""
+                };
+                new DogMoreSellDao().CreateDogMoreSell(dogMoreSell);
 
                 // 下单成功马上去查一次
                 QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
             }
-
-            logger.Error($"下单 --> 下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice}，accountId：{dogMoreBuy.AccountId}");
+            logger.Error($"下单出售 --> 下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice}，accountId：{dogMoreBuy.AccountId}");
         }
 
         private static void QueryBuyDetailAndUpdate(string userName, long orderId)

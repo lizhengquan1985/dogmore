@@ -39,7 +39,7 @@ namespace DogService.Dao
             }
             catch (Exception ex)
             {
-                logger.Error($"------RunSell----危险-----------{JsonConvert.SerializeObject(dogMoreSell)}");
+                logger.Error($"------出售 做多收割----危险-----------{JsonConvert.SerializeObject(dogMoreSell)}");
                 logger.Error(ex.Message, ex);
                 Thread.Sleep(1000 * 60 * 60);
             }

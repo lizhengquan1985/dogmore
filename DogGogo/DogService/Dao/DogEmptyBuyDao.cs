@@ -33,6 +33,7 @@ namespace DogService.Dao
             }
             catch (Exception ex)
             {
+                logger.Error($"收割有误 {JsonConvert.SerializeObject(dogEmptyBuy)}");
                 logger.Error(ex.Message, ex);
                 Thread.Sleep(1000 * 60 * 60);
             }

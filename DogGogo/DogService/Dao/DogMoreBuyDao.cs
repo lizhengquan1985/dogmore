@@ -52,7 +52,7 @@ namespace DogService.Dao
             }
             catch (Exception ex)
             {
-                Console.WriteLine("----RunBuy------危险----- CreateDogMoreBuy ------ 防止出错时候, 无限购买. 业务上不能出错");
+                Console.WriteLine($"----RunBuy------危险----- CreateDogMoreBuy ------ 防止出错时候, 无限购买. 业务上不能出错, {JsonConvert.SerializeObject(dogMoreBuy)}");
                 logger.Error(ex.Message, ex);
                 Thread.Sleep(1000 * 60 * 60);
             }
@@ -180,12 +180,12 @@ namespace DogService.Dao
                 where += $" and SymbolName = @symbolName ";
             }
             var sql = $"select * from t_dog_more_buy {where} order by BuyTradePrice asc";
-            return Database.Query<DogMoreBuy>(sql, new { symbolName , userName }).ToList();
+            return Database.Query<DogMoreBuy>(sql, new { symbolName, userName }).ToList();
         }
 
         public List<DogMoreBuy> listEveryMinPriceMoreBuyIsNotFinished(string userName)
         {
-            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from ( select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where {(string.IsNullOrEmpty(userName)?"":$" UserName = @userName and ")} IsFinished=0 group by SymbolName) t)  ";
+            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from ( select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where {(string.IsNullOrEmpty(userName) ? "" : $" UserName = @userName and ")} IsFinished=0 group by SymbolName) t)  ";
             return Database.Query<DogMoreBuy>(sql, new { userName }).ToList();
         }
 

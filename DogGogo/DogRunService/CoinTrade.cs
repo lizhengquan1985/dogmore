@@ -769,22 +769,25 @@ namespace DogRunService
             var flexPointList = analyzeResult.FlexPointList;
             var nowPrice = analyzeResult.NowPrice;
 
+            // 判断购入阶梯
             var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
             var minBuyTradePrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
             if (minBuyTradePrice <= 0)
             {
-                minBuyTradePrice = 25000;
+                if (symbol.BaseCurrency == "新的币")
+                {
+                    minBuyTradePrice = 25000;
+                }
+                else
+                {
+                    logger.Error("获取上一次最小购入价位出错");
+                    return;
+                }
             }
-            if (nowPrice * ladderBuyPercent > minBuyTradePrice || nowPrice * (decimal)1.04 >= minBuyTradePrice)
+            if (nowPrice * ladderBuyPercent > minBuyTradePrice || nowPrice * (decimal)1.05 >= minBuyTradePrice)
             {
-                //LogNotBuy(symbol.BaseCurrency, $"checkLadderBuy -> ladderBuyPercent:{nowPrice}   minBuyPrice:{minBuyPrice}, nowPrice:{nowPrice}");
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
             }
-
-            //if (nowPrice * (decimal)1.06 > minBuyTradePrice)
-            //{
-            //    throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
-            //}
 
             PlatformApi api = PlatformApi.GetInstance(userName);
             var accountInfo = api.GetAccountBalance(accountId);
@@ -805,10 +808,9 @@ namespace DogRunService
             }
 
             // 购买的要求
-            // 2. 快速上升的，快速下降情况（如果升的太高， 最一定要回落，或者有5个小时平稳才考虑购入，）
             decimal buyQuantity = recommendAmount / nowPrice;
             buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
-            decimal orderPrice = decimal.Round(nowPrice * (decimal)1.005, symbol.PricePrecision);
+            decimal orderPrice = decimal.Round(nowPrice * (decimal)1.006, symbol.PricePrecision);
 
             OrderPlaceRequest req = new OrderPlaceRequest();
             req.account_id = accountId;
@@ -853,8 +855,7 @@ namespace DogRunService
                 // 下单成功马上去查一次
                 QueryBuyDetailAndUpdate(userName, order.Data);
             }
-            logger.Error($"下单 --> 下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId}");
-            logger.Error($"下单 --> 下单购买结果 分析 {JsonConvert.SerializeObject(flexPointList)}");
+            logger.Error($"下单 --> 下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId},分析 {JsonConvert.SerializeObject(flexPointList)}");
         }
 
         private static void QuerySellDetailAndUpdate(string userName, long orderId)

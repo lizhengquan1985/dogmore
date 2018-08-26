@@ -221,12 +221,11 @@ namespace DogApi.Controller
         private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines, out decimal outFlexPercent)
         {
             Dictionary<decimal, int> result = new Dictionary<decimal, int>();
-            decimal lastLowPrice = 0;
             decimal flexPercent = (decimal)1.02;
             outFlexPercent = flexPercent;
             for (int i = 0; i < 30; i++)
             {
-                var flexPointList = CoinAnalyze.Analyze(historyKlines, out lastLowPrice, flexPercent);
+                var flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
                 if (flexPointList.Count != 0)
                 {
                     outFlexPercent = flexPercent;

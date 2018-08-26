@@ -666,6 +666,7 @@ namespace DogRunService
         public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult)
         {
             var flexPointList = analyzeResult.FlexPointList;
+            var flexPercent = analyzeResult.FlexPercent;
             var nowPrice = analyzeResult.NowPrice;
 
             // 判断购入阶梯
@@ -741,7 +742,7 @@ namespace DogRunService
                     SymbolName = symbol.BaseCurrency,
                     AccountId = accountId,
                     UserName = userName,
-                    FlexPercent = (decimal)1.00,
+                    FlexPercent = flexPercent,
 
                     BuyQuantity = buyQuantity,
                     BuyOrderPrice = orderPrice,

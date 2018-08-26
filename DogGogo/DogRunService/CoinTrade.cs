@@ -178,7 +178,7 @@ namespace DogRunService
 
                 try
                 {
-                    BuyWhenDoMore(symbol, userName, accountId);
+                    BuyWhenDoMore(symbol, userName, accountId, analyzeResult);
                 }
                 catch (Exception ex)
                 {
@@ -732,13 +732,7 @@ namespace DogRunService
             EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
         }
 
-        /// <summary>
-        /// 购买,做多的时候
-        /// </summary>
-        /// <param name="symbol"></param>
-        /// <param name="userName"></param>
-        /// <param name="accountId"></param>
-        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId)
+        public static void BuyWhenDoMoreAnalyze(CommonSymbols symbol, string userName, string accountId)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             if (analyzeResult == null)
@@ -746,6 +740,32 @@ namespace DogRunService
                 throw new ApplicationException("做多失败，分析出错");
             }
 
+            var flexPointList = analyzeResult.FlexPointList;
+            var historyKlines = analyzeResult.HistoryKlines;
+            var nowPrice = analyzeResult.NowPrice;
+            var flexPercent = analyzeResult.FlexPercent;
+
+            // 1.最近一次是最高点
+            // 2.不是快速拉升的.
+            // 3.低于管控的购入价
+            if (flexPointList[0].isHigh
+                || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
+                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice))
+            {
+                return;
+            }
+
+            BuyWhenDoMore(symbol, userName, accountId, analyzeResult);
+        }
+
+        /// <summary>
+        /// 购买,做多的时候
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="userName"></param>
+        /// <param name="accountId"></param>
+        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult)
+        {
             var flexPointList = analyzeResult.FlexPointList;
             var nowPrice = analyzeResult.NowPrice;
 

@@ -14,9 +14,9 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(JudgeBuyUtils));
 
-        public static bool CheckCanBuy(decimal nowOpen, decimal nearLowOpen)
+        public static bool CheckCanBuyForHuiDiao(decimal nowOpen, decimal nearLowOpen)
         {
-            return nowOpen > nearLowOpen * (decimal)1.005 && nowOpen < nearLowOpen * (decimal)1.02;
+            return nowOpen > nearLowOpen * (decimal)1.005 && nowOpen < nearLowOpen * (decimal)1.06;
         }
 
         /// <summary>

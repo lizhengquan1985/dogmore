@@ -170,12 +170,6 @@ namespace DogRunService
                 AccountConfig accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                 var accountId = accountConfig.MainAccountId;
 
-                var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
-                if (!canBuy)
-                {
-                    continue;
-                }
-
                 try
                 {
                     BuyWhenDoMore(symbol, userName, accountId, analyzeResult);
@@ -199,7 +193,7 @@ namespace DogRunService
                     Console.WriteLine(item.SellTradePrice);
                 }
 
-                var canBuy = JudgeBuyUtils.CheckCanBuy(nowPrice, flexPointList[0].close);
+                var canBuy = JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, flexPointList[0].close);
                 if (!canBuy)
                 {
                     continue;
@@ -787,6 +781,12 @@ namespace DogRunService
             if (nowPrice * ladderBuyPercent > minBuyTradePrice || nowPrice * (decimal)1.05 >= minBuyTradePrice)
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
+            }
+
+            // 判断是否回调0.5%
+            if (!JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, flexPointList[0].close))
+            {
+                return;
             }
 
             PlatformApi api = PlatformApi.GetInstance(userName);

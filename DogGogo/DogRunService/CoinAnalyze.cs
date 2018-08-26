@@ -16,8 +16,6 @@ namespace DogRunService
 
         public static List<FlexPoint> Analyze(List<HistoryKline> data, decimal flexPercent)
         {
-            decimal lastLowPrice = 25000;
-
             try
             {
                 List<FlexPoint> flexPointList = new List<FlexPoint>();
@@ -58,17 +56,6 @@ namespace DogRunService
                             lastHighOrLow = -1;
                             closeLow = closeHigh;
                             idLow = idHigh;
-                        }
-                    }
-                }
-
-                if (flexPointList.Count != 0 && flexPointList[0].isHigh)
-                {
-                    foreach (var item in data)
-                    {
-                        if (item.Id < flexPointList[0].id && lastLowPrice > item.Close)
-                        {
-                            lastLowPrice = item.Close;
                         }
                     }
                 }

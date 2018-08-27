@@ -289,7 +289,14 @@ namespace DogApi.Controller
                     {
                         return 0;
                     }
-                    return (int)(a.MaxPrice / a.MinPrice - b.MaxPrice / b.MinPrice);
+                    if(a.MaxPrice / a.MinPrice > b.MaxPrice / b.MinPrice)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        return -1;
+                    }
                 });
             }
             if (sort == "amount")

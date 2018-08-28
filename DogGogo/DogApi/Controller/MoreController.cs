@@ -101,8 +101,8 @@ namespace DogApi.Controller
 
                 var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
                 todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
-                todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
-                todayDic.Add(symbol.BaseCurrency + "+", close / todayList.Max(it => it.Close));
+                todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
+                todayDic.Add(symbolName + "+", close / todayList.Max(it => it.Close));
             }
 
             Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();

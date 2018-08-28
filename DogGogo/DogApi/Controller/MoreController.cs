@@ -82,6 +82,7 @@ namespace DogApi.Controller
 
                         var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
                         todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
+                        todayDic.Add(symbol.BaseCurrency+"-", close / todayList.Min(it => it.Close));
                     }
                     catch (Exception ex)
                     {

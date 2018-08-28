@@ -305,7 +305,7 @@ namespace DogRunService
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             if (analyzeResult == null)
             {
-                logger.Error("------------------------> analyzeResult 为 null");
+                logger.Error($"----------{dogMoreBuy.SymbolName}--------------> analyzeResult 为 null");
                 return;
             }
 
@@ -317,7 +317,7 @@ namespace DogRunService
             {
                 if (percent < (decimal)1.04)
                 {
-                    logger.Error("------------------------> 没有大于预期, 也不能收割");
+                    logger.Error($"------------{dogMoreBuy.SymbolName}------------> 没有大于预期, 也不能收割");
                 }
                 return;
             }
@@ -327,7 +327,7 @@ namespace DogRunService
             {
                 if (percent < (decimal)1.04)
                 {
-                    logger.Error("------------------------> 判断是否有回调");
+                    logger.Error($"------------{dogMoreBuy.SymbolName}----{nowPrice}----{flexPointList[0].close}--{flexPointList[0].close/nowPrice}--> 判断是否有回调");
                 }
                 return;
             }

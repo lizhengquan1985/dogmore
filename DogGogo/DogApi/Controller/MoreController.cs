@@ -66,6 +66,7 @@ namespace DogApi.Controller
             var symbols = CoinUtils.GetAllCommonSymbols();
             symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+            Dictionary<string, decimal> todayDic = new Dictionary<string, decimal>();
             if (string.IsNullOrEmpty(symbolName))
             {
                 list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName);
@@ -92,6 +93,9 @@ namespace DogApi.Controller
                 var historyKlineData = HistoryKlinePools.Get(key);
                 var close = historyKlineData.Data[0].Close;
                 closeDic.Add(symbolName, close);
+
+                var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).Select(it => it).ToList();
+                todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
             }
 
             Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();
@@ -114,7 +118,7 @@ namespace DogApi.Controller
                 ladderBuyDic.Add(item.SymbolName, DogControlUtils.GetLadderBuy(item.SymbolName, closeDic[item.SymbolName]));
             }
 
-            return new { list, closeDic, ladderDic, ladderBuyDic };
+            return new { list, closeDic, ladderDic, ladderBuyDic, todayDic };
         }
 
         [HttpGet]
@@ -289,7 +293,7 @@ namespace DogApi.Controller
                     {
                         return 0;
                     }
-                    if(a.MaxPrice / a.MinPrice > b.MaxPrice / b.MinPrice)
+                    if (a.MaxPrice / a.MinPrice > b.MaxPrice / b.MinPrice)
                     {
                         return 1;
                     }

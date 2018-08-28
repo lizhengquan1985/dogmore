@@ -79,6 +79,9 @@ namespace DogApi.Controller
                         var historyKlineData = HistoryKlinePools.Get(key);
                         var close = historyKlineData.Data[0].Close;
                         closeDic.Add(symbol.BaseCurrency, close);
+
+                        var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).Select(it => it).ToList();
+                        todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
                     }
                     catch (Exception ex)
                     {

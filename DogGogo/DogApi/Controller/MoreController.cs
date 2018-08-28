@@ -70,7 +70,7 @@ namespace DogApi.Controller
             if (string.IsNullOrEmpty(symbolName))
             {
                 list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName);
-                list = list.Where(it => it.SymbolName != "btc").ToList();
+                list = list.Where(it => it.SymbolName != "btc" && it.SymbolName != "ven").ToList();
                 foreach (var symbol in symbols)
                 {
                     try
@@ -80,12 +80,12 @@ namespace DogApi.Controller
                         var close = historyKlineData.Data[0].Close;
                         closeDic.Add(symbol.BaseCurrency, close);
 
-                        var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).Select(it => it).ToList();
-                        todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
+                        var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
+                        todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
                     }
                     catch (Exception ex)
                     {
-
+                        Console.WriteLine(ex.Message);
                     }
                 }
             }
@@ -97,7 +97,7 @@ namespace DogApi.Controller
                 var close = historyKlineData.Data[0].Close;
                 closeDic.Add(symbolName, close);
 
-                var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).Select(it => it).ToList();
+                var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
                 todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
             }
 

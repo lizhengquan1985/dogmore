@@ -305,6 +305,7 @@ namespace DogRunService
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             if (analyzeResult == null)
             {
+                Console.WriteLine("analyzeResult 为 null");
                 return;
             }
 
@@ -314,12 +315,14 @@ namespace DogRunService
             // 没有大于预期, 也不能收割
             if (nowPrice < dogMoreBuy.BuyTradePrice * percent || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
             {
+                Console.WriteLine("没有大于预期, 也不能收割");
                 return;
             }
 
-            // 判断是否有回调,以及是否大于percent
+            // 判断是否有回调
             if (!JudgeSellUtils.CheckCanSellForHuiDiao(nowPrice, flexPointList[0].close))
             {
+                Console.WriteLine("判断是否有回调");
                 return;
             }
 

@@ -203,7 +203,7 @@ namespace DogService.Dao
         public void Delete(long buyOrderId)
         {
             var dogMoreBuy = GetByBuyOrderId(buyOrderId);
-            if (dogMoreBuy.BuyState != StateConst.Canceled && dogMoreBuy.BuyState != StateConst.Filled && dogMoreBuy.BuyState != StateConst.PartialFilled)
+            if (dogMoreBuy.BuyState != StateConst.PartialCanceled && dogMoreBuy.BuyState != StateConst.Filled && dogMoreBuy.BuyState != StateConst.PartialFilled)
             {
                 throw new ApplicationException("未取消或者未完成的订单，不能删除");
             }

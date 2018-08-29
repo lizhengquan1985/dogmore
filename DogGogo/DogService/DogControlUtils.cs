@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace DogService
 {
+    /// <summary>
+    /// 这里是管控的代码
+    /// </summary>
     public class DogControlUtils
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
@@ -84,31 +87,52 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderBuy(string symbolName, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.06)
+        public static decimal GetLadderBuy(string symbolName, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.1)
         {
             try
             {
-                var max = (decimal)1.12;
-                var min = (decimal)1.06;
+                var max = (decimal)1.135;
+                var min = (decimal)1.055;
                 var control = new DogControlDao().GetDogControl(symbolName);
-                if (control != null && control.LadderBuyExpiredTime > DateTime.Now)
+                if (control == null)
                 {
-                    defaultLadderBuyPercent = control.LadderBuyPercent;
+                    return defaultLadderBuyPercent;
                 }
-                else if (control != null && nowPrice <= control.HistoryMax && nowPrice >= control.HistoryMin)
+
+                if (control.LadderBuyExpiredTime > DateTime.Now && control.LadderBuyPercent >= min)
                 {
-                    // 计算出来阶梯
-                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                    defaultLadderBuyPercent = max - percent * (max - min);
-                    if (defaultLadderBuyPercent > max)
-                    {
-                        defaultLadderBuyPercent = max;
-                    }
-                    if (defaultLadderBuyPercent < min)
-                    {
-                        defaultLadderBuyPercent = min;
-                    }
+                    return control.LadderBuyPercent;
                 }
+
+                if (control.HistoryMin >= control.HistoryMax || control.HistoryMin <= 0 || control.HistoryMax <= 0)
+                {
+                    return defaultLadderBuyPercent;
+                }
+
+                // 防止价格波动后的, 分隔过合理. 下
+                if (control.HistoryMax < control.HistoryMin * (decimal)2)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.2;
+                    control.HistoryMin = control.HistoryMin * (decimal)0.4;
+                }
+                if (control.HistoryMax <= control.HistoryMin * (decimal)3)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1;
+                    control.HistoryMin = control.HistoryMin * (decimal)0.8;
+                }
+
+                if (nowPrice >= control.HistoryMax)
+                {
+                    return max;
+                }
+                if (nowPrice <= control.HistoryMin)
+                {
+                    return min;
+                }
+
+                // 计算出来阶梯
+                var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                defaultLadderBuyPercent = max - percent * (max - min);
                 defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, min);
                 defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, max);
                 return defaultLadderBuyPercent;
@@ -158,19 +182,90 @@ namespace DogService
             }
         }
 
-        public static int GetRecommendDivide(string symbolName, decimal nowPrice, int divide = 220)
+        /// <summary>
+        /// 做空的阶梯
+        /// </summary>
+        /// <param name="symbolName"></param>
+        /// <param name="nowPrice"></param>
+        /// <param name="defaultLadderSellPercent"></param>
+        /// <returns></returns>
+        public static decimal GetEmptyLadderSell(string symbolName, decimal nowPrice, decimal defaultEmptyLadderSellPercent = (decimal)1.1)
+        {
+            try
+            {
+                var min = (decimal)1.055;
+                var max = (decimal)1.135;
+                var control = new DogControlDao().GetDogControl(symbolName);
+                if (control == null || control.HistoryMin >= control.HistoryMax || control.HistoryMin <= 0 || control.HistoryMax <= 0)
+                {
+                    return defaultEmptyLadderSellPercent;
+                }
+
+                // 防止价格波动后的, 分隔过合理. 上
+                if (control.HistoryMax < control.HistoryMin * (decimal)2)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.5;
+                    control.HistoryMin = control.HistoryMin * (decimal)0.8;
+                }
+                if (control.HistoryMax <= control.HistoryMin * (decimal)3)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.2;
+                    control.HistoryMin = control.HistoryMin * (decimal)1;
+                }
+
+                if (control.HistoryMax > control.HistoryMin)
+                {
+                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                    defaultEmptyLadderSellPercent = (max - min) * percent + min;
+                }
+
+                defaultEmptyLadderSellPercent = Math.Max(defaultEmptyLadderSellPercent, min);
+                defaultEmptyLadderSellPercent = Math.Min(defaultEmptyLadderSellPercent, max);
+
+                return defaultEmptyLadderSellPercent;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return defaultEmptyLadderSellPercent;
+            }
+        }
+
+        public static int GetRecommendDivideForMore(string symbolName, decimal nowPrice, int divide = 700)
         {
             try
             {
                 var control = new DogControlDao().GetDogControl(symbolName);
-                if (control == null || control.HistoryMax <= control.HistoryMin || nowPrice > control.HistoryMax || nowPrice < control.HistoryMin)
+                if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {
                     return divide;
                 }
+                var max = 1200;
+                var min = 200;
+
+                // 防止价格波动后的, 分隔过合理. 下
+                if (control.HistoryMax < control.HistoryMin * (decimal)2)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.2;
+                    control.HistoryMin = control.HistoryMin * (decimal)0.4;
+                }
+                if (control.HistoryMax <= control.HistoryMin * (decimal)3)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1;
+                    control.HistoryMin = control.HistoryMin * (decimal)0.8;
+                }
+
+                if (nowPrice >= control.HistoryMax)
+                {
+                    return max;
+                }
+
+                if (nowPrice <= control.HistoryMin)
+                {
+                    return min;
+                }
 
                 var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                var max = 800;
-                var min = 200;
                 divide = max - Convert.ToInt32(percent * (max - min));
                 if (divide > max)
                 {
@@ -189,14 +284,31 @@ namespace DogService
             }
         }
 
-        public static int GetEmptySellDivide(string symbolName, decimal nowPrice, int divide = 12)
+        public static int GetRecommendDivideForEmpty(string symbolName, decimal nowPrice, int divide = 24)
         {
             try
             {
                 var max = 52;
                 var min = 6;
                 var control = new DogControlDao().GetDogControl(symbolName);
-                if (control == null || control.HistoryMax <= control.HistoryMin || nowPrice < control.HistoryMin)
+                if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
+                {
+                    return max;
+                }
+
+                // 防止价格波动后的, 分隔过合理.
+                if (control.HistoryMax < control.HistoryMin * (decimal)2)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.5;
+                    control.HistoryMin = control.HistoryMin * (decimal)0.8;
+                }
+                if (control.HistoryMax <= control.HistoryMin * (decimal)3)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.2;
+                    control.HistoryMin = control.HistoryMin * (decimal)1;
+                }
+
+                if (nowPrice < control.HistoryMin)
                 {
                     return max;
                 }
@@ -221,36 +333,6 @@ namespace DogService
             {
                 logger.Error(ex.Message, ex);
                 return divide;
-            }
-        }
-
-        /// <summary>
-        /// 做空的阶梯
-        /// </summary>
-        /// <param name="symbolName"></param>
-        /// <param name="nowPrice"></param>
-        /// <param name="defaultLadderSellPercent"></param>
-        /// <returns></returns>
-        public static decimal GetEmptyLadderSell(string symbolName, decimal nowPrice, decimal defaultEmptyLadderSellPercent = (decimal)1.05)
-        {
-            try
-            {
-                var min = (decimal)1.06;
-                var max = (decimal)1.12;
-                var control = new DogControlDao().GetDogControl(symbolName);
-                if (control != null && control.HistoryMin > 0 && control.HistoryMax > 0 && control.HistoryMax > control.HistoryMin)
-                {
-                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                    defaultEmptyLadderSellPercent = (max - min) * percent + min;
-                }
-                defaultEmptyLadderSellPercent = Math.Max(defaultEmptyLadderSellPercent, min);
-                defaultEmptyLadderSellPercent = Math.Min(defaultEmptyLadderSellPercent, max);
-                return defaultEmptyLadderSellPercent;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return defaultEmptyLadderSellPercent;
             }
         }
 

@@ -16,12 +16,16 @@ namespace DogRunService
 
         public static bool CheckCanSellForHuiDiao(decimal nowPrice, decimal nearHighPrice)
         {
+            if (nowPrice > nearHighPrice)
+            {
+                return true;
+            }
             return nowPrice * (decimal)1.005 < nearHighPrice && nowPrice * (decimal)1.06 > nearHighPrice;
         }
 
         public static bool CheckCanSell(decimal buyPrice, decimal afterBuyHighClosePrice, decimal nowPrice, decimal gaoyuPercentSell = (decimal)1.03, bool needHuitou = true)
         {
-            if(nowPrice < buyPrice)
+            if (nowPrice < buyPrice)
             {
                 return false;
             }

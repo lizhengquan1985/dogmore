@@ -240,7 +240,7 @@ namespace DogService
                 {
                     return divide;
                 }
-                var max = 1200;
+                var max = 1500;
                 var min = 200;
 
                 // 防止价格波动后的, 分隔过合理. 下

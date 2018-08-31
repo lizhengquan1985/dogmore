@@ -327,7 +327,7 @@ namespace DogRunService
             {
                 if (percent < (decimal)1.04)
                 {
-                    logger.Error($"------------{dogMoreBuy.SymbolName}----{nowPrice}----{flexPointList[0].close}--{flexPointList[0].close/nowPrice}--> 判断是否有回调");
+                    logger.Error($"------------{dogMoreBuy.SymbolName}----{nowPrice}----{flexPointList[0].close}--{flexPointList[0].close / nowPrice}--> 判断是否有回调");
                 }
                 return;
             }
@@ -534,9 +534,9 @@ namespace DogRunService
                             sellQuantity = 10 / nowPrice;
                         }
                         sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                        if (sellQuantity * nowPrice < 2)
+                        if (sellQuantity * nowPrice < 1)
                         {
-                            LogNotBuy(symbol.BaseCurrency, $"收益不超过2usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            LogNotBuy(symbol.BaseCurrency, $"收益不超过1usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
                             continue;
                         }
 
@@ -621,13 +621,13 @@ namespace DogRunService
                 throw new ApplicationException("做空失败， 最近不是最高");
             }
 
-            if (nowPrice * (decimal)1.03 < flexPointList[0].close)
+            if (nowPrice * (decimal)1.06 < flexPointList[0].close)
             {
-                throw new ApplicationException("已经降低了3%， 不要做空，谨慎起见");
+                throw new ApplicationException("已经降低了6%， 不要做空，谨慎起见");
             }
 
             var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
-            if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.02)
+            if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.06)
             {
                 throw new ApplicationException("有价格比这个更高得还没有收割。不能重新做空。");
             }
@@ -636,19 +636,36 @@ namespace DogRunService
 
             var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
             var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
-            var amount = balanceItem.balance * nowPrice;
-            var sellAmout = Math.Max(amount / 20, 5);
-            sellAmout = Math.Min(sellAmout, 10);
-
-            decimal sellQuantity = sellAmout / nowPrice; // 暂定每次做空5美元
-            sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-            if (symbol.BaseCurrency == "xrp" && sellQuantity < 1)
+            // 要减去未收割得。
+            var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
+            if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
             {
-                sellQuantity = 1;
+                logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
+                return;
+            }
+
+            var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice);
+            decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
+
+            if (sellQuantity * nowPrice > 10)
+            {
+                sellQuantity = 10 / nowPrice;
+            }
+            sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+
+            if (sellQuantity * nowPrice < 1)
+            {
+                sellQuantity = (balanceItem.balance - notShougeQuantity) / 5;
+                if (sellQuantity * nowPrice < 1)
+                {
+                    LogNotBuy(symbol.BaseCurrency, $"收益不超过1usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                    return;
+                }
             }
 
             // 出售
             decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
+
             EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
         }
 

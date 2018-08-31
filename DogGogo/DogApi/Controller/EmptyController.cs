@@ -325,22 +325,23 @@ namespace DogApi.Controller
             var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
             var dao = new KlineDao();
             var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
-            // 大于今天最小值15%才行 or 大于24小时20%
-            var nowPrice = lastKlines[0].Close;
-            var min24 = decimal.MaxValue;
-            var minToday = decimal.MaxValue;
-            foreach (var item in lastKlines)
+            if (Utils.GetDateById(lastKlines[0].Id) < DateTime.Now.AddMinutes(-3))
             {
-                if (item.Close < min24)
-                {
-                    min24 = item.Close;
-                }
-                if (item.Close < minToday && Utils.GetDateById(item.Id) > DateTime.Today)
-                {
-                    minToday = item.Close;
-                }
+                // 数据是3分钟前的数据, 不合理.
+                return "没有拿到最近3分钟的数据";
             }
-            if (nowPrice / min24 > (decimal)1.20 || nowPrice / minToday > (decimal)1.15)
+            // 大于今天最小值30%才行 or 大于24小时60%  并且大于历史最小的15%
+            var control = new DogControlDao().GetDogControl(symbolName);
+            var nowPrice = lastKlines[0].Close;
+            if (nowPrice < control.HistoryMin && nowPrice < control.HistoryMin + (control.HistoryMax - control.HistoryMin) * (decimal)0.15)
+            {
+                return "要大于区间15%";
+            }
+
+            var min24 = lastKlines.Min(it => it.Close);
+            var minToday = lastKlines.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Min(it => it.Close);
+
+            if (nowPrice > min24 * (decimal)1.60 || nowPrice > minToday * (decimal)1.30)
             {
                 CoinTrade.DoEmpty(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
             }

@@ -390,7 +390,7 @@ namespace DogRunService
                 {
                     logger.Error(JsonConvert.SerializeObject(orderDetail));
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                    logger.Error("------------> " + JsonConvert.SerializeObject(orderMatchResult));
+                    logger.Error("-----QueryBuyDetailAndUpdate-------> " + JsonConvert.SerializeObject(orderMatchResult));
                     decimal maxPrice = 0;
                     foreach (var item in orderMatchResult.Data)
                     {
@@ -409,7 +409,7 @@ namespace DogRunService
                 {
                     logger.Error(JsonConvert.SerializeObject(orderDetail));
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                    logger.Error("------------> " + JsonConvert.SerializeObject(orderMatchResult));
+                    logger.Error("------QueryBuyDetailAndUpdate------> " + JsonConvert.SerializeObject(orderMatchResult));
                     decimal maxPrice = 0;
                     decimal buyQuantity = 0;
                     foreach (var item in orderMatchResult.Data)

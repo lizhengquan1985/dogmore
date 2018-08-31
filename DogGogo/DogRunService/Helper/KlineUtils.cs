@@ -107,7 +107,7 @@ namespace DogRunService.Helper
 
                 if (lastKlines.Count < 900)
                 {
-                    logger.Error($"{symbol.BaseCurrency}数据量太少，无法分析啊：" + totalMilliseconds);
+                    logger.Error($"{symbol.BaseCurrency}数据量太少{lastKlines.Count}，无法分析啊：" + totalMilliseconds);
                 }
                 if (lastKlines.Count > 600)
                 {

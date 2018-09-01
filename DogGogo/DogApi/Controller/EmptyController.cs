@@ -333,9 +333,9 @@ namespace DogApi.Controller
             // 大于今天最小值30%才行 or 大于24小时60%  并且大于历史最小的15%
             var control = new DogControlDao().GetDogControl(symbolName);
             var nowPrice = lastKlines[0].Close;
-            if (nowPrice < control.HistoryMin && nowPrice < control.HistoryMin + (control.HistoryMax - control.HistoryMin) * (decimal)0.15)
+            if (nowPrice < control.HistoryMin && nowPrice < control.HistoryMin + (control.HistoryMax - control.HistoryMin) * (decimal)0.12)
             {
-                return "要大于区间15%";
+                return "要大于区间12%";
             }
 
             var min24 = lastKlines.Min(it => it.Close);

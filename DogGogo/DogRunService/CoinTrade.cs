@@ -653,11 +653,19 @@ namespace DogRunService
 
             if (sellQuantity * nowPrice < 1)
             {
-                sellQuantity = (balanceItem.balance - notShougeQuantity) / 5;
+                sellQuantity = (balanceItem.balance - notShougeQuantity) / 10;
                 if (sellQuantity * nowPrice < 1)
                 {
-                    LogNotBuy(symbol.BaseCurrency, $"收益不超过1usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
-                    return;
+                    sellQuantity = (balanceItem.balance - notShougeQuantity) / 5;
+                    if (sellQuantity * nowPrice < 1)
+                    {
+                        sellQuantity = (balanceItem.balance - notShougeQuantity) / 3;
+                        if (sellQuantity * nowPrice < 1)
+                        {
+                            LogNotBuy(symbol.BaseCurrency, $"收益不超过1usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            return;
+                        }
+                    }
                 }
             }
 

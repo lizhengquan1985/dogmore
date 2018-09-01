@@ -390,7 +390,6 @@ namespace DogRunService
                 {
                     logger.Error(JsonConvert.SerializeObject(orderDetail));
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                    logger.Error("-----QueryBuyDetailAndUpdate-------> " + JsonConvert.SerializeObject(orderMatchResult));
                     decimal maxPrice = 0;
                     foreach (var item in orderMatchResult.Data)
                     {
@@ -409,7 +408,6 @@ namespace DogRunService
                 {
                     logger.Error(JsonConvert.SerializeObject(orderDetail));
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                    logger.Error("------QueryBuyDetailAndUpdate------> " + JsonConvert.SerializeObject(orderMatchResult));
                     decimal maxPrice = 0;
                     decimal buyQuantity = 0;
                     foreach (var item in orderMatchResult.Data)
@@ -434,7 +432,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
+                logger.Error("QueryBuyDetailAndUpdate  查询数据出错");
             }
         }
 
@@ -835,7 +833,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
+                logger.Error("QuerySellDetailAndUpdate 查询结果时候出错");
             }
         }
 

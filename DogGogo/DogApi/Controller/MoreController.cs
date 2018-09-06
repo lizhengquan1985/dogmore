@@ -89,7 +89,7 @@ namespace DogApi.Controller
                         var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
                         todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
                         todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
-                        todayDic.Add(symbol.BaseCurrency + "+", todayList.Where(it => it.Id > item.Id).Max(it => it.Close) / close);
+                        todayDic.Add(symbol.BaseCurrency + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
                     }
                     catch (Exception ex)
                     {
@@ -110,7 +110,7 @@ namespace DogApi.Controller
                 var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
                 todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
                 todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
-                todayDic.Add(symbolName + "+", todayList.Where(it => it.Id > item.Id).Max(it => it.Close) / close);
+                todayDic.Add(symbolName + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
             }
 
             Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();

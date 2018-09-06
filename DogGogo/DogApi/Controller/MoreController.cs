@@ -77,13 +77,19 @@ namespace DogApi.Controller
                     {
                         var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
                         var historyKlineData = HistoryKlinePools.Get(key);
+                        if (historyKlineData == null)
+                        {
+                            continue;
+                        }
                         var close = historyKlineData.Data[0].Close;
                         closeDic.Add(symbol.BaseCurrency, close);
 
+                        var item = list.Find(it => it.SymbolName == symbol.BaseCurrency);
+
                         var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
                         todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
-                        todayDic.Add(symbol.BaseCurrency+"-", close / todayList.Min(it => it.Close));
-                        todayDic.Add(symbol.BaseCurrency + "+", todayList.Max(it => it.Close) / close);
+                        todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
+                        todayDic.Add(symbol.BaseCurrency + "+", todayList.Where(it => it.Id > item.Id).Max(it => it.Close) / close);
                     }
                     catch (Exception ex)
                     {
@@ -99,10 +105,12 @@ namespace DogApi.Controller
                 var close = historyKlineData.Data[0].Close;
                 closeDic.Add(symbolName, close);
 
+                var item = list.Find(it => it.SymbolName == symbolName);
+
                 var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
                 todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
                 todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
-                todayDic.Add(symbolName + "+", todayList.Max(it => it.Close) / close);
+                todayDic.Add(symbolName + "+", todayList.Where(it => it.Id > item.Id).Max(it => it.Close) / close);
             }
 
             Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();

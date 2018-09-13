@@ -351,6 +351,7 @@ namespace DogRunService
             req.type = "sell-limit";
             PlatformApi api = PlatformApi.GetInstance(dogMoreBuy.UserName);
             HBResponse<long> order = api.OrderPlace(req);
+            // 下单出错, 报了异常, 也需要查询是否下单成功. 查询最近的订单.
             if (order.Status == "ok")
             {
                 DogMoreSell dogMoreSell = new DogMoreSell()

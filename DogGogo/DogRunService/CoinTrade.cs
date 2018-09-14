@@ -268,7 +268,18 @@ namespace DogRunService
             }
 
             PlatformApi api = PlatformApi.GetInstance(dogEmptySell.UserName);
-            HBResponse<long> order = api.OrderPlace(req);
+            HBResponse<long> order = null;
+            try
+            {
+                order = api.OrderPlace(req);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" ---------------  下的出错  --------------");
+                Thread.Sleep(1000 * 60 * 5);
+                throw ex;
+            }
+
             if (order.Status == "ok")
             {
                 new DogEmptyBuyDao().CreateDogEmptyBuy(new DogEmptyBuy()
@@ -350,7 +361,18 @@ namespace DogRunService
             req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency; ;
             req.type = "sell-limit";
             PlatformApi api = PlatformApi.GetInstance(dogMoreBuy.UserName);
-            HBResponse<long> order = api.OrderPlace(req);
+            HBResponse<long> order = null;
+            try
+            {
+                order = api.OrderPlace(req);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" ---------------  下的出错  --------------");
+                Thread.Sleep(1000 * 60 * 5);
+                throw ex;
+            }
+
             // 下单出错, 报了异常, 也需要查询是否下单成功. 查询最近的订单.
             if (order.Status == "ok")
             {
@@ -570,7 +592,17 @@ namespace DogRunService
                 req.type = "sell-limit";
 
                 PlatformApi api = PlatformApi.GetInstance(userName);
-                HBResponse<long> order = api.OrderPlace(req);
+                HBResponse<long> order = null;
+                try
+                {
+                    order = api.OrderPlace(req);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(" ---------------  下的出错  --------------");
+                    Thread.Sleep(1000 * 60 * 5);
+                    throw ex;
+                }
                 if (order.Status == "ok")
                 {
                     DogEmptySell dogEmptySell = new DogEmptySell()
@@ -779,7 +811,17 @@ namespace DogRunService
                 return;
             }
 
-            HBResponse<long> order = api.OrderPlace(req);
+            HBResponse<long> order = null;
+            try
+            {
+                order = api.OrderPlace(req);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(" ---------------  下的出错  --------------");
+                Thread.Sleep(1000 * 60 * 5);
+                throw ex;
+            }
             if (order.Status == "ok")
             {
                 new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()

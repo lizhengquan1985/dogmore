@@ -547,6 +547,11 @@ namespace DogRunService
                             logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
                             continue;
                         }
+                        if ((balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.8)
+                        {
+                            LogNotBuy(symbol.BaseCurrency, $"收益不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            continue;
+                        }
 
                         var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice);
                         decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
@@ -554,10 +559,26 @@ namespace DogRunService
                         {
                             sellQuantity = 10 / nowPrice;
                         }
-                        sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                        if (sellQuantity * nowPrice < 1)
+                        if ((balanceItem.balance - notShougeQuantity) * nowPrice < 10)
                         {
-                            LogNotBuy(symbol.BaseCurrency, $"收益不超过1usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            sellQuantity = (balanceItem.balance - notShougeQuantity) / 12;
+                            if ((balanceItem.balance - notShougeQuantity) * nowPrice < 5)
+                            {
+                                sellQuantity = (balanceItem.balance - notShougeQuantity) / 6;
+                                if ((balanceItem.balance - notShougeQuantity) * nowPrice < 2)
+                                {
+                                    sellQuantity = (balanceItem.balance - notShougeQuantity) / 4;
+                                    if ((balanceItem.balance - notShougeQuantity) * nowPrice < 1)
+                                    {
+                                        sellQuantity = (balanceItem.balance - notShougeQuantity) / 3;
+                                    }
+                                }
+                            }
+                        }
+                        sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+                        if (sellQuantity * nowPrice < (decimal)0.2)
+                        {
+                            LogNotBuy(symbol.BaseCurrency, $"收益不超过0.2usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
                             continue;
                         }
 

@@ -346,7 +346,7 @@ namespace DogApi.Controller
                 var symbols = CoinUtils.GetAllCommonSymbols();
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
 
-                CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+                CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, (decimal)1.06);
             }
             catch (Exception ex)
             {

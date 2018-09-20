@@ -729,7 +729,7 @@ namespace DogRunService
             EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
         }
 
-        public static void BuyWhenDoMoreAnalyze(CommonSymbols symbol, string userName, string accountId)
+        public static void BuyWhenDoMoreAnalyze(CommonSymbols symbol, string userName, string accountId, decimal ladderBuyPercent)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             if (analyzeResult == null)
@@ -752,7 +752,7 @@ namespace DogRunService
                 return;
             }
 
-            BuyWhenDoMore(symbol, userName, accountId, analyzeResult);
+            BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent, true);
         }
 
         /// <summary>
@@ -761,7 +761,7 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="userName"></param>
         /// <param name="accountId"></param>
-        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult)
+        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult, decimal setLadderBuyPercent = (decimal)1.1, bool useSetLadderBuyPercent = false)
         {
             var flexPointList = analyzeResult.FlexPointList;
             var flexPercent = analyzeResult.FlexPercent;
@@ -769,6 +769,10 @@ namespace DogRunService
 
             // 判断购入阶梯
             var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
+            if (useSetLadderBuyPercent)
+            {
+                ladderBuyPercent = setLadderBuyPercent;
+            }
             var minBuyTradePrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
             if (minBuyTradePrice <= 0)
             {

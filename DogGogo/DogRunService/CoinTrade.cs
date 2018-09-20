@@ -578,7 +578,7 @@ namespace DogRunService
                         sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
                         if (sellQuantity * nowPrice < (decimal)0.2)
                         {
-                            LogNotBuy(symbol.BaseCurrency, $"收益不超过0.2usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            LogNotBuy(symbol.BaseCurrency, $"做空不超过0.2usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
                             continue;
                         }
 

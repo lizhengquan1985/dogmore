@@ -36,9 +36,16 @@ namespace DogRunService
 
             bool isQuickRise = false;
 
+            if (dayMax > dayMin * (decimal)2.00
+                && nowClose > dayMin * (decimal)1.60)
+            {
+                logger.Error($"一天内有大量的上涨，防止追涨，所以不能交易。coin:{coin}, nowClose:{nowClose}, dayMin:{dayMin}, dayMax:{dayMax}");
+                isQuickRise = true;
+            }
+
             // 1. 一天上涨超过50%,  2. 现在价位还在超过40%  3. 现在价位还在上半截
             if (dayMax > dayMin * (decimal)1.60
-                && nowClose > dayMin * (decimal)1.30
+                && nowClose > dayMin * (decimal)1.40
                 && nowClose > dayMin * (1 + (decimal)0.6 * (dayMax - dayMin) / dayMin))
             {
                 logger.Error($"一天内有大量的上涨，防止追涨，所以不能交易。coin:{coin}, nowClose:{nowClose}, dayMin:{dayMin}, dayMax:{dayMax}");
@@ -47,8 +54,8 @@ namespace DogRunService
 
             // 1. 一个小时上涨超过30%,  2. 现在价位还在超过12%  3. 现在价位还在上半截
             if (hourMax > hourMin * (decimal)1.3
-                && nowClose > hourMin * (decimal)1.12
-                && nowClose > hourMin * (1 + (decimal)0.4 * (hourMax - hourMin) / hourMin))
+                && nowClose > hourMin * (decimal)1.20
+                && nowClose > hourMin * (1 + (decimal)0.6 * (hourMax - hourMin) / hourMin))
             {
                 logger.Error($"一个小时内有大量的上涨，防止追涨，所以不能交易。coin:{coin}, nowClose:{nowClose}, hourMin:{hourMin}, hourMax:{hourMax}");
                 isQuickRise = true;

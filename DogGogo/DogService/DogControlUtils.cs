@@ -193,8 +193,8 @@ namespace DogService
         {
             try
             {
-                var min = (decimal)1.055;
-                var max = (decimal)1.135;
+                var min = (decimal)1.06;
+                var max = (decimal)1.14;
                 var control = new DogControlDao().GetDogControl(symbolName);
                 if (control == null || control.HistoryMin >= control.HistoryMax || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {

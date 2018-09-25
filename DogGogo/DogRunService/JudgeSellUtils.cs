@@ -107,11 +107,11 @@ namespace DogRunService
                 throw new Exception("收割多价格不合理");
             }
             var position = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, nowPrice);
-            if (position <= 0)
+            if (position <= (decimal)0.3)
             {
                 position = (decimal)0.3;
             }
-            if (position >= 1)
+            if (position >= (decimal)0.7)
             {
                 position = (decimal)0.7;
             }

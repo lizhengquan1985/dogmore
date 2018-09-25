@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DogPlatform.Model;
+using DogService;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,11 +18,26 @@ namespace DogRunService.Helper
         /// <param name="nowPrice"></param>
         /// <param name="amountPrecision"></param>
         /// <returns></returns>
-        public static decimal CalcBuyQuantityForEmptyShouge(decimal sellQuantity, decimal sellTradePrice, decimal nowPrice, int amountPrecision)
+        public static decimal CalcBuyQuantityForEmptyShouge(decimal sellQuantity, decimal sellTradePrice, decimal nowPrice, int amountPrecision, CommonSymbols symbol)
         {
-            decimal buyQuantity = sellQuantity * (decimal)1.005;
+            if (nowPrice >= sellTradePrice * (decimal)0.99)
+            {
+                throw new Exception("收割空价格不合理");
+            }
+            var position = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, nowPrice);
+            if (position <= 0)
+            {
+                position = (decimal)0.3;
+            }
+            if (position >= 1)
+            {
+                position = (decimal)0.7;
+            }
+
+            decimal buyQuantity = sellQuantity * sellTradePrice / nowPrice;
+            buyQuantity = buyQuantity - (buyQuantity - sellQuantity) * position;
             buyQuantity = decimal.Round(buyQuantity, amountPrecision);
-            if (buyQuantity > sellQuantity && buyQuantity * nowPrice <= sellQuantity * sellTradePrice)
+            if (buyQuantity > sellQuantity && buyQuantity * nowPrice < sellQuantity * sellTradePrice)
             {
                 return buyQuantity;
             }
@@ -49,7 +66,7 @@ namespace DogRunService.Helper
             {
                 return newBuyQuantity;
             }
-            return buyQuantity;
+            throw new Exception("计算buyQuantity不合理");
         }
     }
 }

@@ -247,7 +247,7 @@ namespace DogRunService
                 return;
             }
 
-            decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(dogEmptySell.SellQuantity, dogEmptySell.SellTradePrice, nowPrice, symbol.AmountPrecision);
+            decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(dogEmptySell.SellQuantity, dogEmptySell.SellTradePrice, nowPrice, symbol.AmountPrecision, symbol);
             decimal orderPrice = decimal.Round(nowPrice * (decimal)1.005, symbol.PricePrecision);
 
             OrderPlaceRequest req = new OrderPlaceRequest();

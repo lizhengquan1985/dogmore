@@ -102,8 +102,22 @@ namespace DogRunService
 
         public static decimal CalcSellQuantityForMoreShouge(decimal buyQuantity, decimal buyTradePrice, decimal nowPrice, CommonSymbols symbol)
         {
-
-            decimal sellQuantity = buyQuantity * (decimal)0.99;
+            if (nowPrice <= buyTradePrice * (decimal)1.01)
+            {
+                throw new Exception("收割多价格不合理");
+            }
+            var position = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, nowPrice);
+            if (position <= 0)
+            {
+                position = (decimal)0.3;
+            }
+            if (position >= 1)
+            {
+                position = (decimal)0.7;
+            }
+            // 计算啥
+            decimal sellQuantity = buyQuantity * buyTradePrice / nowPrice;
+            sellQuantity = sellQuantity + (buyQuantity - sellQuantity) * position;
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
 
             if (buyQuantity > sellQuantity && buyQuantity * buyTradePrice < sellQuantity * nowPrice)
@@ -135,7 +149,7 @@ namespace DogRunService
             {
                 return newSellQuantity;
             }
-            return sellQuantity;
+            throw new Exception("计算sellquantity不合理");
         }
     }
 }

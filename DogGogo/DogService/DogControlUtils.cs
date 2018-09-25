@@ -336,5 +336,40 @@ namespace DogService
             }
         }
 
+        /// <summary>
+        /// 0~1
+        /// </summary>
+        /// <param name="symbolName"></param>
+        /// <param name="nowPrice"></param>
+        /// <returns></returns>
+        public static decimal GetLadderPosition(string symbolName, decimal nowPrice, decimal defaultPosition = (decimal)0.5)
+        {
+            try
+            {
+                var control = new DogControlDao().GetDogControl(symbolName);
+                if (control == null || control.HistoryMin == 0 || control.HistoryMax == 0 || control.HistoryMax < control.HistoryMin)
+                {
+                    return defaultPosition;
+                }
+
+                if (nowPrice > control.HistoryMax)
+                {
+                    return (decimal)1;
+                }
+
+                if (nowPrice < control.HistoryMin)
+                {
+                    return (decimal)0;
+                }
+
+                var percent = (nowPrice - control.HistoryMin) / (control.HistoryMax - control.HistoryMin);
+                return percent;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                return defaultPosition;
+            }
+        }
     }
 }

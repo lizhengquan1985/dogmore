@@ -352,7 +352,7 @@ namespace DogRunService
             }
 
             // 出售
-            decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
+            decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
             OrderPlaceRequest req = new OrderPlaceRequest();
             req.account_id = dogMoreBuy.AccountId;
             req.amount = sellQuantity.ToString();

@@ -83,7 +83,7 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("listEmptySellIsNotFinished")]
-        public async Task<object> listEmptySellIsNotFinished(string symbolName)
+        public async Task<object> listEmptySellIsNotFinished(string symbolName, string userName)
         {
             var list = new List<DogEmptySell>();
             var symbols = CoinUtils.GetAllCommonSymbols();
@@ -91,7 +91,7 @@ namespace DogApi.Controller
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
             if (string.IsNullOrEmpty(symbolName))
             {
-                list = new DogEmptySellDao().listEveryMaxPriceEmptySellIsNotFinished();
+                list = new DogEmptySellDao().listEveryMaxPriceEmptySellIsNotFinished(userName);
                 list = list.Where(it => it.SymbolName != "btc").ToList();
                 foreach (var symbol in symbols)
                 {
@@ -110,7 +110,7 @@ namespace DogApi.Controller
             }
             else
             {
-                list = new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName);
+                list = new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName, userName);
 
                 var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
                 var historyKlineData = HistoryKlinePools.Get(key);

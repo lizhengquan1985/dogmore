@@ -97,10 +97,10 @@ namespace DogService.Dao
         /// 列出需要改变出售状态的
         /// </summary>
         /// <returns></returns>
-        public List<DogEmptySell> ListDogEmptySellNotFinished(string symbolName)
+        public List<DogEmptySell> ListDogEmptySellNotFinished(string symbolName, string userName)
         {
-            var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName order by SellTradePrice desc";
-            return Database.Query<DogEmptySell>(sql, new { symbolName }).ToList();
+            var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and UserName=@userName order by SellTradePrice desc";
+            return Database.Query<DogEmptySell>(sql, new { symbolName, userName }).ToList();
         }
 
         public decimal? GetMaxSellTradePrice(string userName, string symbolName)
@@ -135,10 +135,10 @@ namespace DogService.Dao
             Database.Execute(sql);
         }
 
-        public List<DogEmptySell> listEveryMaxPriceEmptySellIsNotFinished()
+        public List<DogEmptySell> listEveryMaxPriceEmptySellIsNotFinished(string userName)
         {
-            var sql = $"select * from t_dog_empty_sell where SellOrderId in( select SellOrderId from  ( select max(SellOrderId) SellOrderId,SymbolName from t_dog_empty_sell where IsFinished=0 group by SymbolName) t)  ";
-            return Database.Query<DogEmptySell>(sql).ToList();
+            var sql = $"select * from t_dog_empty_sell where UserName=@UserName and SellOrderId in( select SellOrderId from  ( select max(SellOrderId) SellOrderId,SymbolName from t_dog_empty_sell where UserName=@UserName and IsFinished=0 group by SymbolName) t)  ";
+            return Database.Query<DogEmptySell>(sql, new { UserName = userName }).ToList();
         }
     }
 }

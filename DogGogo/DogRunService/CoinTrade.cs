@@ -553,7 +553,7 @@ namespace DogRunService
                             continue;
                         }
 
-                        var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice);
+                        var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
                         decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
                         if (sellQuantity * nowPrice > 10)
                         {
@@ -696,7 +696,7 @@ namespace DogRunService
                 return;
             }
 
-            var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice);
+            var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
             decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
 
             if (sellQuantity * nowPrice > 10)

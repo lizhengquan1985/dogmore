@@ -284,12 +284,22 @@ namespace DogService
             }
         }
 
-        public static int GetRecommendDivideForEmpty(string symbolName, decimal nowPrice, int divide = 24)
+        public static int GetRecommendDivideForEmpty(string symbolName, decimal nowPrice, decimal shouyiQuantity, int divide = 24)
         {
             try
             {
                 var max = 52;
                 var min = 12;
+                if (nowPrice * shouyiQuantity > 200)
+                {
+                    max = 60;
+                    min = 15;
+                }
+                if (nowPrice * shouyiQuantity > 300)
+                {
+                    max = 70;
+                    min = 18;
+                }
                 var control = new DogControlDao().GetDogControl(symbolName);
                 if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {

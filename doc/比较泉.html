@@ -1,4 +1,14 @@
-<script src="a.js"></script>
+<style>
+.coin-name{
+	width: 60px;
+    display: inline-block;
+}
+.add-coin{
+	width: 80px;
+    display: inline-block;
+	margin-left:5px;
+}
+</style>
 <script>
 var coins = ["bch","eth","etc","ltc","eos","xrp","omg","dash","zec","ada","steem","iota","ocn","soc","ctxc","act","btm","bts","ont","iost","ht","trx","dta","neo","qtum","smt","ela","theta","snt","zil","xem","nas",
 "ruff","hc","let","mds","storj","elf","itc","cvc","gnt","wicc","hb10","cmt","bix","pai","vet"];
@@ -21,10 +31,10 @@ for(var coin of coins){
   var bItem = b.find(it=>it.coin==coin);
 
   if(aItem.canEmptyQuantity < bItem.canEmptyQuantity){
-     addStr += `${coin}增加：${aItem.canEmptyQuantity}, --> ${bItem.canEmptyQuantity}<br>`
+     addStr += `<span class="coin-name">${coin}：</span>增加<span class="add-coin">${(bItem.canEmptyQuantity-aItem.canEmptyQuantity).toFixed(4,'')}</span>${aItem.canEmptyQuantity.toFixed(4,'')}, --> ${bItem.canEmptyQuantity.toFixed(4,'')}<br>`
   }
   if(aItem.canEmptyQuantity > bItem.canEmptyQuantity){
-     reduceStr += `${coin}减少：${aItem.canEmptyQuantity}, --> ${bItem.canEmptyQuantity}<br>`
+     reduceStr += `<span class="coin-name">${coin}：</span>减少<span class="add-coin">${(aItem.canEmptyQuantity-bItem.canEmptyQuantity).toFixed(4,'')}</span>${aItem.canEmptyQuantity.toFixed(4,'')}, --> ${bItem.canEmptyQuantity.toFixed(4,'')}<br>`
   }
 }
 

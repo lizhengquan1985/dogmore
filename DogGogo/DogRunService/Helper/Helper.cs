@@ -25,14 +25,14 @@ namespace DogRunService.Helper
                 throw new Exception("收割空价格不合理");
             }
             var position = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, nowPrice);
-            position -= (decimal)0.16;
-            if (position <= (decimal)0.2)
+            position += (decimal)0.16;
+            if (position <= (decimal)0.42)
             {
-                position = (decimal)0.2;
+                position = (decimal)0.42;
             }
-            if (position >= (decimal)0.6)
+            if (position >= (decimal)0.82)
             {
-                position = (decimal)0.6;
+                position = (decimal)0.82;
             }
 
             decimal buyQuantity = sellQuantity * sellTradePrice / nowPrice;

@@ -248,7 +248,7 @@ namespace DogRunService
             }
 
             decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(dogEmptySell.SellQuantity, dogEmptySell.SellTradePrice, nowPrice, symbol.AmountPrecision, symbol);
-            decimal orderPrice = decimal.Round(nowPrice * (decimal)1.005, symbol.PricePrecision);
+            decimal orderPrice = decimal.Round(nowPrice * (decimal)1.01, symbol.PricePrecision);
 
             OrderPlaceRequest req = new OrderPlaceRequest();
             req.account_id = dogEmptySell.AccountId;
@@ -564,10 +564,10 @@ namespace DogRunService
                             sellQuantity = (balanceItem.balance - notShougeQuantity) / 12;
                             if ((balanceItem.balance - notShougeQuantity) * nowPrice < 5)
                             {
-                                sellQuantity = (balanceItem.balance - notShougeQuantity) / 6;
+                                sellQuantity = (balanceItem.balance - notShougeQuantity) / 9;
                                 if ((balanceItem.balance - notShougeQuantity) * nowPrice < 2)
                                 {
-                                    sellQuantity = (balanceItem.balance - notShougeQuantity) / 4;
+                                    sellQuantity = (balanceItem.balance - notShougeQuantity) / 5;
                                     if ((balanceItem.balance - notShougeQuantity) * nowPrice < 1)
                                     {
                                         sellQuantity = (balanceItem.balance - notShougeQuantity) / 3;
@@ -583,7 +583,7 @@ namespace DogRunService
                         }
 
                         // 出售
-                        decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
+                        decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
                         EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList, $"device:{devide}");
                     }
                     catch (Exception ex)
@@ -699,7 +699,7 @@ namespace DogRunService
             var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
             decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
 
-            if (sellQuantity * nowPrice > 10)
+            if (sellQuantity * nowPrice > 10) // 一次做空不超过10usdt
             {
                 sellQuantity = 10 / nowPrice;
             }
@@ -714,9 +714,9 @@ namespace DogRunService
                     if (sellQuantity * nowPrice < 1)
                     {
                         sellQuantity = (balanceItem.balance - notShougeQuantity) / 3;
-                        if (sellQuantity * nowPrice < 1)
+                        if (sellQuantity * nowPrice < (decimal)0.2)
                         {
-                            LogNotBuy(symbol.BaseCurrency, $"收益不超过1usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            LogNotBuy(symbol.BaseCurrency, $"收益不超过0.2usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
                             return;
                         }
                     }

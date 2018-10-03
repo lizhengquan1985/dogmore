@@ -346,7 +346,12 @@ namespace DogApi.Controller
                 var symbols = CoinUtils.GetAllCommonSymbols();
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
 
-                CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, (decimal)1.06);
+                var ladder = (decimal)1.06;
+                if(symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch" || symbolName == "etc" || symbolName == "eos" || symbolName == "ht")
+                {
+                    ladder = (decimal)1.04;
+                }
+                CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, ladder);
             }
             catch (Exception ex)
             {

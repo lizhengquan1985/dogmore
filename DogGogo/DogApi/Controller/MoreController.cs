@@ -346,8 +346,9 @@ namespace DogApi.Controller
                 var symbols = CoinUtils.GetAllCommonSymbols();
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
 
-                var ladder = (decimal)1.06;
-                if(symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch" || symbolName == "etc" || symbolName == "eos" || symbolName == "ht")
+                var ladder = (decimal)1.05;
+                if (symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch" || symbolName == "etc" || symbolName == "eos" || symbolName == "ht"
+                    || symbolName == "dash" || symbolName == "zec")
                 {
                     ladder = (decimal)1.04;
                 }

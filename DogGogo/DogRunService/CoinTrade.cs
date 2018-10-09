@@ -729,7 +729,7 @@ namespace DogRunService
             EmtpyTrade(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
         }
 
-        public static void BuyWhenDoMoreAnalyze(CommonSymbols symbol, string userName, string accountId, decimal ladderBuyPercent)
+        public static string BuyWhenDoMoreAnalyze(CommonSymbols symbol, string userName, string accountId, decimal ladderBuyPercent)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             if (analyzeResult == null)
@@ -749,10 +749,11 @@ namespace DogRunService
                 || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
                 || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice))
             {
-                return;
+                return "判断 发现不适合";
             }
 
             BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent, true);
+            return "----";
         }
 
         /// <summary>

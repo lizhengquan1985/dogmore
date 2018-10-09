@@ -339,7 +339,7 @@ namespace DogApi.Controller
 
         [HttpPost]
         [ActionName("doMore")]
-        public async Task DoMore(string userName, string symbolName)
+        public async Task<string> DoMore(string userName, string symbolName)
         {
             try
             {
@@ -352,11 +352,12 @@ namespace DogApi.Controller
                 {
                     ladder = (decimal)1.04;
                 }
-                CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, ladder);
+                return CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, ladder);
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+                return ex.Message;
             }
         }
     }

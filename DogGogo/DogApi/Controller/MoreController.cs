@@ -339,18 +339,25 @@ namespace DogApi.Controller
 
         [HttpPost]
         [ActionName("doMore")]
-        public async Task DoMore(string userName, string symbolName)
+        public async Task<string> DoMore(string userName, string symbolName)
         {
             try
             {
                 var symbols = CoinUtils.GetAllCommonSymbols();
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
 
-                CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, (decimal)1.06);
+                var ladder = (decimal)1.05;
+                if (symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch" || symbolName == "etc" || symbolName == "eos" || symbolName == "ht"
+                    || symbolName == "dash" || symbolName == "zec")
+                {
+                    ladder = (decimal)1.04;
+                }
+                return CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, ladder);
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+                return ex.Message;
             }
         }
     }

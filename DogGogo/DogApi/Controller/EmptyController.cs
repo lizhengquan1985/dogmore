@@ -344,6 +344,7 @@ namespace DogApi.Controller
             if (nowPrice > min24 * (decimal)1.60 || nowPrice > minToday * (decimal)1.30)
             {
                 CoinTrade.DoEmpty(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+                return new { nowPrice, min24, minToday, DoEmpty = true };
             }
             return new { nowPrice, min24, minToday };
         }

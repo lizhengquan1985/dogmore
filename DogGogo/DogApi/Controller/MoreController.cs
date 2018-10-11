@@ -348,7 +348,7 @@ namespace DogApi.Controller
 
                 var ladder = (decimal)1.05;
                 if (symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch" || symbolName == "etc" || symbolName == "eos" || symbolName == "ht"
-                    || symbolName == "dash" || symbolName == "zec")
+                    || symbolName == "dash" || symbolName == "zec" || symbolName == "omg" || symbolName == "ada" || symbolName == "iota")
                 {
                     ladder = (decimal)1.04;
                 }

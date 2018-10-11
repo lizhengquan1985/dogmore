@@ -749,7 +749,7 @@ namespace DogRunService
                 || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
                 || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice))
             {
-                return "判断 发现不适合";
+                return $"判断 发现不适合 最高点{flexPointList[0].isHigh}";
             }
 
             BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent, true);
@@ -787,7 +787,7 @@ namespace DogRunService
                     return;
                 }
             }
-            if (nowPrice * ladderBuyPercent > minBuyTradePrice || nowPrice * (decimal)1.05 >= minBuyTradePrice)
+            if (nowPrice * ladderBuyPercent > minBuyTradePrice || nowPrice * (decimal)1.04 >= minBuyTradePrice)
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
             }

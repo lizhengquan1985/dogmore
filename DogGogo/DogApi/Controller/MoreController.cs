@@ -60,7 +60,7 @@ namespace DogApi.Controller
         /// <returns></returns>
         [HttpGet]
         [ActionName("listMoreBuyIsNotFinished")]
-        public async Task<object> listMoreBuyIsNotFinished(string userName, string symbolName)
+        public async Task<object> listMoreBuyIsNotFinished(string userName, string symbolName, string sort = "lastbuy")
         {
             var list = new List<DogMoreBuy>();
             var symbols = CoinUtils.GetAllCommonSymbols();
@@ -93,24 +93,51 @@ namespace DogApi.Controller
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        logger.Error(ex.Message);
                     }
+                }
+                if(sort != "lastbuy")
+                {
+                    list.Sort((a, b) =>
+                    {
+                        if (!closeDic.ContainsKey(a.SymbolName) || !closeDic.ContainsKey(b.SymbolName))
+                        {
+                            return 1;
+                        }
+                        var ap = closeDic[a.SymbolName] / a.BuyTradePrice;
+                        var bp = closeDic[b.SymbolName] / b.BuyTradePrice;
+                        if(sort == "more")
+                        {
+                            return ap > bp ? 1 : -1;
+                        }
+                        else
+                        {
+                            return ap > bp ? -1 : 1;
+                        }
+                    });
                 }
             }
             else
             {
-                list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
-                var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
-                var historyKlineData = HistoryKlinePools.Get(key);
-                var close = historyKlineData.Data[0].Close;
-                closeDic.Add(symbolName, close);
+                try
+                {
+                    list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
+                    var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
+                    var historyKlineData = HistoryKlinePools.Get(key);
+                    var close = historyKlineData.Data[0].Close;
+                    closeDic.Add(symbolName, close);
 
-                var item = list.Find(it => it.SymbolName == symbolName);
+                    var item = list.Find(it => it.SymbolName == symbolName);
 
-                var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
-                todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
-                todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
-                todayDic.Add(symbolName + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
+                    var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
+                    todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
+                    todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
+                    todayDic.Add(symbolName + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex.Message);
+                }
             }
 
             Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();

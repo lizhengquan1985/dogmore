@@ -96,7 +96,7 @@ namespace DogApi.Controller
                         logger.Error(ex.Message);
                     }
                 }
-                if(sort != "lastbuy")
+                if (sort != "lastbuy")
                 {
                     list.Sort((a, b) =>
                     {
@@ -106,7 +106,7 @@ namespace DogApi.Controller
                         }
                         var ap = closeDic[a.SymbolName] / a.BuyTradePrice;
                         var bp = closeDic[b.SymbolName] / b.BuyTradePrice;
-                        if(sort == "more")
+                        if (sort == "more")
                         {
                             return ap > bp ? 1 : -1;
                         }
@@ -114,6 +114,13 @@ namespace DogApi.Controller
                         {
                             return ap > bp ? -1 : 1;
                         }
+                    });
+                }
+                else
+                {
+                    list.Sort((a, b) =>
+                    {
+                        return b.BuyDate > a.BuyDate ? 1 : -1;
                     });
                 }
             }

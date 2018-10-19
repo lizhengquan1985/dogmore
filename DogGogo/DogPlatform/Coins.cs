@@ -84,14 +84,30 @@ namespace DogPlatform
         //    return coins.Keys.ToList();
         //}
 
-        public static List<CommonSymbols> GetAllCommonSymbols()
+        public static List<CommonSymbols> GetAllCommonSymbols(string baseCoin = "usdt")
         {
-            // 总共其实有36个, 后期还会增加
-            if (usdtCoins.Count < 30)
+            if (baseCoin == "usdt")
             {
-                Init();
+                // 总共其实有36个, 后期还会增加
+                if (usdtCoins.Count < 30)
+                {
+                    Init();
+                }
+                return usdtCoins.Values.ToList();
             }
-            return usdtCoins.Values.ToList();
+            else if (baseCoin == "btc")
+            {
+                return btcCoins.Values.ToList();
+            }
+            else if (baseCoin == "eth")
+            {
+                return ethCoins.Values.ToList();
+            }
+            else if (baseCoin == "ht")
+            {
+                return htCoins.Values.ToList();
+            }
+            throw new ApplicationException("error");
         }
     }
 }

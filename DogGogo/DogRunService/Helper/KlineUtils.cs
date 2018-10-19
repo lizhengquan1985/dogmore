@@ -60,6 +60,10 @@ namespace DogRunService.Helper
             });
         }
 
+        /// <summary>
+        /// 获取行情数据
+        /// </summary>
+        /// <param name="symbol"></param>
         public static void InitOneKine(CommonSymbols symbol)
         {
             try
@@ -67,7 +71,7 @@ namespace DogRunService.Helper
                 var begin = DateTime.Now;
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
-                var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 20);
+                var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 10);
                 var key = HistoryKlinePools.GetKey(symbol, period);
                 //HistoryKlinePools.Init(key, klines);
 
@@ -131,6 +135,72 @@ namespace DogRunService.Helper
             var dao = new KlineDao();
             dao.CheckTable(coin);
             dao.Record(coin, line);
+        }
+
+
+        public static void CheckTableExistAndCreate(CommonSymbols symbol)
+        {
+            new KlineDao().CheckTableExistsAndCreate(symbol.QuoteCurrency, symbol.BaseCurrency);
+        }
+
+        /// <summary>
+        /// 获取行情数据
+        /// </summary>
+        /// <param name="symbol"></param>
+        public static void InitMarketInDB(CommonSymbols symbol)
+        {
+            try
+            {
+                var begin = DateTime.Now;
+
+                PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
+                var period = "1min";
+                var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 10);
+
+                // 记录下， 获取api数据太长的数据
+                var totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;
+                if (totalMilliseconds > 5 * 1000)
+                {
+                    logger.Error($"一次请求时间太长,达到：{totalMilliseconds}ms");
+                }
+                begin = DateTime.Now;
+
+                var dao = new KlineDao();
+                var lastKlines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+                var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
+                foreach (var kline in klines)
+                {
+                    var finds = findList.FindAll(it => it.Id == kline.Id);
+                    if (finds.Count > 1)
+                    {
+                        // 删除，新增
+                        dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
+                    }
+                    else if (finds.Count == 1)
+                    {
+                        if (finds[0].Low != kline.Low || finds[0].High != kline.High || finds[0].Open != kline.Open || finds[0].Close != kline.Close)
+                        {
+                            // 删除新增
+                            dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
+                        }
+                    }
+                    else
+                    {
+                        // 新增
+                        dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
+                    }
+                }
+
+                totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;
+                if (totalMilliseconds > 3 * 1000)
+                {
+                    logger.Error("插入数据库时间太长,达到：" + totalMilliseconds);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("InitMarketInDB --> " + ex.Message, ex);
+            }
         }
     }
 }

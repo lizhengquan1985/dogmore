@@ -1,4 +1,5 @@
 ﻿using DogPlatform.Model;
+using MySql.Data.MySqlClient;
 using SharpDapper;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,30 @@ namespace DogService.Dao
         public KlineDao() : base()
         {
         }
+
+        public void CheckTableExistsAndCreate(string quoteCurrency, string baseCurrency)
+        {
+            try
+            {
+                var createTableSql = $"CREATE TABLE IF NOT EXISTS `t_{quoteCurrency}_{baseCurrency}` ( `RecordId` bigint(20) NOT NULL AUTO_INCREMENT,  " +
+                    $" `Id` bigint(20) NOT NULL, " +
+                    $" `Open` decimal(18, 10) NOT NULL, " +
+                    $" `Close` decimal(18, 10) NOT NULL, " +
+                    $" `Low` decimal(18, 10) NOT NULL, " +
+                    $" `High` decimal(18, 10) NOT NULL, " +
+                    $" `Vol` decimal(18, 10) NOT NULL, " +
+                    $" `Count` decimal(18, 10) NOT NULL, " +
+                    $" `CreateTime` datetime NOT NULL, " +
+                    $" PRIMARY KEY(`RecordId`))" +
+                    $" ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; ";
+                Database.Execute(createTableSql);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         public void CheckTable(string coin)
         {
             try
@@ -71,6 +96,29 @@ namespace DogService.Dao
                 Database.Execute(sql);
 
                 sql = $"insert into t_coin_{symbolName}(Id, Open, Close, Low, High, Vol, Count, CreateTime) values({line.Id},{line.Open},{line.Close},{line.Low},{line.High},{line.Vol},{line.Count}, now())";
+                Database.Execute(sql);
+
+                tx.Commit();
+            }
+        }
+
+        public List<HistoryKline> List24HourKline(string quoteCurrency, string baseCurrency)
+        {
+            var date = DateTime.Now.AddDays(-1);
+            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} where CreateTime>=@date order by Id desc";
+            return Database.Query<HistoryKline>(sql, new { date }).ToList();
+        }
+
+        public void DeleteAndRecordKlines(string quoteCurrency, string baseCurrency, HistoryKline line)
+        {
+            long id = line.Id;
+            using (var tx = Database.BeginTransaction())
+            {
+                var sql = $"delete from t_{quoteCurrency}_{baseCurrency} where id={id}";
+                Database.Execute(sql);
+
+                sql = $"insert into t_{quoteCurrency}_{baseCurrency}(Id, Open, Close, Low, High, Vol, Count, CreateTime) " +
+                    $"values({line.Id},{line.Open},{line.Close},{line.Low},{line.High},{line.Vol},{line.Count}, now())";
                 Database.Execute(sql);
 
                 tx.Commit();

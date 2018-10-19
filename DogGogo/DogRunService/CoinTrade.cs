@@ -275,7 +275,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" ---------------  下的出错  --------------");
+                logger.Error($" ---------------  下的出错  -------------- {JsonConvert.SerializeObject(req)}");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }
@@ -368,7 +368,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" ---------------  下的出错  --------------");
+                logger.Error($" ---------------  下的出错  --------------{JsonConvert.SerializeObject(req)}");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }
@@ -620,7 +620,7 @@ namespace DogRunService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(" ---------------  下的出错  --------------");
+                    logger.Error($" ---------------  下的出错  --------------{JsonConvert.SerializeObject(req)}");
                     Thread.Sleep(1000 * 60 * 5);
                     throw ex;
                 }
@@ -844,7 +844,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                Console.WriteLine(" ---------------  下的出错  --------------");
+                logger.Error($" ---------------  下的出错  --------------{JsonConvert.SerializeObject(req)}");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }

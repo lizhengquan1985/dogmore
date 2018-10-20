@@ -318,7 +318,7 @@ namespace DogApi.Controller
         /// <returns></returns>
         [HttpPost]
         [ActionName("doEmpty")]
-        public async Task<object> DoEmpty(string userName, string symbolName)
+        public async Task<object> DoEmpty(string userName, string symbolName, string quoteCurrency)
         {
             // 立马空单
             var symbols = CoinUtils.GetAllCommonSymbols();
@@ -331,7 +331,7 @@ namespace DogApi.Controller
                 return "没有拿到最近3分钟的数据";
             }
             // 大于今天最小值30%才行 or 大于24小时60%  并且大于历史最小的15%
-            var control = new DogControlDao().GetDogControl(symbolName);
+            var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
             var nowPrice = lastKlines[0].Close;
             if (nowPrice < control.HistoryMin && nowPrice < control.HistoryMin + (control.HistoryMax - control.HistoryMin) * (decimal)0.12)
             {

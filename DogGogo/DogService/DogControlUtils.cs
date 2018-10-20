@@ -15,11 +15,11 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
 
-        public static decimal? GetPredictPrice(string symbolName)
+        public static decimal? GetPredictPrice(string symbolName, string quoteCurrency)
         {
             try
             {
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.PredictExpiredTime < DateTime.Now)
                 {
                     return null;
@@ -33,11 +33,11 @@ namespace DogService
             }
         }
 
-        public static decimal? GetEmptyPrice(string symbolName)
+        public static decimal? GetEmptyPrice(string symbolName, string quoteCurrency)
         {
             try
             {
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.EmptyExpiredTime < DateTime.Now)
                 {
                     return null;
@@ -51,11 +51,11 @@ namespace DogService
             }
         }
 
-        public static decimal? GetAvgInputAmount(string symbolName)
+        public static decimal? GetAvgInputAmount(string symbolName, string quoteCurrency)
         {
             try
             {
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.AvgInputExpiredTime < DateTime.Now)
                 {
                     return null;
@@ -69,11 +69,11 @@ namespace DogService
             }
         }
 
-        public static decimal? GetMaxInputPrice(string symbolName)
+        public static decimal? GetMaxInputPrice(string symbolName, string quoteCurrency)
         {
             try
             {
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.MaxInputPriceExpiredTime < DateTime.Now)
                 {
                     return null;
@@ -87,13 +87,13 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderBuy(string symbolName, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.1)
+        public static decimal GetLadderBuy(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.1)
         {
             try
             {
                 var max = (decimal)1.135;
                 var min = (decimal)1.055;
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null)
                 {
                     return defaultLadderBuyPercent;
@@ -144,13 +144,13 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderSell(string symbolName, decimal nowPrice, decimal defaultLadderSellPercent = (decimal)1.05)
+        public static decimal GetLadderSell(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderSellPercent = (decimal)1.05)
         {
             try
             {
                 var min = (decimal)1.04;
                 var max = (decimal)1.08;
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control != null && control.HistoryMin > 0 && control.HistoryMax > 0 && control.HistoryMax > control.HistoryMin)
                 {
                     max = max + (control.HistoryMax / control.HistoryMin - 2) / 180;
@@ -189,13 +189,13 @@ namespace DogService
         /// <param name="nowPrice"></param>
         /// <param name="defaultLadderSellPercent"></param>
         /// <returns></returns>
-        public static decimal GetEmptyLadderSell(string symbolName, decimal nowPrice, decimal defaultEmptyLadderSellPercent = (decimal)1.1)
+        public static decimal GetEmptyLadderSell(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultEmptyLadderSellPercent = (decimal)1.1)
         {
             try
             {
                 var min = (decimal)1.10;
                 var max = (decimal)1.16;
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.HistoryMin >= control.HistoryMax || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {
                     return defaultEmptyLadderSellPercent;
@@ -231,11 +231,11 @@ namespace DogService
             }
         }
 
-        public static int GetRecommendDivideForMore(string symbolName, decimal nowPrice, int divide = 700)
+        public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice, int divide = 700)
         {
             try
             {
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {
                     return divide;
@@ -284,7 +284,7 @@ namespace DogService
             }
         }
 
-        public static int GetRecommendDivideForEmpty(string symbolName, decimal nowPrice, decimal shouyiQuantity, int divide = 24)
+        public static int GetRecommendDivideForEmpty(string symbolName, string quoteCurrency, decimal nowPrice, decimal shouyiQuantity, int divide = 24)
         {
             try
             {
@@ -300,7 +300,7 @@ namespace DogService
                     max = 70;
                     min = 18;
                 }
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {
                     return max;
@@ -352,11 +352,11 @@ namespace DogService
         /// <param name="symbolName"></param>
         /// <param name="nowPrice"></param>
         /// <returns></returns>
-        public static decimal GetLadderPosition(string symbolName, decimal nowPrice, decimal defaultPosition = (decimal)0.5)
+        public static decimal GetLadderPosition(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultPosition = (decimal)0.5)
         {
             try
             {
-                var control = new DogControlDao().GetDogControl(symbolName);
+                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.HistoryMin == 0 || control.HistoryMax == 0 || control.HistoryMax < control.HistoryMin)
                 {
                     return defaultPosition;

@@ -64,9 +64,9 @@ namespace DogRunService
             return isQuickRise;
         }
 
-        public static bool ControlCanBuy(string symbolName, decimal nowPrice)
+        public static bool ControlCanBuy(string symbolName, string quoteCurrency, decimal nowPrice)
         {
-            var maxInputPrice = DogControlUtils.GetMaxInputPrice(symbolName);
+            var maxInputPrice = DogControlUtils.GetMaxInputPrice(symbolName, quoteCurrency);
             if (maxInputPrice == null)
             {
                 // 没有控制的,默认可以购买

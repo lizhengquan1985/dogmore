@@ -162,7 +162,7 @@ namespace DogRunService
             // 3.低于管控的购入价
             if (flexPointList[0].isHigh
                 || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
-                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice))
+                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
             {
                 return;
             }
@@ -204,7 +204,7 @@ namespace DogRunService
                     continue;
                 }
 
-                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
+                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
                 PlatformApi api = PlatformApi.GetInstance(userName);
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
@@ -484,7 +484,7 @@ namespace DogRunService
 
                 foreach (var needSellDogMoreBuyItem in needSellDogMoreBuyList)
                 {
-                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName, nowPrice); //(decimal)1.035;
+                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName, needSellDogMoreBuyItem.QuoteCurrency, nowPrice); //(decimal)1.035;
 
                     try
                     {
@@ -499,7 +499,7 @@ namespace DogRunService
 
             // 自动做空
             // 要求  1. 进入拐点区域, 2. 受管控未过期
-            var control = new DogControlDao().GetDogControl(symbol.BaseCurrency);
+            var control = new DogControlDao().GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
             var dayMin = historyKlines.Min(it => it.Open);
             var dayMax = historyKlines.Max(it => it.Open);
             var hourMin = historyKlines.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.AddHours(-1)).Min(it => it.Open);
@@ -529,7 +529,7 @@ namespace DogRunService
                     {
                         // 和上次做空价格要相差8%
                         var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
-                        var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, nowPrice);
+                        var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
                         if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * emptyLadder)
                         {
                             // 上一次还没收割得，相差10%， 要等等
@@ -555,7 +555,7 @@ namespace DogRunService
                             continue;
                         }
 
-                        var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
+                        var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
                         decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
                         if (sellQuantity * nowPrice > 10)
                         {
@@ -698,7 +698,7 @@ namespace DogRunService
                 return;
             }
 
-            var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
+            var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
             decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
 
             if (sellQuantity * nowPrice > 10) // 一次做空不超过10usdt
@@ -749,7 +749,7 @@ namespace DogRunService
             // 3.低于管控的购入价
             if (flexPointList[0].isHigh
                 || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
-                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, nowPrice))
+                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
             {
                 return $"判断 发现不适合 最高点{flexPointList[0].isHigh}";
             }
@@ -771,7 +771,7 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             // 判断购入阶梯
-            var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, nowPrice);
+            var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
             if (useSetLadderBuyPercent)
             {
                 ladderBuyPercent = setLadderBuyPercent;
@@ -811,7 +811,7 @@ namespace DogRunService
                 LogNotBuy(symbol.BaseCurrency, $"余额不足,  checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},usdt.balance:{usdt.balance}");
                 return;
             }
-            decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, nowPrice);
+            decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
 
             if (recommendAmount < (decimal)1.1)
             {

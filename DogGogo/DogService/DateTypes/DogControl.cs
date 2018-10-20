@@ -14,6 +14,10 @@ namespace DogService.DateTypes
         public long Id { get; set; }
         public string SymbolName { get; set; }
         /// <summary>
+        /// 基础分区，btc，eth，usdt，ht
+        /// </summary>
+        public string QuoteCurrency { get; set; }
+        /// <summary>
         /// 预计价格，等接近预计价格时候再做处理
         /// </summary>
         public decimal PredictPrice { get; set; }

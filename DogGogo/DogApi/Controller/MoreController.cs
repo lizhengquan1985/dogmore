@@ -154,7 +154,7 @@ namespace DogApi.Controller
                 {
                     continue;
                 }
-                ladderDic.Add(item.SymbolName, DogControlUtils.GetLadderSell(item.SymbolName, closeDic[item.SymbolName]));
+                ladderDic.Add(item.SymbolName, DogControlUtils.GetLadderSell(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
             }
 
             Dictionary<string, decimal> ladderBuyDic = new Dictionary<string, decimal>();
@@ -164,7 +164,7 @@ namespace DogApi.Controller
                 {
                     continue;
                 }
-                ladderBuyDic.Add(item.SymbolName, DogControlUtils.GetLadderBuy(item.SymbolName, closeDic[item.SymbolName]));
+                ladderBuyDic.Add(item.SymbolName, DogControlUtils.GetLadderBuy(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
             }
 
             return new { list, closeDic, ladderDic, ladderBuyDic, todayDic };

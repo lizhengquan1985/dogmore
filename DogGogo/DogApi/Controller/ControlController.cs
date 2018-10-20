@@ -36,9 +36,9 @@ namespace DogApi.Controller
 
         [HttpPut]
         [ActionName("initEmpty30Percent")]
-        public async Task UpdateEmpty30Percent(string symbolName)
+        public async Task UpdateEmpty30Percent(string symbolName, string quoteCurrency)
         {
-            var control = new DogControlDao().GetDogControl(symbolName);
+            var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
             if (control == null)
             {
                 return;
@@ -86,28 +86,29 @@ namespace DogApi.Controller
 
         [HttpPut]
         [ActionName("setUnvalid")]
-        public async Task SetUnvalid(string symbolName)
+        public async Task<string> SetUnvalid(string symbolName, string quoteCurrency)
         {
             try
             {
-                await new DogControlDao().SetUnvalid(symbolName);
+                await new DogControlDao().SetUnvalid(symbolName, quoteCurrency);
+                return "修改完成";
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
-                throw ex;
+                return ex.Message;
             }
         }
 
         [HttpGet]
         [ActionName("refreshHistoryMaxMin")]
-        public async Task RefreshHistoryMaxMin(string symbolName)
+        public async Task RefreshHistoryMaxMin(string symbolName, string quoteCurrency)
         {
             try
             {
                 PlatformApi api = PlatformApi.GetInstance("xx");
                 var period = "4hour";
-                var klines = api.GetHistoryKline(symbolName + "usdt", period, 1000);
+                var klines = api.GetHistoryKline(symbolName + quoteCurrency, period, 1000);
                 var min = decimal.MaxValue;
                 var min1 = decimal.MaxValue;
                 var min2 = decimal.MaxValue;
@@ -166,18 +167,19 @@ namespace DogApi.Controller
                 }
 
                 // 判断max
-                var maxNotSell = new DogMoreBuyDao().GetAllMaxPriceOfNotSellFinished(symbolName);
+                var maxNotSell = new DogMoreBuyDao().GetAllMaxPriceOfNotSellFinished(quoteCurrency, symbolName);
                 if (maxNotSell > max)
                 {
                     max = maxNotSell;
                 }
 
-                var inDB = new DogControlDao().GetDogControl(symbolName);
+                var inDB = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (inDB == null)
                 {
                     inDB = new DogControl()
                     {
                         SymbolName = symbolName,
+                        QuoteCurrency = quoteCurrency,
                         HistoryMax = max,
                         HistoryMin = min
                     };
@@ -199,7 +201,7 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("getFlexCount")]
-        public async Task<Object> GetFlexCount(string symbolName)
+        public async Task<Object> GetFlexCount(string symbolName, string quoteCurrency)
         {
             var symbols = CoinUtils.GetAllCommonSymbols();
             CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == symbolName);
@@ -210,7 +212,7 @@ namespace DogApi.Controller
             var historyKlines = historyKlineData.Data;
             var outFlexPercent = (decimal)0;
             var flexCount = GetFlexpointCount(historyKlines, out outFlexPercent);
-            var inDB = new DogControlDao().GetDogControl(symbolName);
+            var inDB = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
             inDB.LadderSellPercent = outFlexPercent;
             inDB.LadderSellExpiredTime = DateTime.Now.AddYears(1);
             await new DogControlDao().CreateDogControl(inDB);

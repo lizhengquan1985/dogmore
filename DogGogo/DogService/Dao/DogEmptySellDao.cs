@@ -32,15 +32,23 @@ namespace DogService.Dao
         /// </summary>
         /// <param name="userName"></param>
         /// <returns></returns>
-        public decimal GetSumNotShougeDogEmptySell(string userName)
+        public decimal GetSumNotShougeDogEmptySell(string userName, string quoteCurrency)
         {
-            var sql = $"select sum(SellQuantity*SellTradePrice) Total from t_dog_empty_sell where IsFinished=0 and UserName=@userName";
+            decimal sum = 0;
+            var sql = $"select sum(SellQuantity*SellTradePrice) Total from t_dog_empty_sell where IsFinished=0 and UserName=@userName and QuoteCurrency='{quoteCurrency}'";
             var res = Database.Query<decimal?>(sql, new { userName }).FirstOrDefault();
-            if (res == null)
+            if (res != null)
             {
-                return 0;
+                sum += (decimal)res;
             }
-            return (decimal)res;
+
+            sql = $"select sum(BuyQuantity*BuyTradePrice) Total from t_dog_more_buy where IsFinished=0 and UserName=@userName and SymbolName = '{quoteCurrency}'";
+            res = Database.Query<decimal?>(sql, new { userName }).FirstOrDefault();
+            if (res != null)
+            {
+                sum += (decimal)res;
+            }
+            return sum;
         }
 
         public List<DogEmptySell> GetNeedBuyDogEmptySell(string accountId, string userName, string symbolName, string quoteCurrency)

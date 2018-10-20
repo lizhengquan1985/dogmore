@@ -258,20 +258,44 @@ namespace DogRunService
 
             PlatformApi api = PlatformApi.GetInstance(userName);
             var accountInfo = api.GetAccountBalance(accountId);
-            var usdt = accountInfo.Data.list.Find(it => it.currency == "usdt");
+            var quoteCurrency = accountInfo.Data.list.Find(it => it.currency == symbol.QuoteCurrency);
             // 要减去空单未收割得额度总和
-            var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName);
-            if (notShougeEmptySellAmount >= usdt.balance)
+            var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName, symbol.QuoteCurrency);
+            if (notShougeEmptySellAmount >= quoteCurrency.balance)
             {
                 // 余额不足
-                LogNotBuy(symbol.BaseCurrency, $"余额不足,  checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},usdt.balance:{usdt.balance}");
+                LogNotBuy(symbol.BaseCurrency + symbol.QuoteCurrency, $"余额不足,  checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},{symbol.QuoteCurrency}.balance:{quoteCurrency.balance}");
                 return;
             }
-            decimal recommendAmount = (usdt.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
+            decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
 
-            if (recommendAmount < (decimal)1.1)
+            if (symbol.QuoteCurrency == "usdt")
             {
-                recommendAmount = (decimal)1.1;
+                if (recommendAmount < (decimal)1.1)
+                {
+                    recommendAmount = (decimal)1.1;
+                }
+            }
+            else if (symbol.QuoteCurrency == "btc")
+            {
+                if (recommendAmount < (decimal)0.00001)
+                {
+                    recommendAmount = (decimal)0.00001;
+                }
+            }
+            else if (symbol.QuoteCurrency == "eth")
+            {
+                if (recommendAmount < (decimal)0.0001)
+                {
+                    recommendAmount = (decimal)0.0001;
+                }
+            }
+            else if (symbol.QuoteCurrency == "ht")
+            {
+                if (recommendAmount < (decimal)1.1)
+                {
+                    recommendAmount = (decimal)1.1;
+                }
             }
 
             // 购买的要求
@@ -286,7 +310,7 @@ namespace DogRunService
             req.source = "api";
             req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
             req.type = "buy-limit";
-            if (BuyLimitUtils.Record(userName, symbol.BaseCurrency))
+            if (BuyLimitUtils.Record(userName, symbol.BaseCurrency + symbol.QuoteCurrency))
             {
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
@@ -531,7 +555,7 @@ namespace DogRunService
 
                     try
                     {
-                        ShouGeDoMoreForSellEmpty(needSellDogMoreBuyItem, gaoyuPercentSell);
+                        ShouGeDogMore(needSellDogMoreBuyItem, gaoyuPercentSell);
                     }
                     catch (Exception ex)
                     {
@@ -605,12 +629,12 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeDoMoreForSellEmpty(DogMoreBuy dogMoreBuy, decimal percent)
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, decimal percent)
         {
-            var symbols = CoinUtils.GetAllCommonSymbols();
-            CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName);
+            var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
+            CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName && it.QuoteCurrency == dogMoreBuy.QuoteCurrency);
 
-            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
             if (analyzeResult == null)
             {
                 logger.Error($"----------{dogMoreBuy.SymbolName}--------------> analyzeResult 为 null");

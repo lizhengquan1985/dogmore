@@ -84,9 +84,9 @@ namespace DogPlatform
         //    return coins.Keys.ToList();
         //}
 
-        public static List<CommonSymbols> GetAllCommonSymbols(string baseCoin = "usdt")
+        public static List<CommonSymbols> GetAllCommonSymbols(string quoteCurrency)
         {
-            if (baseCoin == "usdt")
+            if (quoteCurrency == "usdt")
             {
                 // 总共其实有36个, 后期还会增加
                 if (usdtCoins.Count < 30)
@@ -95,15 +95,15 @@ namespace DogPlatform
                 }
                 return usdtCoins.Values.ToList();
             }
-            else if (baseCoin == "btc")
+            else if (quoteCurrency == "btc")
             {
                 return btcCoins.Values.ToList();
             }
-            else if (baseCoin == "eth")
+            else if (quoteCurrency == "eth")
             {
                 return ethCoins.Values.ToList();
             }
-            else if (baseCoin == "ht")
+            else if (quoteCurrency == "ht")
             {
                 return htCoins.Values.ToList();
             }

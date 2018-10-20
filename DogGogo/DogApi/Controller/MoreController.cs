@@ -45,7 +45,7 @@ namespace DogApi.Controller
                     return;
                 }
 
-                CoinTrade.ShouGeMore(dogMoreBuy, (decimal)1.035);
+                CoinTrade.ShouGeDoMoreForSellEmpty(dogMoreBuy, (decimal)1.035);
             }
             catch (Exception ex)
             {

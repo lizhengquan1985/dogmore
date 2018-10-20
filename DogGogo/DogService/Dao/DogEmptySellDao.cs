@@ -53,6 +53,16 @@ namespace DogService.Dao
             return Database.Query<DogEmptySell>(sql).ToList();
         }
 
+        public DogEmptySell GetBiggestDogEmptySell(string quoteCurrency, string baseCurrency)
+        {
+            var states = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled });
+            var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
+            var sql = $"select * from t_dog_empty_sell where QuoteCurrency='{quoteCurrency}' and SymbolName = '{baseCurrency}' and SellState in({states}) and IsFinished=0 " +
+                $" and SellOrderId not in(select SellOrderId from t_dog_empty_buy where QuoteCurrency='{quoteCurrency}' and BaseCurrency='{baseCurrency}' and BuyState not in({states})) " +
+                $" order by SellOrderPrice desc limit 0,1";
+            return Database.Query<DogEmptySell>(sql).FirstOrDefault();
+        }
+
         public void CreateDogEmptySell(DogEmptySell dogEmptySell)
         {
             try

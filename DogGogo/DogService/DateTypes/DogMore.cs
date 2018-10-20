@@ -12,7 +12,14 @@ namespace DogService.DateTypes
     {
         [Key]
         public long Id { get; set; }
+        /// <summary>
+        /// 交易对象
+        /// </summary>
         public string SymbolName { get; set; }
+        /// <summary>
+        /// 基础分区，btc，eth，usdt，ht
+        /// </summary>
+        public string QuoteCurrency { get; set; }
         public string AccountId { get; set; }
         public string UserName { get; set; }
         public long BuyOrderId { get; set; }
@@ -45,6 +52,10 @@ namespace DogService.DateTypes
         [Key]
         public long Id { get; set; }
         public string SymbolName { get; set; }
+        /// <summary>
+        /// 基础分区，btc，eth，usdt，ht
+        /// </summary>
+        public string QuoteCurrency { get; set; }
         public string AccountId { get; set; }
         public string UserName { get; set; }
         public long BuyOrderId { get; set; }

@@ -115,6 +115,22 @@ namespace DogService.Dao
         }
 
         /// <summary>
+        /// 不分角色的，拉取最小的那个数据
+        /// </summary>
+        /// <param name="quoteCurrency"></param>
+        /// <param name="baseCurrency"></param>
+        /// <returns></returns>
+        public DogMoreBuy GetSmallestDogMoreBuy(string quoteCurrency, string baseCurrency)
+        {
+            var states = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled });
+            var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
+            var sql = $"select * from t_dog_more_buy where SymbolName = '{baseCurrency}' and QuoteCurrency='{quoteCurrency}' and BuyState in({states}) and IsFinished=0 " +
+                $" and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where QuoteCurrency='{quoteCurrency}' and SellState not in({states})) " +
+                $" order by BuyTradePrice asc limit 0,1";
+            return Database.Query<DogMoreBuy>(sql).FirstOrDefault();
+        }
+
+        /// <summary>
         /// 获取最小的购买价格.
         /// </summary>
         /// <param name="accountId"></param>

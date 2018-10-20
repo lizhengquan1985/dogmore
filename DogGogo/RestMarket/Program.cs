@@ -25,10 +25,29 @@ namespace RestMarket
 
             CoinUtils.Init();
 
-
+            InitUsdtData();
             InitBtcData();
+            InitEthData();
+            InitHtData();
 
             Console.ReadLine();
+        }
+
+        public static void InitUsdtData()
+        {
+            // 准备好各种对
+            var symbols = CoinUtils.GetAllCommonSymbols("btc");
+            var removeCoins = new List<string> {
+                "ven"
+            };
+            var addSymbols = symbols.Where(it => !removeCoins.Contains(it.BaseCurrency)).ToList();
+
+            foreach (var symbol in addSymbols)
+            {
+                KlineUtils.CheckTableExistAndCreate(symbol);
+            }
+
+            RunCoin(addSymbols.ToList());
         }
 
         public static void InitBtcData()
@@ -39,6 +58,42 @@ namespace RestMarket
                 "eos","xrp","eth","ada"
             };
             var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+
+            foreach (var symbol in addSymbols)
+            {
+                KlineUtils.CheckTableExistAndCreate(symbol);
+            }
+
+            RunCoin(addSymbols.ToList());
+        }
+
+
+        public static void InitEthData()
+        {
+            // 准备好各种对
+            var btcSymbols = CoinUtils.GetAllCommonSymbols("eth");
+            var addCoins = new List<string> {
+                "eos", "xrp", "ada"
+            };
+            var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+
+            foreach (var symbol in addSymbols)
+            {
+                KlineUtils.CheckTableExistAndCreate(symbol);
+            }
+
+            RunCoin(addSymbols.ToList());
+        }
+
+
+        public static void InitHtData()
+        {
+            // 准备好各种对
+            var symbols = CoinUtils.GetAllCommonSymbols("ht");
+            var addCoins = new List<string> {
+                "eos", "xrp" ,"ada"
+            };
+            var addSymbols = symbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
             {

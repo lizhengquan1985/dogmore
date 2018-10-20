@@ -43,12 +43,12 @@ namespace DogService.Dao
             return (decimal)res;
         }
 
-        public List<DogEmptySell> GetNeedBuyDogEmptySell(string accountId, string userName, string symbolName)
+        public List<DogEmptySell> GetNeedBuyDogEmptySell(string accountId, string userName, string symbolName, string quoteCurrency)
         {
             var states = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled });
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select * from t_dog_empty_sell where AccountId='{accountId}' and SymbolName = '{symbolName}' and SellState in({states}) and IsFinished=0 " +
-                $" and UserName='{userName}' and SellOrderId not in(select SellOrderId from t_dog_empty_buy where AccountId='{accountId}' and UserName='{userName}' and BuyState not in({states})) " +
+            var sql = $"select * from t_dog_empty_sell where AccountId='{accountId}' and SymbolName = '{symbolName}' and QuoteCurrency='{quoteCurrency}' and SellState in({states}) and IsFinished=0 " +
+                $" and UserName='{userName}' and SellOrderId not in(select SellOrderId from t_dog_empty_buy where AccountId='{accountId}' and UserName='{userName}' and SymbolName = '{symbolName}' and QuoteCurrency='{quoteCurrency}' and BuyState not in({states})) " +
                 $" order by SellOrderPrice desc limit 0,5";
             return Database.Query<DogEmptySell>(sql).ToList();
         }

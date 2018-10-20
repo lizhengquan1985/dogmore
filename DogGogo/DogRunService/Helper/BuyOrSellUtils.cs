@@ -17,11 +17,7 @@ namespace DogRunService.Helper
         public static void Begin()
         {
             var symbols = CoinUtils.GetAllCommonSymbols();
-            //RunCoin(symbols.Where(it => it.BaseCurrency == "let" || it.BaseCurrency == "zec" || it.BaseCurrency == "etc" || it.BaseCurrency == "act" || it.BaseCurrency == "storj").ToList());
             RunCoin(symbols.Where(it => it.BaseCurrency != "btc" && it.BaseCurrency != "ven").ToList());
-            //var splitIndex = 16;
-            //RunCoin(symbols.GetRange(0, splitIndex + 1));
-            //RunCoin(symbols.GetRange(splitIndex, symbols.Count - splitIndex));
         }
 
         private static void RunCoin(List<CommonSymbols> symbols)
@@ -42,7 +38,12 @@ namespace DogRunService.Helper
                             var historyKlineData = HistoryKlinePools.Get(key);
                             if (historyKlineData == null || historyKlineData.Data == null || historyKlineData.Data.Count == 0 || historyKlineData.Date < DateTime.Now.AddSeconds(-10))
                             {
-                                KlineUtils.InitOneKine(symbol);
+                                //KlineUtils.InitOneKine(symbol);
+                                continue;
+                            }
+                            else
+                            {
+                                KlineUtils.InitKlineInToPool(symbol);
                             }
 
                             CoinTrade.Run(symbol);
@@ -55,13 +56,14 @@ namespace DogRunService.Helper
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime > 60)
+                    if (useTime >= 60)
                     {
                         logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
                     }
                     else
                     {
                         Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
+                        Thread.Sleep(1000 * (60 - (int)useTime));
                     }
                 }
             });

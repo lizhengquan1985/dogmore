@@ -28,11 +28,18 @@ namespace DogService.Dao
             return Database.Query<DogMoreBuy>(sql).FirstOrDefault();
         }
 
-        public decimal GetBuyQuantityNotShouge(string userName, string symbolName)
+        /// <summary>
+        /// TODO 计算方式考虑交叉交易
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="quoteCurrency"></param>
+        /// <param name="symbolName"></param>
+        /// <returns></returns>
+        public decimal GetBuyQuantityNotShouge(string userName, string quoteCurrency, string symbolName)
         {
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select sum(BuyQuantity) BuyQuantity from t_dog_more_buy where IsFinished=0 and UserName=@userName and SymbolName=@symbolName";
-            var res = Database.Query<decimal?>(sql, new { userName, symbolName }).FirstOrDefault();
+            var sql = $"select sum(BuyQuantity) BuyQuantity from t_dog_more_buy where IsFinished=0 and UserName=@userName and QuoteCurrency=@quoteCurrency and SymbolName=@symbolName";
+            var res = Database.Query<decimal?>(sql, new { userName, symbolName, quoteCurrency }).FirstOrDefault();
             if (res == null)
             {
                 return 0;
@@ -104,12 +111,12 @@ namespace DogService.Dao
 
         #endregion
 
-        public List<DogMoreBuy> GetNeedSellDogMoreBuy(string accountId, string userName, string symbolName)
+        public List<DogMoreBuy> GetNeedSellDogMoreBuy(string accountId, string userName, string quoteCurrency, string symbolName)
         {
             var states = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled });
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{symbolName}' and BuyState in({states}) and IsFinished=0 " +
-                $" and UserName='{userName}' and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where AccountId='{accountId}' and UserName='{userName}' and SellState not in({states})) " +
+            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and QuoteCurrency = '{quoteCurrency}' and SymbolName = '{symbolName}' and BuyState in({states}) and IsFinished=0 " +
+                $" and UserName='{userName}' and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where AccountId='{accountId}' and UserName='{userName}' and QuoteCurrency = '{quoteCurrency}' and SellState not in({states})) " +
                 $" order by BuyTradePrice asc limit 0,8";
             return Database.Query<DogMoreBuy>(sql).ToList();
         }
@@ -137,9 +144,9 @@ namespace DogService.Dao
         /// <param name="userName"></param>
         /// <param name="coin"></param>
         /// <returns></returns>
-        public decimal GetMinBuyPriceOfNotSellFinished(string accountId, string userName, string coin)
+        public decimal GetMinBuyPriceOfNotSellFinished(string accountId, string userName, string quoteCurrency, string coin)
         {
-            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and SymbolName = '{coin}' and BuyState!='({StateConst.Canceled.ToString()})' " +
+            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and QuoteCurrency = '{quoteCurrency}' and SymbolName = '{coin}' and BuyState!='({StateConst.Canceled.ToString()})' " +
                 $" and IsFinished=0 and UserName='{userName}'";
             var list = Database.Query<DogMoreBuy>(sql).ToList();
             var minPrice = (decimal)25000;
@@ -157,9 +164,9 @@ namespace DogService.Dao
             return minPrice;
         }
 
-        public decimal GetAllMaxPriceOfNotSellFinished(string symbolName)
+        public decimal GetAllMaxPriceOfNotSellFinished(string quoteCurrency, string symbolName)
         {
-            var sql = $"select * from t_dog_more_buy where SymbolName =@SymbolName and BuyState!='({StateConst.Canceled.ToString()})' " +
+            var sql = $"select * from t_dog_more_buy where SymbolName=@SymbolName and QuoteCurrency = '{quoteCurrency}' and BuyState!='({StateConst.Canceled.ToString()})' " +
                 $" and IsFinished=0 ";
             var list = Database.Query<DogMoreBuy>(sql, new { SymbolName = symbolName }).ToList();
             var maxPrice = (decimal)0;

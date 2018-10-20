@@ -285,6 +285,7 @@ namespace DogRunService
                 new DogEmptyBuyDao().CreateDogEmptyBuy(new DogEmptyBuy()
                 {
                     SymbolName = symbol.BaseCurrency,
+                    QuoteCurrency = symbol.BaseCurrency,
                     AccountId = dogEmptySell.AccountId,
                     UserName = dogEmptySell.UserName,
                     SellOrderId = dogEmptySell.SellOrderId,
@@ -390,6 +391,7 @@ namespace DogRunService
                     SellState = StateConst.Submitted,
                     SellTradePrice = 0,
                     SymbolName = symbol.BaseCurrency,
+                    QuoteCurrency = symbol.QuoteCurrency,
                     SellMemo = "",
                     SellOrderDetail = "",
                     SellOrderMatchResults = ""
@@ -478,7 +480,7 @@ namespace DogRunService
             {
                 var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                 var accountId = accountConfig.MainAccountId;
-                var needSellDogMoreBuyList = new DogMoreBuyDao().GetNeedSellDogMoreBuy(accountId, userName, symbol.BaseCurrency);
+                var needSellDogMoreBuyList = new DogMoreBuyDao().GetNeedSellDogMoreBuy(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
 
                 foreach (var needSellDogMoreBuyItem in needSellDogMoreBuyList)
                 {
@@ -541,7 +543,7 @@ namespace DogRunService
                         var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
                         var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
                         // 要减去未收割得。
-                        var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
+                        var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.QuoteCurrency, symbol.BaseCurrency);
                         if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
                         {
                             logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
@@ -689,7 +691,7 @@ namespace DogRunService
             var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
             var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
             // 要减去未收割得。
-            var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
+            var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.QuoteCurrency, symbol.BaseCurrency);
             if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
             {
                 logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
@@ -774,7 +776,7 @@ namespace DogRunService
             {
                 ladderBuyPercent = setLadderBuyPercent;
             }
-            var minBuyTradePrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.BaseCurrency);
+            var minBuyTradePrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
             if (minBuyTradePrice <= 0)
             {
                 if (symbol.BaseCurrency == "新的币")
@@ -853,6 +855,7 @@ namespace DogRunService
                 new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
                 {
                     SymbolName = symbol.BaseCurrency,
+                    QuoteCurrency = symbol.QuoteCurrency,
                     AccountId = accountId,
                     UserName = userName,
                     FlexPercent = flexPercent,

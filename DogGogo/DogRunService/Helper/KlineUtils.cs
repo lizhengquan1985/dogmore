@@ -60,6 +60,30 @@ namespace DogRunService.Helper
             });
         }
 
+        public static void InitKlineInToPool(CommonSymbols symbol)
+        {
+            try
+            {
+                var period = "1min";
+                var key = HistoryKlinePools.GetKey(symbol, period);
+
+                var dao = new KlineDao();
+                var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+                if (lastKlines.Count < 900)
+                {
+                    logger.Error($"{symbol.BaseCurrency},{symbol.QuoteCurrency}数据量太少{lastKlines.Count}，无法分析啊：");
+                }
+                if (lastKlines.Count > 600)
+                {
+                    HistoryKlinePools.Init(key, lastKlines);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("InitOneKine --> " + ex.Message, ex);
+            }
+        }
+
         /// <summary>
         /// 获取行情数据
         /// </summary>
@@ -196,6 +220,8 @@ namespace DogRunService.Helper
                 begin = DateTime.Now;
 
                 var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
+
+                klines.Sort((a, b) => (int)(a.Id - b.Id));
                 foreach (var kline in klines)
                 {
                     var finds = findList.FindAll(it => it.Id == kline.Id);

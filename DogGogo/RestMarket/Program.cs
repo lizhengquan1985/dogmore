@@ -25,18 +25,22 @@ namespace RestMarket
 
             CoinUtils.Init();
 
-            InitUsdtData();
-            InitBtcData();
-            InitEthData();
-            InitHtData();
+            var runCoins = new List<CommonSymbols>();
+            runCoins.AddRange(InitUsdtData());
+            runCoins.AddRange(InitBtcData());
+            runCoins.AddRange(InitEthData());
+            runCoins.AddRange(InitHtData());
+
+            // 开始
+            RunCoin(runCoins);
 
             Console.ReadLine();
         }
 
-        public static void InitUsdtData()
+        public static List<CommonSymbols> InitUsdtData()
         {
             // 准备好各种对
-            var symbols = CoinUtils.GetAllCommonSymbols("btc");
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             var removeCoins = new List<string> {
                 "ven"
             };
@@ -47,10 +51,10 @@ namespace RestMarket
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
 
-            RunCoin(addSymbols.ToList());
+            return addSymbols.ToList();
         }
 
-        public static void InitBtcData()
+        public static List<CommonSymbols> InitBtcData()
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
@@ -64,11 +68,11 @@ namespace RestMarket
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
 
-            RunCoin(addSymbols.ToList());
+            return addSymbols.ToList();
         }
 
 
-        public static void InitEthData()
+        public static List<CommonSymbols> InitEthData()
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("eth");
@@ -82,11 +86,11 @@ namespace RestMarket
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
 
-            RunCoin(addSymbols.ToList());
+            return addSymbols.ToList();
         }
 
 
-        public static void InitHtData()
+        public static List<CommonSymbols> InitHtData()
         {
             // 准备好各种对
             var symbols = CoinUtils.GetAllCommonSymbols("ht");
@@ -100,7 +104,7 @@ namespace RestMarket
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
 
-            RunCoin(addSymbols.ToList());
+            return addSymbols.ToList();
         }
 
         private static void RunCoin(List<CommonSymbols> symbols)
@@ -115,7 +119,7 @@ namespace RestMarket
                     {
                         var symbol = symbols[i];
 
-                        Console.WriteLine($"---> {i + 1}   {symbol.BaseCurrency}");
+                        Console.WriteLine($"---> {i + 1}   {symbol.BaseCurrency}{symbol.QuoteCurrency}");
                         try
                         {
                             KlineUtils.InitMarketInDB(symbol);

@@ -134,6 +134,7 @@ namespace Test
                 new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
                 {
                     SymbolName = orderDetail.Data.symbol.Replace("usdt", ""),
+                     //QuoteCurrency = 
                     AccountId = account.MainAccountId,
                     UserName = account.UserName,
                     FlexPercent = (decimal)1.04,

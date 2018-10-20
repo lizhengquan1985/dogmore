@@ -17,7 +17,7 @@ namespace DogRunService
 
         public static string GetKey(CommonSymbols symbol, string period)
         {
-            return symbol.BaseCurrency + "-" + period;
+            return symbol.BaseCurrency + "-" + symbol.QuoteCurrency + "-" + period;
         }
 
         public static void Init(string key, List<HistoryKline> data)

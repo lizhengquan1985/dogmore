@@ -63,7 +63,7 @@ namespace DogApi.Controller
         public async Task<object> listMoreBuyIsNotFinished(string userName, string symbolName, string sort = "lastbuy")
         {
             var list = new List<DogMoreBuy>();
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
             Dictionary<string, decimal> todayDic = new Dictionary<string, decimal>();
@@ -309,7 +309,7 @@ namespace DogApi.Controller
         {
             var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName);
 
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
             foreach (var symbol in symbols)
@@ -377,7 +377,7 @@ namespace DogApi.Controller
         {
             try
             {
-                var symbols = CoinUtils.GetAllCommonSymbols();
+                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
 
                 var ladder = (decimal)1.05;

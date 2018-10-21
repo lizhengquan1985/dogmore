@@ -19,7 +19,7 @@ namespace Alert
                 Price24Alert.RunAlert();
             });
 
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
 
             // 空
             //EmptyOrderTask.Run(symbols);

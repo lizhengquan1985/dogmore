@@ -17,7 +17,7 @@ namespace Alert
     {
         public static void RunAlert()
         {
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             Task.Run(() =>
             {
                 while (true)

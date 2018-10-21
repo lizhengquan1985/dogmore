@@ -16,7 +16,7 @@ namespace DogRunService.Helper
 
         public static void Begin()
         {
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             RunCoin(symbols.Where(it => it.BaseCurrency != "btc" && it.BaseCurrency != "ven").ToList());
         }
 

@@ -31,7 +31,7 @@ namespace DogApi
             options.Urls.Add("http://+:80");
             WebApp.Start<Startup>(options);
 
-            BeginTrade();
+            //BeginTrade();
 
             while (true)
             {

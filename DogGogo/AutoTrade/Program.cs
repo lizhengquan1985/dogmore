@@ -1,8 +1,10 @@
 ﻿using DogPlatform;
 using DogRunService;
 using DogRunService.Helper;
+using log4net.Config;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +15,9 @@ namespace AutoTrade
     {
         static void Main(string[] args)
         {
+            // 注册日志
+            XmlConfigurator.Configure(new FileInfo("log4net.config"));
+
             BeginTrade();
         }
 
@@ -23,9 +28,6 @@ namespace AutoTrade
 
             UserPools.Push("xx");
             UserPools.Push("qq");
-
-            // 初始化k线
-            //KlineUtils.Begin();
 
             // 不停的对每个币做操作
             BuyOrSellUtils.Begin();

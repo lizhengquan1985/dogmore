@@ -20,7 +20,7 @@ namespace DogRunService.Helper
         {
             logger.Info("----------------------  begin  --------------------------------");
             // 初始化
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
 
             // 定时任务， 不停的获取最新数据， 以供分析使用
             foreach (var symbol in symbols)

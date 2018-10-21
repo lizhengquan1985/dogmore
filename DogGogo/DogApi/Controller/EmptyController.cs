@@ -40,7 +40,7 @@ namespace DogApi.Controller
                     return;
                 }
 
-                var symbols = CoinUtils.GetAllCommonSymbols();
+                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
                 CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
                 CoinTrade.ShouGeDoEmptyForBuyMore(dogEmptySell, symbol, analyzeResult);
@@ -70,7 +70,7 @@ namespace DogApi.Controller
                     return;
                 }
 
-                var symbols = CoinUtils.GetAllCommonSymbols();
+                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
                 CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
                 CoinTrade.ShouGeDoEmptyForBuyMore(dogEmptySell, symbol, analyzeResult, (decimal)1.01);
@@ -86,7 +86,7 @@ namespace DogApi.Controller
         public async Task<object> listEmptySellIsNotFinished(string symbolName, string userName)
         {
             var list = new List<DogEmptySell>();
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
             if (string.IsNullOrEmpty(symbolName))
@@ -321,7 +321,7 @@ namespace DogApi.Controller
         public async Task<object> DoEmpty(string userName, string symbolName, string quoteCurrency)
         {
             // 立马空单
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
             var dao = new KlineDao();
             var lastKlines = dao.List24HourKline(symbol.BaseCurrency);

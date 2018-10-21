@@ -58,7 +58,7 @@ namespace DogApi.Controller
                 var res = await new DogControlDao().ListDogControl();
                 res = res.OrderBy(it => it.SymbolName).ToList();
 
-                var symbols = CoinUtils.GetAllCommonSymbols();
+                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
                 symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
                 Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
                 foreach (var symbol in symbols)
@@ -203,7 +203,7 @@ namespace DogApi.Controller
         [ActionName("getFlexCount")]
         public async Task<Object> GetFlexCount(string symbolName, string quoteCurrency)
         {
-            var symbols = CoinUtils.GetAllCommonSymbols();
+            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == symbolName);
             KlineUtils.InitOneKine(symbol);
             var key = HistoryKlinePools.GetKey(symbol, "1min");
@@ -251,7 +251,7 @@ namespace DogApi.Controller
 
                 var result = new List<Dictionary<string, object>>();
 
-                var symbols = CoinUtils.GetAllCommonSymbols();
+                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
                 foreach (var symbol in symbols)
                 {
                     var symbolName = symbol.BaseCurrency;

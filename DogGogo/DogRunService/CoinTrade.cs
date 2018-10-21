@@ -837,7 +837,6 @@ namespace DogRunService
                 var orderDetail = api.QueryOrderDetail(orderId);
                 if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
-                    logger.Error(JsonConvert.SerializeObject(orderDetail));
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
                     decimal maxPrice = 0;
                     foreach (var item in orderMatchResult.Data)
@@ -855,7 +854,6 @@ namespace DogRunService
 
                 if (orderDetail.Status == "ok" && orderDetail.Data.state == StateConst.PartialCanceled)
                 {
-                    logger.Error(JsonConvert.SerializeObject(orderDetail));
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
                     decimal maxPrice = 0;
                     decimal buyQuantity = 0;
@@ -958,7 +956,6 @@ namespace DogRunService
                 logger.Error(ex.Message, ex);
             }
 
-
             // 空
             try
             {
@@ -1024,25 +1021,32 @@ namespace DogRunService
 
         private static void QueryEmptyBuyDetailAndUpdate(string userName, long orderId)
         {
-            PlatformApi api = PlatformApi.GetInstance(userName);
-
-            var orderDetail = api.QueryOrderDetail(orderId);
-            if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
+            try
             {
-                var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                decimal maxPrice = 0;
-                foreach (var item in orderMatchResult.Data)
+                PlatformApi api = PlatformApi.GetInstance(userName);
+
+                var orderDetail = api.QueryOrderDetail(orderId);
+                if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
-                    if (maxPrice < item.price)
+                    var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                    decimal maxPrice = 0;
+                    foreach (var item in orderMatchResult.Data)
                     {
-                        maxPrice = item.price;
+                        if (maxPrice < item.price)
+                        {
+                            maxPrice = item.price;
+                        }
+                    }
+                    if (orderMatchResult.Status == "ok")
+                    {
+                        // 完成
+                        new DogEmptyBuyDao().UpdateDogEmptyBuyWhenSuccess(orderId, orderDetail, orderMatchResult, maxPrice);
                     }
                 }
-                if (orderMatchResult.Status == "ok")
-                {
-                    // 完成
-                    new DogEmptyBuyDao().UpdateDogEmptyBuyWhenSuccess(orderId, orderDetail, orderMatchResult, maxPrice);
-                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
             }
         }
 

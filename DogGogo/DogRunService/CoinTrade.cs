@@ -380,7 +380,7 @@ namespace DogRunService
             req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
             req.type = "buy-limit";
 
-            if (BuyLimitUtils.Record(dogEmptySell.UserName, symbol.BaseCurrency))
+            if (BuyLimitUtils.Record(dogEmptySell.UserName, symbol.BaseCurrency + symbol.QuoteCurrency))
             {
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
@@ -407,7 +407,7 @@ namespace DogRunService
                 new DogEmptyBuyDao().CreateDogEmptyBuy(new DogEmptyBuy()
                 {
                     SymbolName = symbol.BaseCurrency,
-                    QuoteCurrency = symbol.BaseCurrency,
+                    QuoteCurrency = symbol.QuoteCurrency,
                     AccountId = dogEmptySell.AccountId,
                     UserName = dogEmptySell.UserName,
                     SellOrderId = dogEmptySell.SellOrderId,
@@ -476,7 +476,7 @@ namespace DogRunService
                     try
                     {
                         // 和上次做空价格要相差8%
-                        var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
+                        var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
                         var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
                         if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * emptyLadder)
                         {
@@ -491,10 +491,10 @@ namespace DogRunService
                         var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
                         var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
                         // 要减去未收割得。
-                        var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.QuoteCurrency, symbol.BaseCurrency);
+                        var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
                         if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
                         {
-                            logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");
+                            logger.Error($"未收割得数量大于余额，有些不合理, {symbol.BaseCurrency}, {userName}, {notShougeQuantity}, {balanceItem.balance}");
                             continue;
                         }
                         if ((balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.8)
@@ -566,7 +566,8 @@ namespace DogRunService
             }
         }
 
-        private static void SellWhenDoEmpty(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, List<FlexPoint> flexPointList, string sellMemo = "")
+        private static void SellWhenDoEmpty(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice,
+            List<FlexPoint> flexPointList, string sellMemo = "")
         {
             try
             {
@@ -611,6 +612,7 @@ namespace DogRunService
                         SellState = StateConst.Submitted,
                         SellTradePrice = 0,
                         SymbolName = symbol.BaseCurrency,
+                        QuoteCurrency = symbol.QuoteCurrency,
                         SellMemo = sellMemo,
                         SellOrderDetail = "",
                         SellOrderMatchResults = "",
@@ -747,7 +749,7 @@ namespace DogRunService
                 throw new ApplicationException("已经降低了6%， 不要做空，谨慎起见");
             }
 
-            var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency);
+            var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
             if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * (decimal)1.06)
             {
                 throw new ApplicationException("有价格比这个更高得还没有收割。不能重新做空。");
@@ -758,7 +760,7 @@ namespace DogRunService
             var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
             var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
             // 要减去未收割得。
-            var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.QuoteCurrency, symbol.BaseCurrency);
+            var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
             if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
             {
                 logger.Error($"未收割得数量大于余额，有些不合理，  {symbol.BaseCurrency},, {userName},, {notShougeQuantity}, {balanceItem.balance}");

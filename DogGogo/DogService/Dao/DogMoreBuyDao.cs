@@ -35,11 +35,11 @@ namespace DogService.Dao
         /// <param name="quoteCurrency"></param>
         /// <param name="symbolName"></param>
         /// <returns></returns>
-        public decimal GetBuyQuantityNotShouge(string userName, string quoteCurrency, string symbolName)
+        public decimal GetBuyQuantityNotShouge(string userName, string symbolName)
         {
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select sum(BuyQuantity) BuyQuantity from t_dog_more_buy where IsFinished=0 and UserName=@userName and QuoteCurrency=@quoteCurrency and SymbolName=@symbolName";
-            var res = Database.Query<decimal?>(sql, new { userName, symbolName, quoteCurrency }).FirstOrDefault();
+            var sql = $"select sum(BuyQuantity) BuyQuantity from t_dog_more_buy where IsFinished=0 and UserName=@userName and SymbolName=@symbolName";
+            var res = Database.Query<decimal?>(sql, new { userName, symbolName }).FirstOrDefault();
             if (res == null)
             {
                 return 0;

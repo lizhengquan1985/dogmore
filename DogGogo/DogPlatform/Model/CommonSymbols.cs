@@ -10,13 +10,13 @@ namespace DogPlatform.Model
     public class CommonSymbols
     {
         /// <summary>
-        /// 如 e-t-h
+        /// 如 x-rp,e-os, s-oc, a-ct
         /// </summary>
         [JsonProperty(PropertyName = "base-currency")]
         public string BaseCurrency { get; set; }
 
         /// <summary>
-        /// 如 u-s-d-t
+        /// 如 u-s-d-t, b-t-c, e-th,h-t,
         /// </summary>
         [JsonProperty(PropertyName = "quote-currency")]
         public string QuoteCurrency { get; set; }

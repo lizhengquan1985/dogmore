@@ -209,7 +209,7 @@ namespace DogRunService
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
                 {
-                    ShouGeDoEmptyForBuyMore(needBuyDogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
+                    ShouGeDogEmpty(needBuyDogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
                 }
             }
         }
@@ -220,7 +220,8 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="userName"></param>
         /// <param name="accountId"></param>
-        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult, decimal setLadderBuyPercent = (decimal)1.1, bool useSetLadderBuyPercent = false)
+        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult,
+            decimal setLadderBuyPercent = (decimal)1.1, bool useSetLadderBuyPercent = false)
         {
             var flexPointList = analyzeResult.FlexPointList;
             var flexPercent = analyzeResult.FlexPercent;
@@ -228,7 +229,7 @@ namespace DogRunService
 
             // 判断购入阶梯
             var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-            if (useSetLadderBuyPercent)
+            if (useSetLadderBuyPercent && setLadderBuyPercent > (decimal)1.02)
             {
                 ladderBuyPercent = setLadderBuyPercent;
             }
@@ -278,16 +279,16 @@ namespace DogRunService
             }
             else if (symbol.QuoteCurrency == "btc")
             {
-                if (recommendAmount < (decimal)0.00001)
+                if (recommendAmount < (decimal)0.000125)
                 {
-                    recommendAmount = (decimal)0.00001;
+                    recommendAmount = (decimal)0.000125;
                 }
             }
             else if (symbol.QuoteCurrency == "eth")
             {
-                if (recommendAmount < (decimal)0.0001)
+                if (recommendAmount < (decimal)0.005)
                 {
-                    recommendAmount = (decimal)0.0001;
+                    recommendAmount = (decimal)0.005;
                 }
             }
             else if (symbol.QuoteCurrency == "ht")
@@ -360,7 +361,7 @@ namespace DogRunService
             logger.Error($"下单 --> 下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId},分析 {JsonConvert.SerializeObject(flexPointList)}");
         }
 
-        public static void ShouGeDoEmptyForBuyMore(DogEmptySell dogEmptySell, CommonSymbols symbol, AnalyzeResult analyzeResult, decimal percent = (decimal)1.02)
+        public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbols symbol, AnalyzeResult analyzeResult, decimal percent = (decimal)1.02)
         {
             var nowPrice = analyzeResult.NowPrice;
             if (nowPrice * percent > dogEmptySell.SellTradePrice)

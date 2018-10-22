@@ -170,21 +170,6 @@ namespace DogApi.Controller
             return new { list, closeDic, ladderDic, ladderBuyDic, todayDic };
         }
 
-        [HttpGet]
-        [ActionName("listMoreBuyIsFinished")]
-        public async Task<object> listMoreBuyIsFinished(string userName, string symbolName)
-        {
-            try
-            {
-                return new DogMoreBuyDao().listDogMoreBuyIsFinished(userName, symbolName);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return null;
-            }
-        }
-
         /// <summary>
         /// 查看一个购买后出售的详情。
         /// </summary>

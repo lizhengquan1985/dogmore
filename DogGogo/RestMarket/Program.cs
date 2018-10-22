@@ -58,9 +58,7 @@ namespace RestMarket
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            var addCoins = new List<string> {
-                "eos","xrp","eth","ada"
-            };
+            var addCoins = "xmr,bch,eth,ltc,etc,eos,omg,xrp,dash,zec,ada,steem,iota".Split(',').ToList();
             var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
@@ -75,11 +73,9 @@ namespace RestMarket
         public static List<CommonSymbols> InitEthData()
         {
             // 准备好各种对
-            var btcSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addCoins = new List<string> {
-                "eos", "xrp", "ada"
-            };
-            var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+            var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
+            var addCoins = "xmr,eos,omg,iota,ada,steem,ht,btm,iost,smt,ela,trx".Split(',').ToList();
+            var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
             {
@@ -94,17 +90,12 @@ namespace RestMarket
         {
             // 准备好各种对
             var symbols = CoinUtils.GetAllCommonSymbols("ht");
-            var addCoins = new List<string> {
-                "eos", "xrp" ,"ada"
-            };
-            var addSymbols = symbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
-
-            foreach (var symbol in addSymbols)
+            foreach (var symbol in symbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
 
-            return addSymbols.ToList();
+            return symbols.ToList();
         }
 
         private static void RunCoin(List<CommonSymbols> symbols)

@@ -87,6 +87,13 @@ namespace DogService.Dao
             return Database.Query<HistoryKline>(sql, new { date }).ToList();
         }
 
+        public List<HistoryKline> List20Kline(string quoteCurrency, string baseCurrency)
+        {
+            var date = DateTime.Now.AddMinutes(-60);
+            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} where CreateTime>=@date order by Id desc limit 0,20";
+            return Database.Query<HistoryKline>(sql, new { date }).ToList();
+        }
+
         public void DeleteAndRecordKlines(string symbolName, HistoryKline line)
         {
             long id = line.Id;

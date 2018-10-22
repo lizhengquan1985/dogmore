@@ -179,9 +179,9 @@ namespace DogRunService.Helper
                 var dogMoreBuyDao = new DogMoreBuyDao();
                 var dogEmptySellDao = new DogEmptySellDao();
 
-                // 去数据库中拉取数据， 判断是否超过3分钟，  或者是否离目标差4%，
-                var lastKlines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-                var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-3)).Count;
+                // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
+                var lastKlines = dao.List20Kline(symbol.QuoteCurrency, symbol.BaseCurrency);
+                var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-5)).Count;
                 if (minutesAfterCount > 0)
                 {
                     var smallBuy = dogMoreBuyDao.GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);

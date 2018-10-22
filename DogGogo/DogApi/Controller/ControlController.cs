@@ -6,6 +6,7 @@ using DogRunService.Helper;
 using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -182,6 +183,7 @@ namespace DogApi.Controller
             {
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+                logger.Info(JsonConvert.SerializeObject(accountInfo.Data.list));
 
                 var result = new List<Dictionary<string, object>>();
 
@@ -189,6 +191,11 @@ namespace DogApi.Controller
                 {
                     try
                     {
+                        if(balanceItem.balance < (decimal)0.00001 || balanceItem.type == "frozen")
+                        {
+                            continue;
+                        }
+
                         var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, balanceItem.currency);
                         var totalQuantity = list.Sum(it => it.BuyQuantity);
 

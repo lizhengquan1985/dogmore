@@ -18,20 +18,10 @@ namespace DogService.DateTypes
         /// </summary>
         public string QuoteCurrency { get; set; }
         /// <summary>
-        /// 预计价格，等接近预计价格时候再做处理
-        /// </summary>
-        public decimal PredictPrice { get; set; }
-        public DateTime PredictExpiredTime { get; set; }
-        /// <summary>
         /// 到了这个价可以考虑做空，做空也要阶梯式的做。
         /// </summary>
         public decimal EmptyPrice { get; set; }
         public DateTime EmptyExpiredTime { get; set; }
-        /// <summary>
-        /// 平均投入额度
-        /// </summary>
-        public decimal AvgInputAmount { get; set; }
-        public DateTime AvgInputExpiredTime { get; set; }
         /// <summary>
         /// 最大投入价格
         /// </summary>

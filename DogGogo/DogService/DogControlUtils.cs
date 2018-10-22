@@ -15,24 +15,6 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
 
-        public static decimal? GetPredictPrice(string symbolName, string quoteCurrency)
-        {
-            try
-            {
-                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control == null || control.PredictExpiredTime < DateTime.Now)
-                {
-                    return null;
-                }
-                return control.PredictPrice;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return null;
-            }
-        }
-
         public static decimal? GetEmptyPrice(string symbolName, string quoteCurrency)
         {
             try
@@ -43,24 +25,6 @@ namespace DogService
                     return null;
                 }
                 return control.EmptyPrice;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return null;
-            }
-        }
-
-        public static decimal? GetAvgInputAmount(string symbolName, string quoteCurrency)
-        {
-            try
-            {
-                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control == null || control.AvgInputExpiredTime < DateTime.Now)
-                {
-                    return null;
-                }
-                return control.AvgInputAmount;
             }
             catch (Exception ex)
             {

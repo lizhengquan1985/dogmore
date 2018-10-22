@@ -2,6 +2,7 @@
 using DogPlatform.Model;
 using DogService;
 using DogService.Dao;
+using DogService.DateTypes;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -210,6 +211,7 @@ namespace DogRunService.Helper
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
                 var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 10);
+                new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice { NowPrice = klines[0].Close, NowTime = klines[0].Id, QuoteCurrency = symbol.QuoteCurrency, SymbolName = symbol.BaseCurrency });
 
                 // 记录下， 获取api数据太长的数据
                 var totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;

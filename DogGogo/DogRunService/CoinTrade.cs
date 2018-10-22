@@ -161,7 +161,7 @@ namespace DogRunService
             // 2.不是快速拉升的.
             // 3.低于管控的购入价
             if (flexPointList[0].isHigh
-                || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
+                || JudgeBuyUtils.IsQuickRise(symbol, historyKlines)
                 || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
             {
                 return;
@@ -814,7 +814,7 @@ namespace DogRunService
             // 2.不是快速拉升的.
             // 3.低于管控的购入价
             if (flexPointList[0].isHigh
-                || JudgeBuyUtils.IsQuickRise(symbol.BaseCurrency, historyKlines)
+                || JudgeBuyUtils.IsQuickRise(symbol, historyKlines)
                 || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
             {
                 return $"判断 发现不适合 最高点{flexPointList[0].isHigh}";

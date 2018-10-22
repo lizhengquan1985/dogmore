@@ -80,10 +80,10 @@ namespace DogService.Dao
             return Database.Query<HistoryKline>(sql, new { Begin = begin, End = end }).ToList(); ;
         }
 
-        public List<HistoryKline> List24HourKline(string symbolName)
+        public List<HistoryKline> List24HourKline(string quoteCurrency, string baseCurrency)
         {
             var date = DateTime.Now.AddDays(-1);
-            var sql = $"select * from t_coin_{symbolName} where CreateTime>=@date order by Id desc";
+            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} where CreateTime>=@date order by Id desc";
             return Database.Query<HistoryKline>(sql, new { date }).ToList();
         }
 
@@ -100,13 +100,6 @@ namespace DogService.Dao
 
                 tx.Commit();
             }
-        }
-
-        public List<HistoryKline> List24HourKline(string quoteCurrency, string baseCurrency)
-        {
-            var date = DateTime.Now.AddDays(-1);
-            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} where CreateTime>=@date order by Id desc";
-            return Database.Query<HistoryKline>(sql, new { date }).ToList();
         }
 
         public void DeleteAndRecordKlines(string quoteCurrency, string baseCurrency, HistoryKline line)

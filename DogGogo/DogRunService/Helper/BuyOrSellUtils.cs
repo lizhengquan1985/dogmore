@@ -30,7 +30,7 @@ namespace DogRunService.Helper
                     for (var i = 0; i < symbols.Count; i++)
                     {
                         var symbol = symbols[i];
-                        Console.WriteLine($"---> {i}   {symbol.BaseCurrency}");
+                        Console.WriteLine($"---> {i}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                         try
                         {
                             // 判断kline存不存在, 不存在读取一次.

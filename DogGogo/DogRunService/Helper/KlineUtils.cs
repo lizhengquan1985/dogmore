@@ -68,7 +68,7 @@ namespace DogRunService.Helper
                 var key = HistoryKlinePools.GetKey(symbol, period);
 
                 var dao = new KlineDao();
-                var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+                var lastKlines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
                 if (lastKlines.Count < 900)
                 {
                     logger.Error($"{symbol.BaseCurrency},{symbol.QuoteCurrency}数据量太少{lastKlines.Count}，无法分析啊：");
@@ -108,7 +108,7 @@ namespace DogRunService.Helper
                 Record(symbol.BaseCurrency, klines[0]);
 
                 var dao = new KlineDao();
-                var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+                var lastKlines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
                 var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
                 foreach (var kline in klines)
                 {

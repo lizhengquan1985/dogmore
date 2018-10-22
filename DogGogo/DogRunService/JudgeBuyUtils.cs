@@ -25,7 +25,7 @@ namespace DogRunService
         /// <param name="coin"></param>
         /// <param name="historyKlines">24小时的数据</param>
         /// <returns></returns>
-        public static bool IsQuickRise(string coin, List<HistoryKline> historyKlines)
+        public static bool IsQuickRise(CommonSymbols symbol, List<HistoryKline> historyKlines)
         {
             // 暂时判断 1个小时内是否上涨超过12%， 如果超过，则控制下
             var nowClose = historyKlines[0].Close;
@@ -39,7 +39,7 @@ namespace DogRunService
             if (dayMax > dayMin * (decimal)2.00
                 && nowClose > dayMin * (decimal)1.60)
             {
-                logger.Error($"一天内有大量的上涨，防止追涨，所以不能交易。coin:{coin}, nowClose:{nowClose}, dayMin:{dayMin}, dayMax:{dayMax}");
+                logger.Error($"一天内有大量的上涨，防止追涨，所以不能交易。coin:{symbol.BaseCurrency}{symbol.QuoteCurrency}, nowClose:{nowClose}, dayMin:{dayMin}, dayMax:{dayMax}");
                 isQuickRise = true;
             }
 
@@ -48,7 +48,7 @@ namespace DogRunService
                 && nowClose > dayMin * (decimal)1.40
                 && nowClose > dayMin * (1 + (decimal)0.6 * (dayMax - dayMin) / dayMin))
             {
-                logger.Error($"一天内有大量的上涨，防止追涨，所以不能交易。coin:{coin}, nowClose:{nowClose}, dayMin:{dayMin}, dayMax:{dayMax}");
+                logger.Error($"一天内有大量的上涨，防止追涨，所以不能交易。coin:{symbol.BaseCurrency}{symbol.QuoteCurrency}, nowClose:{nowClose}, dayMin:{dayMin}, dayMax:{dayMax}");
                 isQuickRise = true;
             }
 
@@ -57,7 +57,7 @@ namespace DogRunService
                 && nowClose > hourMin * (decimal)1.20
                 && nowClose > hourMin * (1 + (decimal)0.6 * (hourMax - hourMin) / hourMin))
             {
-                logger.Error($"一个小时内有大量的上涨，防止追涨，所以不能交易。coin:{coin}, nowClose:{nowClose}, hourMin:{hourMin}, hourMax:{hourMax}");
+                logger.Error($"一个小时内有大量的上涨，防止追涨，所以不能交易。coin:{symbol.BaseCurrency}{symbol.QuoteCurrency}, nowClose:{nowClose}, hourMin:{hourMin}, hourMax:{hourMax}");
                 isQuickRise = true;
             }
 

@@ -324,7 +324,7 @@ namespace DogApi.Controller
             var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
             var dao = new KlineDao();
-            var lastKlines = dao.List24HourKline(symbol.BaseCurrency);
+            var lastKlines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             if (Utils.GetDateById(lastKlines[0].Id) < DateTime.Now.AddMinutes(-3))
             {
                 // 数据是3分钟前的数据, 不合理.

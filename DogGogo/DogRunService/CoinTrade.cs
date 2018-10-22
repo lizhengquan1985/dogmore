@@ -45,10 +45,9 @@ namespace DogRunService
         {
             var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             if (historyKlines == null
-                || historyKlines.Count < 60
+                || historyKlines.Count < 100
                 || Utils.GetDateById(historyKlines[0].Id) < DateTime.Now.AddMinutes(-1))
             {
-                logger.Error($"GetAnalyzeResult 数据还未准备好：{symbol.BaseCurrency}");
                 return null;
             }
 
@@ -111,13 +110,14 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
 
-        public static void Run(CommonSymbols symbol)
+        public static void Run(int index, CommonSymbols symbol)
         {
             try
             {
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
                 if (analyzeResult != null)
                 {
+                    Console.WriteLine($"--->domore {index + 1}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                     // 计算是否适合购买
                     RunBuy(symbol, analyzeResult);
                 }
@@ -132,6 +132,7 @@ namespace DogRunService
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
                 if (analyzeResult != null)
                 {
+                    Console.WriteLine($"--->doempty {index + 1}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                     // 计算是否适合出售
                     RunSell(symbol, analyzeResult);
                 }

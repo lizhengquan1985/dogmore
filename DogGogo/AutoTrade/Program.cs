@@ -24,6 +24,9 @@ namespace AutoTrade
             XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
             BeginTrade();
+
+            Console.WriteLine("------begin-------");
+            Console.ReadLine();
         }
 
         private static void BeginTrade()
@@ -55,17 +58,13 @@ namespace AutoTrade
         {
             // 准备好各种对
             var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-            var removeCoins = new List<string> {
-                "ven","btc"
-            };
-            var addSymbols = symbols.Where(it => !removeCoins.Contains(it.BaseCurrency)).ToList();
 
-            foreach (var symbol in addSymbols)
+            foreach (var symbol in symbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
 
-            return addSymbols.ToList();
+            return symbols.ToList();
         }
 
         public static List<CommonSymbols> InitBtcData()
@@ -122,25 +121,9 @@ namespace AutoTrade
                     for (var i = 0; i < symbols.Count; i++)
                     {
                         var symbol = symbols[i];
-                        Console.WriteLine($"---> {i}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                         try
                         {
-                            // 判断kline存不存在, 不存在读取一次.
-                            var key = HistoryKlinePools.GetKey(symbol, "1min");
-                            var historyKlineData = HistoryKlinePools.Get(key);
-                            if(historyKlineData == null)
-                            {
-                                KlineUtils.InitKlineInToPool(symbol);
-                                historyKlineData = HistoryKlinePools.Get(key);
-                            }
-
-                            if (historyKlineData == null || historyKlineData.Data == null || historyKlineData.Data.Count < 100 || historyKlineData.Date < DateTime.Now.AddSeconds(-20))
-                            {
-                                continue;
-                            }
-
-                            CoinTrade.Run(symbol);
-
+                            CoinTrade.Run(i, symbol);
                         }
                         catch (Exception ex)
                         {

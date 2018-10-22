@@ -64,45 +64,26 @@ namespace DogPlatform
             }
         }
 
-        //public static CommonSymbols Get(string name)
-        //{
-        //    if (!coins.ContainsKey(name))
-        //    {
-        //        Init();
-        //    }
-
-        //    return coins[name];
-        //}
-
-        //public static List<string> GetAllCoins()
-        //{
-        //    // 总共其实有36个, 后期还会增加
-        //    if (coins.Count < 10)
-        //    {
-        //        Init();
-        //    }
-        //    return coins.Keys.ToList();
-        //}
-
         public static List<CommonSymbols> GetAllCommonSymbols(string quoteCurrency)
         {
             if (quoteCurrency == "usdt")
             {
                 var res = usdtCoins.Values.ToList();
-                return res.Where(it => it.BaseCurrency != "ven" && it.BaseCurrency != "btc").ToList();
+                return res.Where(it => it.BaseCurrency != "ven" && it.BaseCurrency != "btc" && it.BaseCurrency != "hsr").ToList();
             }
             else if (quoteCurrency == "btc")
             {
-                return btcCoins.Values.ToList();
+                var res = btcCoins.Values.ToList();
+                return res;
             }
             else if (quoteCurrency == "eth")
             {
-                return ethCoins.Values.ToList();
+                var res = ethCoins.Values.ToList();
+                return res;
             }
             else if (quoteCurrency == "ht")
             {
-                var res = htCoins.Values.ToList();
-                return res.Where(it => it.BaseCurrency != "kcash" && it.BaseCurrency != "mt").ToList();
+                return htCoins.Values.ToList();
             }
             throw new ApplicationException("error");
         }

@@ -172,7 +172,7 @@ namespace DogRunService.Helper
         /// 获取行情数据， 防止频繁rest， 因为api调用次数太多。
         /// </summary>
         /// <param name="symbol"></param>
-        public static void InitMarketInDB(CommonSymbols symbol, bool forceUpdate = false)
+        public static void InitMarketInDB(int index, CommonSymbols symbol, bool forceUpdate = false)
         {
             try
             {
@@ -186,17 +186,18 @@ namespace DogRunService.Helper
                 if (minutesAfterCount > 0)
                 {
                     var smallBuy = dogMoreBuyDao.GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);
-                    var nearSellOrBuy = true;
-                    if (smallBuy != null && (lastKlines[0].Close % smallBuy.BuyTradePrice > (decimal)1.04 || smallBuy.BuyTradePrice % lastKlines[0].Close > (decimal)1.042))
+                    var nearSellOrBuy = false;
+                    if (smallBuy != null && (lastKlines[0].Close / smallBuy.BuyTradePrice > (decimal)1.04 || smallBuy.BuyTradePrice / lastKlines[0].Close > (decimal)1.042))
                     {
-                        nearSellOrBuy = false;
+                        Console.WriteLine($"--->aa {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} {lastKlines[0].Close},{smallBuy.BuyTradePrice}");
+                        nearSellOrBuy = true;
                     }
-                    if (nearSellOrBuy)
+                    if (!nearSellOrBuy)
                     {
                         var bigSell = dogEmptySellDao.GetBiggestDogEmptySell(symbol.QuoteCurrency, symbol.BaseCurrency);
-                        if (bigSell != null && (lastKlines[0].Close % bigSell.SellTradePrice > (decimal)1.050 || lastKlines[0].Close % bigSell.SellTradePrice > (decimal)1.035))
+                        if (bigSell != null && (lastKlines[0].Close/ bigSell.SellTradePrice > (decimal)1.060 || bigSell.SellTradePrice / lastKlines[0].Close > (decimal)1.035))
                         {
-                            nearSellOrBuy = false;
+                            nearSellOrBuy = true;
                         }
                     }
                     // 在3分钟内有数据， 并且没有需要做多或做空的。
@@ -205,6 +206,7 @@ namespace DogRunService.Helper
                         return;
                     }
                 }
+                Console.WriteLine($"---> {index + 1}   {symbol.BaseCurrency}{symbol.QuoteCurrency}");
 
                 var begin = DateTime.Now;
 

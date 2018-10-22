@@ -104,10 +104,9 @@ namespace RestMarket
                     {
                         var symbol = symbols[i];
 
-                        Console.WriteLine($"---> {i + 1}   {symbol.BaseCurrency}{symbol.QuoteCurrency}");
                         try
                         {
-                            KlineUtils.InitMarketInDB(symbol);
+                            KlineUtils.InitMarketInDB(i, symbol);
                         }
                         catch (Exception ex)
                         {

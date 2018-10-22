@@ -33,6 +33,9 @@ namespace DogApi
 
             //BeginTrade();
 
+            // 状态检查
+            TradeStateUtils.Begin();
+
             while (true)
             {
                 Console.ReadLine();

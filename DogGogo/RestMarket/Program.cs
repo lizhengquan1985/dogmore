@@ -42,17 +42,11 @@ namespace RestMarket
         {
             // 准备好各种对
             var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-            var removeCoins = new List<string> {
-                "ven"
-            };
-            var addSymbols = symbols.Where(it => !removeCoins.Contains(it.BaseCurrency)).ToList();
-
-            foreach (var symbol in addSymbols)
+            foreach (var symbol in symbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
-            return addSymbols.ToList();
+            return symbols.ToList();
         }
 
         public static List<CommonSymbols> InitBtcData()
@@ -95,7 +89,6 @@ namespace RestMarket
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
             return symbols.ToList();
         }
 

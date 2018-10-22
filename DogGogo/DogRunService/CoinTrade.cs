@@ -236,7 +236,7 @@ namespace DogRunService
             var minBuyTradePrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
             if (minBuyTradePrice <= 0)
             {
-                if (symbol.BaseCurrency == "新的币")
+                if (symbol.BaseCurrency == "新的啊")
                 {
                     minBuyTradePrice = 25000;
                 }

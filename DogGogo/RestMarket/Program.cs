@@ -22,6 +22,7 @@ namespace RestMarket
         {
             // 注册日志
             XmlConfigurator.Configure(new FileInfo("log4net.config"));
+            logger.Info("-----------------------Main---------------------------");
 
             CoinUtils.Init();
 
@@ -119,6 +120,9 @@ namespace RestMarket
                         {
                             logger.Error("RunCoin:  " + ex.Message, ex);
                         }
+
+                        // 暂停100毫秒
+                        Thread.Sleep(50);
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;

@@ -27,9 +27,9 @@ namespace DogService.Dao
             }
         }
 
-        public async Task<List<DogControl>> ListDogControl()
+        public async Task<List<DogControl>> ListDogControl(string quoteCurrency)
         {
-            return (await Database.QueryAsync<DogControl>(new { IsValid = true })).ToList();
+            return (await Database.QueryAsync<DogControl>(new { IsValid = true, QuoteCurrency = quoteCurrency })).ToList();
         }
 
         public async Task SetUnvalid(string symbolName, string quoteCurrency)

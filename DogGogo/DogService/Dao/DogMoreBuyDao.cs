@@ -164,11 +164,11 @@ namespace DogService.Dao
             return minPrice;
         }
 
-        public decimal GetAllMaxPriceOfNotSellFinished(string quoteCurrency, string symbolName)
+        public decimal GetMaxPriceOfNotSellFinished(string quoteCurrency, string symbolName)
         {
-            var sql = $"select * from t_dog_more_buy where SymbolName=@SymbolName and QuoteCurrency = '{quoteCurrency}' and BuyState!='({StateConst.Canceled.ToString()})' " +
+            var sql = $"select * from t_dog_more_buy where SymbolName=@SymbolName and QuoteCurrency=@quoteCurrency and BuyState!='({StateConst.Canceled.ToString()})' " +
                 $" and IsFinished=0 ";
-            var list = Database.Query<DogMoreBuy>(sql, new { SymbolName = symbolName }).ToList();
+            var list = Database.Query<DogMoreBuy>(sql, new { SymbolName = symbolName, quoteCurrency }).ToList();
             var maxPrice = (decimal)0;
             foreach (var item in list)
             {

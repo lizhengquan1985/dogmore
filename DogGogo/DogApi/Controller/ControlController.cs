@@ -51,31 +51,12 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("list")]
-        public async Task<object> List()
+        public async Task<object> List(string quoteCurrency)
         {
             try
             {
-                var res = await new DogControlDao().ListDogControl();
-                res = res.OrderBy(it => it.SymbolName).ToList();
-
-                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-                symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
-                Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
-                foreach (var symbol in symbols)
-                {
-                    try
-                    {
-                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
-                        var historyKlineData = HistoryKlinePools.Get(key);
-                        var close = historyKlineData.Data[0].Close;
-                        closeDic.Add(symbol.BaseCurrency, close);
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                }
-                return new { list = res, closeDic };
+                var res = await new DogControlDao().ListDogControl(quoteCurrency);
+                return res.OrderBy(it => it.SymbolName).ToList();
             }
             catch (Exception ex)
             {
@@ -109,65 +90,19 @@ namespace DogApi.Controller
                 PlatformApi api = PlatformApi.GetInstance("xx");
                 var period = "4hour";
                 var klines = api.GetHistoryKline(symbolName + quoteCurrency, period, 1000);
-                var min = decimal.MaxValue;
-                var min1 = decimal.MaxValue;
-                var min2 = decimal.MaxValue;
-                var min3 = decimal.MaxValue;
-                var max = decimal.MinValue;
-                var max1 = decimal.MinValue;
-                var max2 = decimal.MinValue;
-                var max3 = decimal.MinValue;
-                foreach (var item in klines)
-                {
-                    if (item.Low < min3)
-                    {
-                        min = min1;
-                        min1 = min2;
-                        min2 = min3;
-                        min3 = item.Low;
-                    }
-                    else if (item.Low < min2)
-                    {
-                        min = min1;
-                        min1 = min2;
-                        min2 = item.Low;
-                    }
-                    else if (item.Low < min1)
-                    {
-                        min = min1;
-                        min1 = item.Low;
-                    }
-                    else if (item.Low < min)
-                    {
-                        min = item.Low;
-                    }
+                var min = decimal.MinValue;
+                var max = decimal.MaxValue;
 
-                    if (item.High >= max3)
-                    {
-                        max = max1;
-                        max1 = max2;
-                        max2 = max3;
-                        max3 = item.High;
-                    }
-                    else if (item.High >= max2)
-                    {
-                        max = max1;
-                        max1 = max2;
-                        max2 = item.High;
-                    }
-                    else if (item.High >= max1)
-                    {
-                        max = max1;
-                        max1 = item.High;
-                    }
-                    else if (item.High >= max)
-                    {
-                        max = item.High;
-                    }
-                }
+                min = klines.Where(it => it.Low > min).Min(it => it.Low);
+                min = klines.Where(it => it.Low > min).Min(it => it.Low);
+                min = klines.Where(it => it.Low > min).Min(it => it.Low);
+
+                max = klines.Where(it => it.High < max).Max(it => it.High);
+                max = klines.Where(it => it.High < max).Max(it => it.High);
+                max = klines.Where(it => it.High < max).Max(it => it.High);
 
                 // 判断max
-                var maxNotSell = new DogMoreBuyDao().GetAllMaxPriceOfNotSellFinished(quoteCurrency, symbolName);
+                var maxNotSell = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(quoteCurrency, symbolName);
                 if (maxNotSell > max)
                 {
                     max = maxNotSell;
@@ -199,26 +134,26 @@ namespace DogApi.Controller
             }
         }
 
-        [HttpGet]
-        [ActionName("getFlexCount")]
-        public async Task<Object> GetFlexCount(string symbolName, string quoteCurrency)
-        {
-            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-            CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == symbolName);
-            KlineUtils.InitOneKine(symbol);
-            var key = HistoryKlinePools.GetKey(symbol, "1min");
-            var historyKlineData = HistoryKlinePools.Get(key);
+        //[HttpGet]
+        //[ActionName("getFlexCount")]
+        //public async Task<Object> GetFlexCount(string symbolName, string quoteCurrency)
+        //{
+        //    var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
+        //    CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == symbolName);
+        //    KlineUtils.InitOneKine(symbol);
+        //    var key = HistoryKlinePools.GetKey(symbol, "1min");
+        //    var historyKlineData = HistoryKlinePools.Get(key);
 
-            var historyKlines = historyKlineData.Data;
-            var outFlexPercent = (decimal)0;
-            var flexCount = GetFlexpointCount(historyKlines, out outFlexPercent);
-            var inDB = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-            inDB.LadderSellPercent = outFlexPercent;
-            inDB.LadderSellExpiredTime = DateTime.Now.AddYears(1);
-            await new DogControlDao().CreateDogControl(inDB);
+        //    var historyKlines = historyKlineData.Data;
+        //    var outFlexPercent = (decimal)0;
+        //    var flexCount = GetFlexpointCount(historyKlines, out outFlexPercent);
+        //    var inDB = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
+        //    inDB.LadderSellPercent = outFlexPercent;
+        //    inDB.LadderSellExpiredTime = DateTime.Now.AddYears(1);
+        //    await new DogControlDao().CreateDogControl(inDB);
 
-            return flexCount;
-        }
+        //    return flexCount;
+        //}
 
         private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines, out decimal outFlexPercent)
         {
@@ -245,39 +180,25 @@ namespace DogApi.Controller
         {
             try
             {
-
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
 
                 var result = new List<Dictionary<string, object>>();
 
-                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-                foreach (var symbol in symbols)
+                foreach (var balanceItem in accountInfo.Data.list)
                 {
-                    var symbolName = symbol.BaseCurrency;
-                    if (symbolName == "btc" || symbolName == "ven")
-                    {
-                        continue;
-                    }
-
                     try
                     {
-                        var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbolName);
-
-                        var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
+                        var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, balanceItem.currency);
                         var totalQuantity = list.Sum(it => it.BuyQuantity);
 
-                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
-                        var historyKlineData = HistoryKlinePools.Get(key);
-                        var close = historyKlineData.Data[0].Close;
-
                         Dictionary<string, object> item = new Dictionary<string, object>();
-                        item.Add("coin", symbol.BaseCurrency);
+                        item.Add("currency", balanceItem.currency);
                         item.Add("buyQuantity", totalQuantity);
                         item.Add("balance", balanceItem.balance);
-                        item.Add("nowPrice", close);
+                        //item.Add("nowPrice", close);
                         item.Add("canEmptyQuantity", balanceItem.balance - totalQuantity);
-                        item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * close);
+                        //item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * close);
 
                         result.Add(item);
                     }

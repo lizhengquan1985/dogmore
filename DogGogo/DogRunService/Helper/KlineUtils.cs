@@ -172,7 +172,7 @@ namespace DogRunService.Helper
         /// 获取行情数据， 防止频繁rest， 因为api调用次数太多。
         /// </summary>
         /// <param name="symbol"></param>
-        public static void InitMarketInDB(CommonSymbols symbol)
+        public static void InitMarketInDB(CommonSymbols symbol, bool forceUpdate = false)
         {
             try
             {
@@ -200,7 +200,7 @@ namespace DogRunService.Helper
                         }
                     }
                     // 在3分钟内有数据， 并且没有需要做多或做空的。
-                    if (!nearSellOrBuy)
+                    if (!nearSellOrBuy && !forceUpdate)
                     {
                         return;
                     }

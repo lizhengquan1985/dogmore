@@ -60,114 +60,122 @@ namespace DogApi.Controller
         /// <returns></returns>
         [HttpGet]
         [ActionName("listMoreBuyIsNotFinished")]
-        public async Task<object> listMoreBuyIsNotFinished(string userName, string symbolName, string sort = "lastbuy")
+        public async Task<object> listMoreBuyIsNotFinished(string userName, string symbolName, string quoteCurrency, string sort = "lastbuy")
         {
-            var list = new List<DogMoreBuy>();
-            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-            symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
-            Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
-            Dictionary<string, decimal> todayDic = new Dictionary<string, decimal>();
-            if (string.IsNullOrEmpty(symbolName))
+            try
             {
-                list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName);
-                list = list.Where(it => it.SymbolName != "btc" && it.SymbolName != "ven" && it.SymbolName != "hsr").ToList();
-                foreach (var symbol in symbols)
+
+                var list = new List<DogMoreBuy>();
+                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
+                symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice();
+                Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+                foreach (var item in nowPriceList)
+                {
+                    if(item.QuoteCurrency != quoteCurrency)
+                    {
+                        continue;
+                    }
+                    closeDic.Add(item.SymbolName, item.NowPrice);
+                }
+                Dictionary<string, decimal> todayDic = new Dictionary<string, decimal>();
+                if (string.IsNullOrEmpty(symbolName))
+                {
+                    list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName);
+                    list = list.Where(it => it.SymbolName != "btc" && it.SymbolName != "ven" && it.SymbolName != "hsr").ToList();
+                    foreach (var symbol in symbols)
+                    {
+                        try
+                        {
+                            var item = list.Find(it => it.SymbolName == symbol.BaseCurrency);
+                            var close = closeDic[symbol.BaseCurrency];
+
+                            var todayList = new KlineDao().ListTodayKline(symbol.BaseCurrency, symbol.QuoteCurrency, DateTime.Now.Date, DateTime.Now);
+                            todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
+                            todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
+                            todayDic.Add(symbol.BaseCurrency + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error(ex.Message);
+                        }
+                    }
+                    if (sort != "lastbuy")
+                    {
+                        list.Sort((a, b) =>
+                        {
+                            if (!closeDic.ContainsKey(a.SymbolName) || !closeDic.ContainsKey(b.SymbolName))
+                            {
+                                return 1;
+                            }
+                            var ap = closeDic[a.SymbolName] / a.BuyTradePrice;
+                            var bp = closeDic[b.SymbolName] / b.BuyTradePrice;
+                            if (sort == "more")
+                            {
+                                return ap > bp ? 1 : -1;
+                            }
+                            else
+                            {
+                                return ap > bp ? -1 : 1;
+                            }
+                        });
+                    }
+                    else
+                    {
+                        list.Sort((a, b) =>
+                        {
+                            return b.BuyDate > a.BuyDate ? 1 : -1;
+                        });
+                    }
+                }
+                else
                 {
                     try
                     {
-                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
-                        var historyKlineData = HistoryKlinePools.Get(key);
-                        if (historyKlineData == null)
-                        {
-                            continue;
-                        }
-                        var close = historyKlineData.Data[0].Close;
-                        closeDic.Add(symbol.BaseCurrency, close);
+                        list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
 
-                        var item = list.Find(it => it.SymbolName == symbol.BaseCurrency);
+                        var close = closeDic[symbolName];
+                        var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
+                        var item = list.Find(it => it.SymbolName == symbolName);
 
-                        var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
-                        todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
-                        todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
-                        todayDic.Add(symbol.BaseCurrency + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
+                        var todayList = new KlineDao().ListTodayKline(symbol.BaseCurrency, symbol.QuoteCurrency, DateTime.Now.Date, DateTime.Now);
+                        todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
+                        todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
+                        todayDic.Add(symbolName + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
                     }
                     catch (Exception ex)
                     {
                         logger.Error(ex.Message);
                     }
                 }
-                if (sort != "lastbuy")
+
+                Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();
+                foreach (var item in list)
                 {
-                    list.Sort((a, b) =>
+                    if (ladderDic.ContainsKey(item.SymbolName) || !closeDic.ContainsKey(item.SymbolName))
                     {
-                        if (!closeDic.ContainsKey(a.SymbolName) || !closeDic.ContainsKey(b.SymbolName))
-                        {
-                            return 1;
-                        }
-                        var ap = closeDic[a.SymbolName] / a.BuyTradePrice;
-                        var bp = closeDic[b.SymbolName] / b.BuyTradePrice;
-                        if (sort == "more")
-                        {
-                            return ap > bp ? 1 : -1;
-                        }
-                        else
-                        {
-                            return ap > bp ? -1 : 1;
-                        }
-                    });
+                        continue;
+                    }
+                    ladderDic.Add(item.SymbolName, DogControlUtils.GetLadderSell(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
                 }
-                else
+
+                Dictionary<string, decimal> ladderBuyDic = new Dictionary<string, decimal>();
+                foreach (var item in list)
                 {
-                    list.Sort((a, b) =>
+                    if (ladderBuyDic.ContainsKey(item.SymbolName) || !closeDic.ContainsKey(item.SymbolName))
                     {
-                        return b.BuyDate > a.BuyDate ? 1 : -1;
-                    });
+                        continue;
+                    }
+                    ladderBuyDic.Add(item.SymbolName, DogControlUtils.GetLadderBuy(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
                 }
+
+                return new { list, closeDic, ladderDic, ladderBuyDic, todayDic };
             }
-            else
+            catch (Exception ex)
             {
-                try
-                {
-                    list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
-                    var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
-                    var historyKlineData = HistoryKlinePools.Get(key);
-                    var close = historyKlineData.Data[0].Close;
-                    closeDic.Add(symbolName, close);
-
-                    var item = list.Find(it => it.SymbolName == symbolName);
-
-                    var todayList = historyKlineData.Data.Where(it => Utils.GetDateById(it.Id) >= DateTime.Now.Date).Select(it => it).ToList();
-                    todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
-                    todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
-                    todayDic.Add(symbolName + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error(ex.Message);
-                }
+                logger.Error(ex.Message, ex);
+                throw ex;
             }
-
-            Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();
-            foreach (var item in list)
-            {
-                if (ladderDic.ContainsKey(item.SymbolName) || !closeDic.ContainsKey(item.SymbolName))
-                {
-                    continue;
-                }
-                ladderDic.Add(item.SymbolName, DogControlUtils.GetLadderSell(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
-            }
-
-            Dictionary<string, decimal> ladderBuyDic = new Dictionary<string, decimal>();
-            foreach (var item in list)
-            {
-                if (ladderBuyDic.ContainsKey(item.SymbolName) || !closeDic.ContainsKey(item.SymbolName))
-                {
-                    continue;
-                }
-                ladderBuyDic.Add(item.SymbolName, DogControlUtils.GetLadderBuy(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
-            }
-
-            return new { list, closeDic, ladderDic, ladderBuyDic, todayDic };
         }
 
         /// <summary>
@@ -358,11 +366,11 @@ namespace DogApi.Controller
 
         [HttpPost]
         [ActionName("doMore")]
-        public async Task<string> DoMore(string userName, string symbolName)
+        public async Task<string> DoMore(string userName, string symbolName, string quoteCurrency)
         {
             try
             {
-                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
+                var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
                 var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
 
                 var ladder = (decimal)1.05;

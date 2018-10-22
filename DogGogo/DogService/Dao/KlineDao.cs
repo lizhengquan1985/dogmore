@@ -74,9 +74,9 @@ namespace DogService.Dao
             }
         }
 
-        public List<HistoryKline> ListKline(string name, DateTime begin, DateTime end)
+        public List<HistoryKline> ListTodayKline(string symbolName, string quoteCurrency, DateTime begin, DateTime end)
         {
-            var sql = $"select * from t_coin_{name} where CreateTime>=@Begin and CreateTime<=@End";
+            var sql = $"select * from t_{quoteCurrency}_{symbolName} where CreateTime>=@Begin and CreateTime<=@End";
             return Database.Query<HistoryKline>(sql, new { Begin = begin, End = end }).ToList(); ;
         }
 

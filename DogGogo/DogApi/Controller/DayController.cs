@@ -111,7 +111,7 @@ namespace DogApi.Controller
 
                 var buyList = await new DogMoreStatisticsDao().ListBuy(userName, name, begin, end);
                 var sellList = await new DogMoreStatisticsDao().ListSell(userName, name, begin, end);
-                var klineList = new KlineDao().ListKline(name, begin, end);
+                var klineList = new KlineDao().ListTodayKline(name, "", begin, end);
                 return new
                 {
                     buyList = buyList.Select(it => new { it.BuyDate, it.BuyTradePrice }),

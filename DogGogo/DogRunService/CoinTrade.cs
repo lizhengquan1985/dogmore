@@ -43,20 +43,12 @@ namespace DogRunService
         /// <returns></returns>
         public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol, bool isBuy)
         {
-            var key = HistoryKlinePools.GetKey(symbol, "1min");
-            var historyKlineData = HistoryKlinePools.Get(key);
-            if (historyKlineData == null
-                || historyKlineData.Data == null
-                || historyKlineData.Data.Count == 0
-                || historyKlineData.Date < DateTime.Now.AddMinutes(-1))
+            var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+            if (historyKlines == null
+                || historyKlines.Count < 60
+                || Utils.GetDateById(historyKlines[0].Id) < DateTime.Now.AddMinutes(-1))
             {
                 logger.Error($"GetAnalyzeResult 数据还未准备好：{symbol.BaseCurrency}");
-                return null;
-            }
-            var historyKlines = historyKlineData.Data;
-            if (historyKlines == null
-                || historyKlines.Count < 60)
-            {
                 return null;
             }
 
@@ -805,7 +797,13 @@ namespace DogRunService
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
             if (analyzeResult == null)
             {
-                throw new ApplicationException("做多失败，分析出错");
+                // 初始化数据, 再次拿去
+                KlineUtils.InitMarketInDB(symbol, true);
+                analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+                if(analyzeResult == null)
+                {
+                    throw new ApplicationException("做多失败，分析出错");
+                }
             }
 
             var flexPointList = analyzeResult.FlexPointList;
@@ -816,11 +814,13 @@ namespace DogRunService
             // 1.最近一次是最高点
             // 2.不是快速拉升的.
             // 3.低于管控的购入价
+            var IsQuickRise = JudgeBuyUtils.IsQuickRise(symbol, historyKlines);
+            var controlCanBuy = JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
             if (flexPointList[0].isHigh
-                || JudgeBuyUtils.IsQuickRise(symbol, historyKlines)
-                || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
+                || IsQuickRise
+                || !controlCanBuy)
             {
-                return $"判断 发现不适合 最高点{flexPointList[0].isHigh}";
+                return $"判断 发现不适合 最高点isHigh:{flexPointList[0].isHigh},IsQuickRise:{IsQuickRise}, controlCanBuy:{controlCanBuy}";
             }
 
             BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent, true);

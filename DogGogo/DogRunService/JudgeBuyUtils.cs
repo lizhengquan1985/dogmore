@@ -69,6 +69,7 @@ namespace DogRunService
             var maxInputPrice = DogControlUtils.GetMaxInputPrice(symbolName, quoteCurrency);
             if (maxInputPrice == null)
             {
+                Console.WriteLine($"由于管控,不能购入 MaxInputPrice:{maxInputPrice}, nowPrice:{nowPrice}");
                 // 没有控制的,默认可以不可以购买
                 return false;
             }

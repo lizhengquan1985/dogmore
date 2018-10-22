@@ -190,10 +190,26 @@ namespace DogService.Dao
             return Database.Query<DogMoreBuy>(sql).FirstOrDefault();
         }
 
-        public List<DogMoreBuy> listMoreBuyIsNotFinished(string userName, string symbolName)
+        public decimal GetBuyQuantityOfDogMoreBuyIsNotFinished(string userName, string symbolName)
         {
 
-            var where = $" where IsFinished=0 ";
+            var where = $" where IsFinished=0";
+            if (!string.IsNullOrEmpty(userName))
+            {
+                where += $" and UserName = @userName ";
+            }
+            if (!string.IsNullOrEmpty(symbolName))
+            {
+                where += $" and SymbolName = @symbolName ";
+            }
+            var sql = $"select sum(BuyQuantity) from t_dog_more_buy {where} order by BuyTradePrice asc";
+            return (decimal)Database.Query<decimal?>(sql, new { symbolName, userName}).FirstOrDefault();
+        }
+
+        public List<DogMoreBuy> listMoreBuyIsNotFinished(string userName, string symbolName, string quoteCurrency)
+        {
+
+            var where = $" where IsFinished=0 and QuoteCurrency=@quoteCurrency ";
             if (!string.IsNullOrEmpty(userName))
             {
                 where += $" and UserName = @userName ";
@@ -203,13 +219,15 @@ namespace DogService.Dao
                 where += $" and SymbolName = @symbolName ";
             }
             var sql = $"select * from t_dog_more_buy {where} order by BuyTradePrice asc";
-            return Database.Query<DogMoreBuy>(sql, new { symbolName, userName }).ToList();
+            return Database.Query<DogMoreBuy>(sql, new { symbolName, userName, quoteCurrency }).ToList();
         }
 
-        public List<DogMoreBuy> listEveryMinPriceMoreBuyIsNotFinished(string userName)
+        public List<DogMoreBuy> listEveryMinPriceMoreBuyIsNotFinished(string userName, string quoteCurrency)
         {
-            var sql = $"select * from t_dog_more_buy where BuyOrderId in( select BuyOrderId from ( select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where {(string.IsNullOrEmpty(userName) ? "" : $" UserName = @userName and ")} IsFinished=0 group by SymbolName) t)  ";
-            return Database.Query<DogMoreBuy>(sql, new { userName }).ToList();
+            var sql = $"select * from t_dog_more_buy where BuyOrderId in(" +
+                $" select BuyOrderId from ( " +
+                $"  select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where quoteCurrency=@quoteCurrency and {(string.IsNullOrEmpty(userName) ? "" : $" UserName = @userName and ")} IsFinished=0 group by SymbolName) t)  ";
+            return Database.Query<DogMoreBuy>(sql, new { userName, quoteCurrency }).ToList();
         }
 
         public List<DogMoreBuy> listDogMoreBuyIsFinished(string userName, string symbolName)

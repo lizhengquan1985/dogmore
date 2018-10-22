@@ -196,8 +196,7 @@ namespace DogApi.Controller
                             continue;
                         }
 
-                        var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, balanceItem.currency);
-                        var totalQuantity = list.Sum(it => it.BuyQuantity);
+                        var totalQuantity = new DogMoreBuyDao().GetBuyQuantityOfDogMoreBuyIsNotFinished(userName, balanceItem.currency);
 
                         Dictionary<string, object> item = new Dictionary<string, object>();
                         item.Add("currency", balanceItem.currency);

@@ -23,10 +23,10 @@ namespace DogService.Dao
             }
         }
 
-        public List<DogNowPrice> ListDogNowPrice()
+        public List<DogNowPrice> ListDogNowPrice(string quoteCurrency)
         {
-            var sql = $"select * from t_dog_now_price";
-            return (Database.Query<DogNowPrice>(sql)).ToList();
+            var sql = $"select * from t_dog_now_price where QuoteCurrency=@quoteCurrency";
+            return (Database.Query<DogNowPrice>(sql, new { quoteCurrency })).ToList();
         }
     }
 }

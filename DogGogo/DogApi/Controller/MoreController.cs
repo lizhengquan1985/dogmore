@@ -64,15 +64,13 @@ namespace DogApi.Controller
         {
             try
             {
-
                 var list = new List<DogMoreBuy>();
-                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-                symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
-                var nowPriceList = new DogNowPriceDao().ListDogNowPrice();
+                var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
                 Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
                 foreach (var item in nowPriceList)
                 {
-                    if(item.QuoteCurrency != quoteCurrency)
+                    if (item.QuoteCurrency != quoteCurrency)
                     {
                         continue;
                     }
@@ -81,7 +79,7 @@ namespace DogApi.Controller
                 Dictionary<string, decimal> todayDic = new Dictionary<string, decimal>();
                 if (string.IsNullOrEmpty(symbolName))
                 {
-                    list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName);
+                    list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName, quoteCurrency);
                     list = list.Where(it => it.SymbolName != "btc" && it.SymbolName != "ven" && it.SymbolName != "hsr").ToList();
                     foreach (var symbol in symbols)
                     {
@@ -132,7 +130,7 @@ namespace DogApi.Controller
                 {
                     try
                     {
-                        list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
+                        list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName, quoteCurrency);
 
                         var close = closeDic[symbolName];
                         var symbol = symbols.Find(it => it.BaseCurrency == symbolName);

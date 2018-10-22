@@ -296,14 +296,14 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("emptyInfo")]
-        public async Task<object> EmptyInfo(string userName, string symbolName)
+        public async Task<object> EmptyInfo(string userName, string symbolName, string quoteCurrency)
         {
             PlatformApi api = PlatformApi.GetInstance(userName);
 
             var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
             var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbolName);
 
-            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName);
+            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName, quoteCurrency);
             var totalQuantity = (decimal)0;
             list.ForEach(it => totalQuantity += it.BuyQuantity);
 

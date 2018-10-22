@@ -88,12 +88,8 @@ namespace DogPlatform
         {
             if (quoteCurrency == "usdt")
             {
-                // 总共其实有36个, 后期还会增加
-                if (usdtCoins.Count < 30)
-                {
-                    Init();
-                }
-                return usdtCoins.Values.ToList();
+                var res = usdtCoins.Values.ToList();
+                return res.Where(it => it.BaseCurrency != "ven" && it.BaseCurrency != "btc").ToList();
             }
             else if (quoteCurrency == "btc")
             {
@@ -105,7 +101,8 @@ namespace DogPlatform
             }
             else if (quoteCurrency == "ht")
             {
-                return htCoins.Values.ToList();
+                var res = htCoins.Values.ToList();
+                return res.Where(it => it.BaseCurrency != "kcash" && it.BaseCurrency != "mt").ToList();
             }
             throw new ApplicationException("error");
         }

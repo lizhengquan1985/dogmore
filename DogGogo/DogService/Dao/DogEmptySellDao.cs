@@ -42,7 +42,7 @@ namespace DogService.Dao
                 sum += (decimal)res;
             }
 
-            sql = $"select sum(BuyQuantity*BuyTradePrice) Total from t_dog_more_buy where IsFinished=0 and UserName=@userName and SymbolName = '{quoteCurrency}'";
+            sql = $"select sum(BuyQuantity) Total from t_dog_more_buy where IsFinished=0 and UserName=@userName and SymbolName = '{quoteCurrency}'";
             res = Database.Query<decimal?>(sql, new { userName }).FirstOrDefault();
             if (res != null)
             {

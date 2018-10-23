@@ -48,6 +48,10 @@ namespace DogRunService
                 || historyKlines.Count < 100
                 || Utils.GetDateById(historyKlines[0].Id) < DateTime.Now.AddMinutes(-1))
             {
+                if(Utils.GetDateById(historyKlines[0].Id) > DateTime.Now.AddMinutes(-2))
+                {
+                    logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  Utils.GetDateById(historyKlines[0].Id) < DateTime.Now.AddMinutes(-1)");
+                }
                 return null;
             }
 
@@ -635,13 +639,12 @@ namespace DogRunService
                     analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
                     if (analyzeResult == null)
                     {
-                        logger.Error($"----------{dogMoreBuy.SymbolName}--------------> analyzeResult 为 null");
+                        logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null");
                         return;
                     }
                 }
                 else
                 {
-                    logger.Error($"----------{dogMoreBuy.SymbolName}--------------> analyzeResult 为 null");
                     return;
                 }
             }

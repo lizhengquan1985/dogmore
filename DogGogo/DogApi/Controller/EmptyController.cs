@@ -83,39 +83,28 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("listEmptySellIsNotFinished")]
-        public async Task<object> listEmptySellIsNotFinished(string symbolName, string userName)
+        public async Task<object> listEmptySellIsNotFinished(string symbolName, string quoteCurrency, string userName)
         {
             var list = new List<DogEmptySell>();
             var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+            var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+            foreach (var item in nowPriceList)
+            {
+                if (item.QuoteCurrency != quoteCurrency)
+                {
+                    continue;
+                }
+                closeDic.Add(item.SymbolName, item.NowPrice);
+            }
             if (string.IsNullOrEmpty(symbolName))
             {
                 list = new DogEmptySellDao().listEveryMaxPriceEmptySellIsNotFinished(userName);
-                list = list.Where(it => it.SymbolName != "btc").ToList();
-                foreach (var symbol in symbols)
-                {
-                    try
-                    {
-                        var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
-                        var historyKlineData = HistoryKlinePools.Get(key);
-                        var close = historyKlineData.Data[0].Close;
-                        closeDic.Add(symbol.BaseCurrency, close);
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                }
             }
             else
             {
                 list = new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName, userName);
-
-                var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbolName), "1min");
-                var historyKlineData = HistoryKlinePools.Get(key);
-                var close = historyKlineData.Data[0].Close;
-                closeDic.Add(symbolName, close);
             }
 
             return new { list, closeDic };

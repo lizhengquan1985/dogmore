@@ -300,27 +300,23 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("listDogMoreBuyNotFinishedStatistics")]
-        public async Task<object> ListDogMoreBuyNotFinishedStatistics(string userName, string sort)
+        public async Task<object> ListDogMoreBuyNotFinishedStatistics(string userName, string quoteCurrency, string sort)
         {
             var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName);
 
             var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+            var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
-            foreach (var symbol in symbols)
+            foreach (var item in nowPriceList)
             {
-                try
+                if (item.QuoteCurrency != quoteCurrency)
                 {
-                    var key = HistoryKlinePools.GetKey(symbols.Find(it => it.BaseCurrency == symbol.BaseCurrency), "1min");
-                    var historyKlineData = HistoryKlinePools.Get(key);
-                    var close = historyKlineData.Data[0].Close;
-                    closeDic.Add(symbol.BaseCurrency, close);
+                    continue;
                 }
-                catch (Exception ex)
-                {
-
-                }
+                closeDic.Add(item.SymbolName, item.NowPrice);
             }
+
             foreach (var item in res)
             {
                 if (closeDic.ContainsKey(item.SymbolName))

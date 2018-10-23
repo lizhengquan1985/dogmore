@@ -187,7 +187,7 @@ namespace DogRunService.Helper
                 {
                     var smallBuy = dogMoreBuyDao.GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);
                     var nearSellOrBuy = false;
-                    if (smallBuy != null && (lastKlines[0].Close / smallBuy.BuyTradePrice > (decimal)1.04 || smallBuy.BuyTradePrice / lastKlines[0].Close > (decimal)1.042))
+                    if (smallBuy != null && (lastKlines[0].Close / smallBuy.BuyTradePrice > (decimal)1.04 || smallBuy.BuyTradePrice / lastKlines[0].Close > (decimal)1.048))
                     {
                         Console.WriteLine($"--->aa {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} {lastKlines[0].Close},{smallBuy.BuyTradePrice}");
                         nearSellOrBuy = true;

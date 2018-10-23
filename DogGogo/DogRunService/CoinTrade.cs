@@ -44,13 +44,14 @@ namespace DogRunService
         public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol, bool isBuy)
         {
             var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+            var idDate = Utils.GetDateById(historyKlines[0].Id);
             if (historyKlines == null
                 || historyKlines.Count < 100
-                || Utils.GetDateById(historyKlines[0].Id) < DateTime.Now.AddMinutes(-1))
+                || idDate < DateTime.Now.AddMinutes(-1))
             {
-                if(Utils.GetDateById(historyKlines[0].Id) > DateTime.Now.AddMinutes(-2))
+                if(idDate.Minute == DateTime.Now.Minute)
                 {
-                    logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  Utils.GetDateById(historyKlines[0].Id) < DateTime.Now.AddMinutes(-1)");
+                    logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  idDate.Minute > DateTime.Now.Minute");
                 }
                 return null;
             }

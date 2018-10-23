@@ -86,6 +86,10 @@ namespace DogApi.Controller
                         try
                         {
                             var item = list.Find(it => it.SymbolName == symbol.BaseCurrency);
+                            if (item == null)
+                            {
+                                continue;
+                            }
                             var close = closeDic[symbol.BaseCurrency];
 
                             var todayList = new KlineDao().ListTodayKline(symbol.BaseCurrency, symbol.QuoteCurrency, DateTime.Now.Date, DateTime.Now);
@@ -95,7 +99,7 @@ namespace DogApi.Controller
                         }
                         catch (Exception ex)
                         {
-                            logger.Error(ex.Message);
+                            logger.Error(ex.Message, ex);
                         }
                     }
                     if (sort != "lastbuy")
@@ -106,8 +110,8 @@ namespace DogApi.Controller
                             {
                                 return 1;
                             }
-                            var ap = closeDic[a.SymbolName] / a.BuyTradePrice;
-                            var bp = closeDic[b.SymbolName] / b.BuyTradePrice;
+                            var ap = closeDic[a.SymbolName] / a.BuyOrderPrice;
+                            var bp = closeDic[b.SymbolName] / b.BuyOrderPrice;
                             if (sort == "more")
                             {
                                 return ap > bp ? 1 : -1;
@@ -143,7 +147,7 @@ namespace DogApi.Controller
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex.Message);
+                        logger.Error(ex.Message, ex);
                     }
                 }
 

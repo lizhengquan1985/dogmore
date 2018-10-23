@@ -21,6 +21,7 @@ namespace DogPlatform
 
             // usdt
             var usdtCommonSymbols = commonSymbols.FindAll(it => it.QuoteCurrency == "usdt");
+            Console.WriteLine($"us-dt对数量: {usdtCommonSymbols.Count}");
             foreach (var item in usdtCommonSymbols)
             {
                 item.LeastBuyQuantity = 1; // TODO 改进
@@ -32,6 +33,7 @@ namespace DogPlatform
 
             // b
             var btcCommonSymbols = commonSymbols.FindAll(it => it.QuoteCurrency == "btc");
+            Console.WriteLine($"b-tc对数量: {btcCommonSymbols.Count}");
             foreach (var item in btcCommonSymbols)
             {
                 item.LeastBuyQuantity = 1; // TODO 改进
@@ -43,6 +45,7 @@ namespace DogPlatform
 
             // e
             var ethCommonSymbols = commonSymbols.FindAll(it => it.QuoteCurrency == "eth");
+            Console.WriteLine($"e-th对数量: {ethCommonSymbols.Count}");
             foreach (var item in ethCommonSymbols)
             {
                 item.LeastBuyQuantity = 1; // TODO 改进
@@ -54,6 +57,7 @@ namespace DogPlatform
 
             // ht
             var htCommonSymbols = commonSymbols.FindAll(it => it.QuoteCurrency == "ht");
+            Console.WriteLine($"h-t对数量: {htCommonSymbols.Count}");
             foreach (var item in htCommonSymbols)
             {
                 item.LeastBuyQuantity = 1; // TODO 改进

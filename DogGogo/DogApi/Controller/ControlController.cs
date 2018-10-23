@@ -177,13 +177,14 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("initAccountInfo")]
-        public async Task<object> InitAccountInfo(string userName)
+        public async Task<object> InitAccountInfo(string userName, string quoteCurrency, string sort)
         {
             try
             {
                 PlatformApi api = PlatformApi.GetInstance(userName);
                 var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
-                logger.Info(JsonConvert.SerializeObject(accountInfo.Data.list));
+
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
 
                 var result = new List<Dictionary<string, object>>();
 
@@ -191,7 +192,13 @@ namespace DogApi.Controller
                 {
                     try
                     {
-                        if(balanceItem.balance < (decimal)0.00001 || balanceItem.type == "frozen")
+                        if (balanceItem.balance < (decimal)0.00001 || balanceItem.type == "frozen")
+                        {
+                            continue;
+                        }
+
+                        var nowPriceItem = nowPriceList.Find(it => it.SymbolName == balanceItem.currency);
+                        if (nowPriceItem == null)
                         {
                             continue;
                         }
@@ -202,16 +209,34 @@ namespace DogApi.Controller
                         item.Add("currency", balanceItem.currency);
                         item.Add("buyQuantity", totalQuantity);
                         item.Add("balance", balanceItem.balance);
-                        //item.Add("nowPrice", close);
+                        item.Add("nowPrice", nowPriceItem.NowPrice);
                         item.Add("canEmptyQuantity", balanceItem.balance - totalQuantity);
-                        //item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * close);
+                        item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * nowPriceItem.NowPrice);
 
                         result.Add(item);
                     }
                     catch (Exception ex)
                     {
                         logger.Error(ex.Message, ex);
+                        logger.Info(JsonConvert.SerializeObject(balanceItem));
                     }
+                }
+
+                if (sort == "canEmptyAmountasc")
+                {
+                    result.Sort((a, b) => decimal.Compare((decimal)a["canEmptyAmount"], (decimal)b["canEmptyAmount"]));
+                }
+                if (sort == "canEmptyAmountdesc")
+                {
+                    result.Sort((a, b) => decimal.Compare((decimal)b["canEmptyAmount"], (decimal)a["canEmptyAmount"]));
+                }
+                else if (sort == "currencydesc")
+                {
+                    result.Sort((a, b) => string.Compare(b["currency"].ToString(), a["currency"].ToString()));
+                }
+                else if (sort == "currencyasc")
+                {
+                    result.Sort((a, b) => string.Compare(a["currency"].ToString(), b["currency"].ToString()));
                 }
 
                 return result;

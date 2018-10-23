@@ -192,7 +192,6 @@ namespace DogService.Dao
 
         public decimal GetBuyQuantityOfDogMoreBuyIsNotFinished(string userName, string symbolName)
         {
-
             var where = $" where IsFinished=0";
             if (!string.IsNullOrEmpty(userName))
             {
@@ -203,7 +202,12 @@ namespace DogService.Dao
                 where += $" and SymbolName = @symbolName ";
             }
             var sql = $"select sum(BuyQuantity) from t_dog_more_buy {where} order by BuyTradePrice asc";
-            return (decimal)Database.Query<decimal?>(sql, new { symbolName, userName}).FirstOrDefault();
+            decimal? q = Database.Query<decimal?>(sql, new { symbolName, userName }).FirstOrDefault();
+            if (q == null)
+            {
+                q = (decimal)0;
+            }
+            return (decimal)q;
         }
 
         public List<DogMoreBuy> listMoreBuyIsNotFinished(string userName, string symbolName, string quoteCurrency)

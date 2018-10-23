@@ -99,7 +99,7 @@ namespace DogApi.Controller
                         }
                         catch (Exception ex)
                         {
-                            logger.Error(ex.Message, ex);
+                            logger.Error($"{userName} --> {symbolName}{quoteCurrency} --> {ex.Message}", ex);
                         }
                     }
                     if (sort != "lastbuy")

@@ -452,11 +452,7 @@ namespace DogRunService
                 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin
                 && nowPrice >= control.HistoryMin * (decimal)1.3
                 && (
-                    (
-                    nowPrice >= control.EmptyPrice
-                    && control.EmptyExpiredTime > DateTime.Now
-                    )
-                    ||
+                    nowPrice >= control.EmptyPrice ||
                     (
                     // 24小时上涨30%以上, 并且, 1个小时上涨10%以上.
                     dayMax % dayMin > (decimal)1.30
@@ -801,7 +797,7 @@ namespace DogRunService
                 // 初始化数据, 再次拿去
                 KlineUtils.InitMarketInDB(0, symbol, true);
                 analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
-                if(analyzeResult == null)
+                if (analyzeResult == null)
                 {
                     throw new ApplicationException("做多失败，分析出错");
                 }

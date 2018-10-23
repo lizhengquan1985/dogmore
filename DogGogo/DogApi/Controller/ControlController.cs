@@ -45,7 +45,6 @@ namespace DogApi.Controller
                 return;
             }
             control.EmptyPrice = (control.HistoryMax - control.HistoryMin) * (decimal)0.7 + control.HistoryMin;
-            control.EmptyExpiredTime = DateTime.Now.AddYears(2);
             await new DogControlDao().CreateDogControl(control);
             return;
         }

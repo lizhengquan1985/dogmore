@@ -20,7 +20,7 @@ namespace DogService
             try
             {
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control == null || control.EmptyExpiredTime < DateTime.Now)
+                if (control == null)
                 {
                     return null;
                 }
@@ -38,7 +38,7 @@ namespace DogService
             try
             {
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control == null || control.MaxInputPriceExpiredTime < DateTime.Now)
+                if (control == null)
                 {
                     return null;
                 }
@@ -63,23 +63,18 @@ namespace DogService
                     return defaultLadderBuyPercent;
                 }
 
-                if (control.LadderBuyExpiredTime > DateTime.Now && control.LadderBuyPercent >= min)
-                {
-                    return control.LadderBuyPercent;
-                }
-
                 if (control.HistoryMin >= control.HistoryMax || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {
                     return defaultLadderBuyPercent;
                 }
 
                 // 防止价格波动后的, 分隔过合理. 下
-                if (control.HistoryMax < control.HistoryMin * (decimal)2)
+                if (control.HistoryMax <= control.HistoryMin * (decimal)2)
                 {
                     control.HistoryMax = control.HistoryMax * (decimal)1.2;
                     control.HistoryMin = control.HistoryMin * (decimal)0.4;
                 }
-                if (control.HistoryMax <= control.HistoryMin * (decimal)3)
+                else if (control.HistoryMax <= control.HistoryMin * (decimal)3)
                 {
                     control.HistoryMax = control.HistoryMax * (decimal)1;
                     control.HistoryMin = control.HistoryMin * (decimal)0.8;
@@ -87,18 +82,22 @@ namespace DogService
 
                 if (nowPrice >= control.HistoryMax)
                 {
-                    return max;
+                    defaultLadderBuyPercent = max;
                 }
-                if (nowPrice <= control.HistoryMin)
+                else if (nowPrice <= control.HistoryMin)
                 {
-                    return min;
+                    defaultLadderBuyPercent = min;
+                }
+                else
+                {
+                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                    defaultLadderBuyPercent = max - percent * (max - min);
                 }
 
                 // 计算出来阶梯
-                var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                defaultLadderBuyPercent = max - percent * (max - min);
                 defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, min);
                 defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, max);
+                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, control.LadderBuyPercent);
                 return defaultLadderBuyPercent;
             }
             catch (Exception ex)
@@ -108,35 +107,53 @@ namespace DogService
             }
         }
 
-        public static decimal GetLadderSell(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderSellPercent = (decimal)1.05)
+        public static decimal GetLadderSell(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderSellPercent = (decimal)1.1)
         {
             try
             {
-                var min = (decimal)1.04;
-                var max = (decimal)1.08;
+                var max = (decimal)1.135;
+                var min = (decimal)1.055;
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control != null && control.HistoryMin > 0 && control.HistoryMax > 0 && control.HistoryMax > control.HistoryMin)
+                if (control == null)
                 {
-                    max = max + (control.HistoryMax / control.HistoryMin - 2) / 180;
-                    if (max > (decimal)1.12)
-                    {
-                        max = (decimal)1.12;
-                    }
-                    if (max < (decimal)1.06)
-                    {
-                        max = (decimal)1.06;
-                    }
+                    return defaultLadderSellPercent;
+                }
 
+                if (control.HistoryMin >= control.HistoryMax || control.HistoryMin <= 0 || control.HistoryMax <= 0)
+                {
+                    return defaultLadderSellPercent;
+                }
+
+                // 防止价格波动后的, 分隔过合理. 下
+                if (control.HistoryMax <= control.HistoryMin * (decimal)2)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.4;
+                    control.HistoryMin = control.HistoryMin * (decimal)0.8;
+                }
+                else if (control.HistoryMax <= control.HistoryMin * (decimal)3)
+                {
+                    control.HistoryMax = control.HistoryMax * (decimal)1.2;
+                    control.HistoryMin = control.HistoryMin * (decimal)1;
+                }
+
+                if (nowPrice >= control.HistoryMax)
+                {
+                    defaultLadderSellPercent = min;
+                }
+                else if (nowPrice <= control.HistoryMin)
+                {
+                    defaultLadderSellPercent = max;
+                }
+                else
+                {
                     var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
                     defaultLadderSellPercent = (max - min) * percent + min;
-
-                    if (control.LadderSellExpiredTime > DateTime.Now && control.LadderSellPercent < defaultLadderSellPercent)
-                    {
-                        defaultLadderSellPercent = control.LadderSellPercent > min ? control.LadderSellPercent : min;
-                    }
                 }
+
+                // 计算出来阶梯
                 defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, min);
                 defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, max);
+                defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, control.LadderSellPercent);
                 return defaultLadderSellPercent;
             }
             catch (Exception ex)

@@ -59,7 +59,7 @@ namespace DogService.Dao
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"----RunBuy------危险----- CreateDogMoreBuy ------ 防止出错时候, 无限购买. 业务上不能出错, {JsonConvert.SerializeObject(dogMoreBuy)}");
+                logger.Error($"--------危险----- CreateDogMoreBuy ------ 防止出错时候, 无限购买. 业务上不能出错, {JsonConvert.SerializeObject(dogMoreBuy)}");
                 logger.Error(ex.Message, ex);
                 Thread.Sleep(1000 * 60 * 60);
             }

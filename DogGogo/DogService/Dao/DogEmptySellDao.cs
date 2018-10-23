@@ -121,6 +121,12 @@ namespace DogService.Dao
             return Database.Query<DogEmptySell>(sql, new { symbolName, userName }).ToList();
         }
 
+        public List<DogEmptySell> ListDogEmptySellNotFinished(string symbolName, string userName, string quoteCurrency)
+        {
+            var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and QuoteCurrency=@quoteCurrency and UserName=@userName order by SellTradePrice desc";
+            return Database.Query<DogEmptySell>(sql, new { symbolName, userName, quoteCurrency }).ToList();
+        }
+
         public decimal? GetMaxSellTradePrice(string userName, string symbolName, string quoteCurrency)
         {
             var sql = $"select max(SellTradePrice) MaxPrice from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and QuoteCurrency=@quoteCurrency and UserName=@userName";

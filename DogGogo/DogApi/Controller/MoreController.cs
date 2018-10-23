@@ -385,5 +385,20 @@ namespace DogApi.Controller
                 return ex.Message;
             }
         }
+
+        [HttpGet]
+        [ActionName("moreInfo")]
+        public async Task<object> MoreInfo(string userName, string symbolName, string quoteCurrency)
+        {
+            PlatformApi api = PlatformApi.GetInstance(userName);
+
+            var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+            var balanceItem = accountInfo.Data.list.Find(it => it.currency == quoteCurrency);
+
+            var list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName, quoteCurrency);
+            var totalQuantity = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName, symbolName);
+
+            return new { balanceItem, list, totalQuantity };
+        }
     }
 }

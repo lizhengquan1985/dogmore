@@ -46,7 +46,7 @@ namespace DogService
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
+                logger.Error($"GetMaxInputPrice-->  {symbolName}{quoteCurrency}----------{ex.Message}", ex);
                 return null;
             }
         }

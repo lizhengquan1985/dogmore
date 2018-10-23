@@ -13,20 +13,29 @@ namespace DogService.Dao
         public DogControl GetDogControl(string symbolName, string quoteCurrency)
         {
             var dogControl = Database.Get<DogControl>(new { SymbolName = symbolName, QuoteCurrency = quoteCurrency, IsValid = true });
-            if (dogControl.HistoryMax < dogControl.HistoryMin
-                || dogControl.MaxInputPrice <= 0
-                || dogControl.EmptyPrice <= 0
-                || dogControl.LadderBuyPercent <= 1
-                || dogControl.LadderSellPercent <= 1
-                || dogControl.HistoryMin <= 0)
+            if (dogControl == null ||
+                dogControl.HistoryMax < dogControl.HistoryMin ||
+                dogControl.MaxInputPrice <= 0 ||
+                dogControl.EmptyPrice <= 0 ||
+                dogControl.LadderBuyPercent <= 1 ||
+                dogControl.LadderSellPercent <= 1 ||
+                dogControl.HistoryMin <= 0)
             {
-                throw new ApplicationException("管控数据出错");
+                throw new ApplicationException($"管控数据出错{symbolName}{quoteCurrency}");
             }
             return dogControl;
         }
 
         public async Task CreateDogControl(DogControl dogControl)
         {
+            if (dogControl.QuoteCurrency != "usdt"
+                && dogControl.QuoteCurrency != "btc"
+                && dogControl.QuoteCurrency != "eth"
+                && dogControl.QuoteCurrency != "ht")
+            {
+                throw new ApplicationException("管控数据QuoteCurrency出错");
+            }
+
             if (dogControl.HistoryMax < dogControl.HistoryMin
                    || dogControl.MaxInputPrice <= 0
                    || dogControl.EmptyPrice <= 0

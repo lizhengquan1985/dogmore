@@ -56,7 +56,18 @@ namespace DogApi.Controller
             try
             {
                 var res = await new DogControlDao().ListDogControl(quoteCurrency);
-                return res.OrderBy(it => it.SymbolName).ToList();
+                res = res.OrderBy(it => it.SymbolName).ToList();
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
+                Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+                foreach (var item in nowPriceList)
+                {
+                    if (item.QuoteCurrency != quoteCurrency)
+                    {
+                        continue;
+                    }
+                    closeDic.Add(item.SymbolName, item.NowPrice);
+                }
+                return new { list = res, closeDic };
             }
             catch (Exception ex)
             {

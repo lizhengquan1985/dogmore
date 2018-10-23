@@ -621,7 +621,7 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, decimal percent)
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, decimal percent, bool refreshMarket = false)
         {
             var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
             CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName && it.QuoteCurrency == dogMoreBuy.QuoteCurrency);
@@ -629,8 +629,21 @@ namespace DogRunService
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
             if (analyzeResult == null)
             {
-                logger.Error($"----------{dogMoreBuy.SymbolName}--------------> analyzeResult 为 null");
-                return;
+                if (refreshMarket)
+                {
+                    KlineUtils.InitMarketInDB(0, symbol, true);
+                    analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+                    if (analyzeResult == null)
+                    {
+                        logger.Error($"----------{dogMoreBuy.SymbolName}--------------> analyzeResult 为 null");
+                        return;
+                    }
+                }
+                else
+                {
+                    logger.Error($"----------{dogMoreBuy.SymbolName}--------------> analyzeResult 为 null");
+                    return;
+                }
             }
 
             var flexPointList = analyzeResult.FlexPointList;

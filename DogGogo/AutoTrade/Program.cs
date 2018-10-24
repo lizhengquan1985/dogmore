@@ -48,8 +48,8 @@ namespace AutoTrade
         {
             var runCoins = new List<CommonSymbols>();
             runCoins.AddRange(InitUsdtData());
-            //runCoins.AddRange(InitBtcData());
-            //runCoins.AddRange(InitEthData());
+            runCoins.AddRange(InitBtcData());
+            runCoins.AddRange(InitEthData());
             runCoins.AddRange(InitHtData());
             RunCoin(runCoins);
         }
@@ -71,7 +71,7 @@ namespace AutoTrade
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            var addCoins = "xmr,bch,eth,ltc,etc,eos,omg,xrp,dash,zec,ada,steem,iota".Split(',').ToList();
+            var addCoins = "xmr,ardr,eos,eth,ht,xrp".Split(',').ToList();
             var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
@@ -87,7 +87,7 @@ namespace AutoTrade
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addCoins = "xmr,eos,omg,iota,ada,steem,ht,btm,iost,smt,ela,trx".Split(',').ToList();
+            var addCoins = "ada,ardr,eos,gxs,hit,ht,iota,omg,pai,trx,vet,xlm,xmr".Split(',').ToList();
             var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)

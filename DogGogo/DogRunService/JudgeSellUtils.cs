@@ -120,6 +120,7 @@ namespace DogRunService
             decimal sellQuantity = buyQuantity * buyTradePrice / nowPrice;
             sellQuantity = sellQuantity + (buyQuantity - sellQuantity) * position;
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+            Console.WriteLine($" ------------ {buyQuantity}, {sellQuantity}, {symbol.AmountPrecision}");
 
             if (buyQuantity > sellQuantity && buyQuantity * buyTradePrice < sellQuantity * nowPrice)
             {
@@ -146,11 +147,15 @@ namespace DogRunService
                     newSellQuantity -= (decimal)0.1;
                 }
             }
+            if (newSellQuantity == buyQuantity && symbol.AmountPrecision == 0 && symbol.BaseCurrency == "xrp")
+            {
+                return newSellQuantity;
+            }
             if (buyQuantity > newSellQuantity && buyQuantity * buyTradePrice < newSellQuantity * nowPrice)
             {
                 return newSellQuantity;
             }
-            throw new Exception("计算sellquantity不合理");
+            throw new Exception($"计算sellquantity不合理, buyQuantity:{buyQuantity},newSellQuantity:{newSellQuantity}");
         }
     }
 }

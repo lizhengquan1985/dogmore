@@ -159,10 +159,10 @@ namespace DogService.Dao
             Database.Execute(sql);
         }
 
-        public List<DogEmptySell> listEveryMaxPriceEmptySellIsNotFinished(string userName)
+        public List<DogEmptySell> listEveryMaxPriceEmptySellIsNotFinished(string userName, string quoteCurrency)
         {
-            var sql = $"select * from t_dog_empty_sell where UserName=@UserName and SellOrderId in( select SellOrderId from  ( select max(SellOrderId) SellOrderId,SymbolName from t_dog_empty_sell where UserName=@UserName and IsFinished=0 group by SymbolName) t)  ";
-            return Database.Query<DogEmptySell>(sql, new { UserName = userName }).ToList();
+            var sql = $"select * from t_dog_empty_sell where UserName=@UserName and SellOrderId in( select SellOrderId from  ( select max(SellOrderId) SellOrderId,SymbolName from t_dog_empty_sell where UserName=@UserName and QuoteCurrency=@quoteCurrency and IsFinished=0 group by SymbolName) t)  ";
+            return Database.Query<DogEmptySell>(sql, new { UserName = userName, quoteCurrency }).ToList();
         }
     }
 }

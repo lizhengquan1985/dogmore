@@ -86,8 +86,7 @@ namespace DogApi.Controller
         public async Task<object> listEmptySellIsNotFinished(string symbolName, string quoteCurrency, string userName)
         {
             var list = new List<DogEmptySell>();
-            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-            symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+            var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
             var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
             Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
             foreach (var item in nowPriceList)
@@ -100,11 +99,11 @@ namespace DogApi.Controller
             }
             if (string.IsNullOrEmpty(symbolName))
             {
-                list = new DogEmptySellDao().listEveryMaxPriceEmptySellIsNotFinished(userName);
+                list = new DogEmptySellDao().listEveryMaxPriceEmptySellIsNotFinished(userName, quoteCurrency);
             }
             else
             {
-                list = new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName, userName);
+                list = new DogEmptySellDao().ListDogEmptySellNotFinished(symbolName, userName, quoteCurrency);
             }
 
             return new { list, closeDic };

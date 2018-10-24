@@ -277,16 +277,16 @@ namespace DogRunService
             }
             else if (symbol.QuoteCurrency == "btc")
             {
-                if (recommendAmount < (decimal)0.000125)
+                if (recommendAmount < (decimal)0.0004)
                 {
-                    recommendAmount = (decimal)0.000125;
+                    recommendAmount = (decimal)0.0004;
                 }
             }
             else if (symbol.QuoteCurrency == "eth")
             {
-                if (recommendAmount < (decimal)0.005)
+                if (recommendAmount < (decimal)0.008)
                 {
-                    recommendAmount = (decimal)0.005;
+                    recommendAmount = (decimal)0.008;
                 }
             }
             else if (symbol.QuoteCurrency == "ht")

@@ -259,16 +259,16 @@ namespace DogService.Dao
             Database.Execute(sql);
         }
 
-        public List<DogMoreBuyNotFinishedStatistics> ListDogMoreBuyNotFinishedStatistics(string userName)
+        public List<DogMoreBuyNotFinishedStatistics> ListDogMoreBuyNotFinishedStatistics(string userName, string quoteCurrency)
         {
-            var where = " where IsFinished=0 and SymbolName != 'btc' ";
+            var where = " where IsFinished=0 and quoteCurrency=@quoteCurrency ";
             if (!string.IsNullOrEmpty(userName))
             {
                 where += $" and UserName=@userName ";
             }
             var sql = $"select * from ( select SymbolName, min(BuyTradePrice) MinPrice, max(BuyTradePrice) MaxPrice, sum(BuyQuantity) TotalQuantity, sum(BuyQuantity*BuyTradePrice) TotalAmount, count(1) Count" +
                 $" from t_dog_more_buy {where} group by SymbolName ) t order by SymbolName asc";
-            return Database.Query<DogMoreBuyNotFinishedStatistics>(sql, new { userName }).ToList();
+            return Database.Query<DogMoreBuyNotFinishedStatistics>(sql, new { userName, quoteCurrency }).ToList();
         }
     }
 }

@@ -302,7 +302,7 @@ namespace DogApi.Controller
         [ActionName("listDogMoreBuyNotFinishedStatistics")]
         public async Task<object> ListDogMoreBuyNotFinishedStatistics(string userName, string quoteCurrency, string sort)
         {
-            var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName);
+            var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName, quoteCurrency);
 
             var symbols = CoinUtils.GetAllCommonSymbols("usdt");
             symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();

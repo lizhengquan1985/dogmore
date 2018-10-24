@@ -45,13 +45,14 @@ namespace DogRunService
         {
             var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             var idDate = Utils.GetDateById(historyKlines[0].Id);
+            var now = DateTime.Now;
             if (historyKlines == null
                 || historyKlines.Count < 100
-                || idDate < DateTime.Now.AddMinutes(-1))
+                || idDate < now.AddMinutes(-1))
             {
-                if(idDate.Minute == DateTime.Now.Minute)
+                if (idDate.Minute == now.Minute)
                 {
-                    logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  idDate.Minute > DateTime.Now.Minute");
+                    logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  idDate.Minute == now.Minute, {idDate.Second}, {now.Second}");
                 }
                 return null;
             }
@@ -260,7 +261,7 @@ namespace DogRunService
             var quoteCurrency = accountInfo.Data.list.Find(it => it.currency == symbol.QuoteCurrency);
             // 要减去空单未收割得额度总和
             var notShougeEmptySellAmount = new DogEmptySellDao().GetSumNotShougeDogEmptySell(userName, symbol.QuoteCurrency);
-            if (notShougeEmptySellAmount >= quoteCurrency.balance)
+            if (!CommonHelper.CheckBalanceForDoMore(symbol.QuoteCurrency, quoteCurrency.balance, notShougeEmptySellAmount))
             {
                 // 余额不足
                 LogNotBuy(symbol.BaseCurrency + symbol.QuoteCurrency, $"余额不足,  checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},{symbol.QuoteCurrency}.balance:{quoteCurrency.balance}");
@@ -270,9 +271,9 @@ namespace DogRunService
 
             if (symbol.QuoteCurrency == "usdt")
             {
-                if (recommendAmount < (decimal)1.1)
+                if (recommendAmount < (decimal)1.2)
                 {
-                    recommendAmount = (decimal)1.1;
+                    recommendAmount = (decimal)1.2;
                 }
             }
             else if (symbol.QuoteCurrency == "btc")
@@ -567,7 +568,7 @@ namespace DogRunService
             {
                 if (sellQuantity < symbol.AmountPrecision)
                 {
-                    LogNotBuy(symbol.BaseCurrency + "-empty-sell", $"sell 出错,{symbol.BaseCurrency} 的精度为 {symbol.AmountPrecision}, 但是却要出售{sellQuantity}  ");
+                    LogNotBuy(symbol.BaseCurrency + "-empty-sell", $"sell userName:{userName} 出错,{symbol.BaseCurrency} 的精度为 {symbol.AmountPrecision}, 但是却要出售{sellQuantity}  ");
                     return;
                 }
 

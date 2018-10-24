@@ -69,5 +69,34 @@ namespace DogRunService.Helper
             }
             throw new Exception("计算buyQuantity不合理");
         }
+
+        /// <summary>
+        /// 检查余额是否充足
+        /// </summary>
+        /// <param name="quoteCurrency"></param>
+        /// <param name="balance"></param>
+        /// <param name="notShougeEmptySellAmount"></param>
+        /// <returns></returns>
+        public static bool CheckBalanceForDoMore(string quoteCurrency, decimal balance, decimal notShougeEmptySellAmount)
+        {
+            if (notShougeEmptySellAmount >= balance)
+            {
+                return false;
+            }
+            if (quoteCurrency == "btc" && balance - notShougeEmptySellAmount < (decimal)0.0004)
+            {
+                return false;
+            }
+            if (quoteCurrency == "eth" && balance - notShougeEmptySellAmount < (decimal)0.01)
+            {
+                return false;
+            }
+            if (quoteCurrency == "ht" && balance - notShougeEmptySellAmount < (decimal)1.1)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

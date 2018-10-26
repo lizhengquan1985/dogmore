@@ -10,6 +10,7 @@ namespace DogApi.DTO
     {
         public long BuyOrderId { get; set; }
         public string SymbolName { get; set; }
+        public string QuoteCurrency { get; set; }
         public decimal BuyAmount { get; set; }
         public decimal SellQuantity { get; set; }
         public decimal Usdt { get; set; }

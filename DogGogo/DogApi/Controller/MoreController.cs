@@ -274,6 +274,7 @@ namespace DogApi.Controller
             {
                 BuyOrderId = buyOrderId,
                 SymbolName = dogMoreBuy.SymbolName,
+                QuoteCurrency = dogMoreBuy.QuoteCurrency,
                 UserName = dogMoreBuy.UserName,
                 BuyTradePrice = dogMoreBuy.BuyTradePrice,
                 BuyDate = dogMoreBuy.BuyDate,

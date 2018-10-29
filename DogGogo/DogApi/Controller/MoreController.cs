@@ -110,8 +110,18 @@ namespace DogApi.Controller
                             {
                                 return 1;
                             }
-                            var ap = closeDic[a.SymbolName] / a.BuyOrderPrice;
-                            var bp = closeDic[b.SymbolName] / b.BuyOrderPrice;
+                            var aTradePrice = a.BuyTradePrice;
+                            if(aTradePrice <= 0)
+                            {
+                                aTradePrice = a.BuyOrderPrice;
+                            }
+                            var bTradePrice = b.BuyTradePrice;
+                            if (bTradePrice <= 0)
+                            {
+                                bTradePrice = b.BuyOrderPrice;
+                            }
+                            var ap = closeDic[a.SymbolName] / aTradePrice;
+                            var bp = closeDic[b.SymbolName] / bTradePrice;
                             if (sort == "more")
                             {
                                 return ap > bp ? 1 : -1;

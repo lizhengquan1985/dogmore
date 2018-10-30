@@ -95,7 +95,12 @@ namespace DogApi.Controller
                             var todayList = new KlineDao().ListTodayKline(symbol.BaseCurrency, symbol.QuoteCurrency, DateTime.Now.Date, DateTime.Now);
                             todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
                             todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
-                            todayDic.Add(symbol.BaseCurrency + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
+                            var todaySubList = todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).ToList();
+                            if(todaySubList.Count == 0)
+                            {
+                                logger.Error($"--------1-----");
+                            }
+                            todayDic.Add(symbol.BaseCurrency + "+", todaySubList.Max(it => it.Close) / close);
                         }
                         catch (Exception ex)
                         {

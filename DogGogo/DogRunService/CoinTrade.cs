@@ -264,7 +264,7 @@ namespace DogRunService
             if (!CommonHelper.CheckBalanceForDoMore(symbol.QuoteCurrency, quoteCurrency.balance, notShougeEmptySellAmount))
             {
                 // 余额不足
-                LogNotBuy(symbol.BaseCurrency + symbol.QuoteCurrency, $"余额不足,  checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},{symbol.QuoteCurrency}.balance:{quoteCurrency.balance}");
+                // LogNotBuy(symbol.BaseCurrency + symbol.QuoteCurrency, $"余额不足,  checkNotShougeEmptySellAmount -> notShougeEmptySellAmount:{notShougeEmptySellAmount},{symbol.QuoteCurrency}.balance:{quoteCurrency.balance}");
                 return;
             }
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
@@ -494,7 +494,7 @@ namespace DogRunService
                         }
                         if ((balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.8)
                         {
-                            LogNotBuy(symbol.BaseCurrency, $"收益不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            //LogNotBuy(symbol.BaseCurrency, $"收益不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
                             continue;
                         }
 
@@ -521,9 +521,9 @@ namespace DogRunService
                             }
                         }
                         sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                        if (sellQuantity * nowPrice < (decimal)0.2)
+                        if (sellQuantity * nowPrice < (decimal)0.8)
                         {
-                            LogNotBuy(symbol.BaseCurrency, $"做空不超过0.2usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                            //LogNotBuy(symbol.BaseCurrency, $"做空不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
                             continue;
                         }
 

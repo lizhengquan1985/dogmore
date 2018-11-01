@@ -655,7 +655,8 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             // 没有大于预期, 也不能收割
-            if (nowPrice < dogMoreBuy.BuyTradePrice * percent || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * JudgeSellUtils.GetPercent(nowPrice, flexPointList[0].close, flexPointList[0].id, percent)
+                || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
             {
                 if (percent < (decimal)1.04)
                 {

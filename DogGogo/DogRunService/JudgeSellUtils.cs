@@ -14,13 +14,47 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(JudgeSellUtils));
 
+        public static decimal GetPercent(decimal nowPrice, decimal nearHighPrice, long dateId, decimal percent)
+        {
+            if (nowPrice > nearHighPrice)
+            {
+                return percent;
+            }
+
+            if (nowPrice * (decimal)1.15 < nearHighPrice && Utils.GetDateById(dateId) > DateTime.Now.AddMinutes(-30))
+            {
+                // 急速下降了10%, 则 4%都可以出售了
+                return (decimal)1.03;
+            }
+
+            if (nowPrice * (decimal)1.10 < nearHighPrice && Utils.GetDateById(dateId) > DateTime.Now.AddMinutes(-30))
+            {
+                // 急速下降了10%, 则 4%都可以出售了
+                return (decimal)1.04;
+            }
+
+            if (nowPrice * (decimal)1.08 < nearHighPrice && Utils.GetDateById(dateId) > DateTime.Now.AddMinutes(-30))
+            {
+                // 急速下降了10%, 则 4%都可以出售了
+                return (decimal)1.045;
+            }
+
+            if (nowPrice * (decimal)1.05 < nearHighPrice && Utils.GetDateById(dateId) > DateTime.Now.AddMinutes(-30))
+            {
+                // 急速下降了10%, 则 4%都可以出售了
+                return (decimal)1.05;
+            }
+
+            return percent;
+        }
+
         public static bool CheckCanSellForHuiDiao(decimal nowPrice, decimal nearHighPrice)
         {
             if (nowPrice > nearHighPrice)
             {
                 return true;
             }
-            return nowPrice * (decimal)1.005 < nearHighPrice && nowPrice * (decimal)1.06 > nearHighPrice;
+            return nowPrice * (decimal)1.005 < nearHighPrice && nowPrice * (decimal)1.16 > nearHighPrice;
         }
 
         public static bool CheckCanSell(decimal buyPrice, decimal afterBuyHighClosePrice, decimal nowPrice, decimal gaoyuPercentSell = (decimal)1.03, bool needHuitou = true)

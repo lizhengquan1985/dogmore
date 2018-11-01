@@ -71,7 +71,7 @@ namespace AutoTrade
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            var addCoins = "xmr,ardr,eos,eth,ht,xrp".Split(',').ToList();
+            var addCoins = "eth,xrp,bch,ltc,etc,eos,ht,ada,zec,omg,iota,dash,xmr,ardr".Split(',').ToList();
             var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
@@ -87,7 +87,7 @@ namespace AutoTrade
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addCoins = "ada,ardr,eos,gxs,hit,ht,iota,omg,pai,trx,vet,xlm,xmr".Split(',').ToList();
+            var addCoins = "eos,ht,ada,omg,xmr,iota,ardr,gxs,hit,pai,trx,vet,xlm".Split(',').ToList();
             var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)

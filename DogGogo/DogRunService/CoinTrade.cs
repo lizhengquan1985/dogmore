@@ -130,7 +130,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error("---> 购买异常: " + ex.Message, ex);
+                logger.Error($"---> 购买异常: {JsonConvert.SerializeObject(symbol)}" + ex.Message, ex);
             }
 
             try
@@ -145,7 +145,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error("---> 出售异常: " + ex.Message, ex);
+                logger.Error($"---> 购买异常: {JsonConvert.SerializeObject(symbol)}" + ex.Message, ex);
             }
         }
 

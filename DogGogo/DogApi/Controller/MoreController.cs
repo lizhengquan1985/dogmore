@@ -45,7 +45,7 @@ namespace DogApi.Controller
                     return;
                 }
 
-                CoinTrade.ShouGeDogMore(dogMoreBuy, (decimal)1.035, true);
+                CoinTrade.ShouGeDogMore(dogMoreBuy, (decimal)1.032, true);
             }
             catch (Exception ex)
             {
@@ -92,15 +92,19 @@ namespace DogApi.Controller
                             }
                             var close = closeDic[symbol.BaseCurrency];
 
+                            // 这里有些慢, 50个
                             var todayList = new KlineDao().ListTodayKline(symbol.BaseCurrency, symbol.QuoteCurrency, DateTime.Now.Date, DateTime.Now);
                             todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
                             todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
                             var todaySubList = todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).ToList();
-                            if(todaySubList.Count == 0)
+                            if (todaySubList.Count > 0)
                             {
-                                logger.Error($"--------1-----");
+                                todayDic.Add(symbol.BaseCurrency + "+", todaySubList.Max(it => it.Close) / close);
                             }
-                            todayDic.Add(symbol.BaseCurrency + "+", todaySubList.Max(it => it.Close) / close);
+                            else
+                            {
+                                logger.Error($"{JsonConvert.SerializeObject(todayList)} -------- {JsonConvert.SerializeObject(item)}");
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -116,7 +120,7 @@ namespace DogApi.Controller
                                 return 1;
                             }
                             var aTradePrice = a.BuyTradePrice;
-                            if(aTradePrice <= 0)
+                            if (aTradePrice <= 0)
                             {
                                 aTradePrice = a.BuyOrderPrice;
                             }
@@ -269,14 +273,17 @@ namespace DogApi.Controller
             foreach (var sell in dogMoreSellList)
             {
                 var sellOrderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(sell.SellOrderMatchResults);
-                foreach (var item in sellOrderMatchResult.Data)
+                if (sellOrderMatchResult != null && sellOrderMatchResult.Data != null && sellOrderMatchResult.Data.Count > 0)
                 {
-                    sellAmount += item.FilledAmount * item.price;
-                    sellQuantity += item.FilledAmount;
-                    sellFees += item.FilledFees;
-                    if (item.price < sellTradePrice)
+                    foreach (var item in sellOrderMatchResult.Data)
                     {
-                        sellTradePrice = item.price;
+                        sellAmount += item.FilledAmount * item.price;
+                        sellQuantity += item.FilledAmount;
+                        sellFees += item.FilledFees;
+                        if (item.price < sellTradePrice)
+                        {
+                            sellTradePrice = item.price;
+                        }
                     }
                 }
                 if (sell.SellDate > sellDate)

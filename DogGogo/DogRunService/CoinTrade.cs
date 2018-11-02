@@ -271,9 +271,9 @@ namespace DogRunService
 
             if (symbol.QuoteCurrency == "usdt")
             {
-                if (recommendAmount < (decimal)1.2)
+                if (recommendAmount < (decimal)1.5)
                 {
-                    recommendAmount = (decimal)1.2;
+                    recommendAmount = (decimal)1.5;
                 }
             }
             else if (symbol.QuoteCurrency == "btc")
@@ -676,7 +676,7 @@ namespace DogRunService
             }
 
             decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
-            if (sellQuantity >= dogMoreBuy.BuyQuantity)
+            if (sellQuantity > dogMoreBuy.BuyQuantity)
             {
                 // 一定要赚才能出售
                 logger.Error($"{dogMoreBuy.SymbolName} sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}");
@@ -839,7 +839,15 @@ namespace DogRunService
                 return $"判断 发现不适合 最高点isHigh:{flexPointList[0].isHigh},IsQuickRise:{IsQuickRise}, controlCanBuy:{controlCanBuy}";
             }
 
-            BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent, true);
+            try
+            {
+                BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent, true);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                return ex.Message;
+            }
             return "----";
         }
 

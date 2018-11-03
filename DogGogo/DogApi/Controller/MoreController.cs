@@ -103,7 +103,7 @@ namespace DogApi.Controller
                             }
                             else
                             {
-                                logger.Error($"{JsonConvert.SerializeObject(todayList)} -------- {JsonConvert.SerializeObject(item)}");
+                                logger.Error($"{Utils.GetDateById(todayList.Max(it => it.Id))} -------- {JsonConvert.SerializeObject(item)}");
                             }
                         }
                         catch (Exception ex)

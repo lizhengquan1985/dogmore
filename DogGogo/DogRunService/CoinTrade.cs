@@ -271,9 +271,15 @@ namespace DogRunService
 
             if (symbol.QuoteCurrency == "usdt")
             {
-                if (recommendAmount < (decimal)1.5)
+                var ladderPosition = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
+                var min = (decimal)1.5;
+                if (ladderPosition < (decimal)0.2)
                 {
-                    recommendAmount = (decimal)1.5;
+                    min = (decimal)2;
+                }
+                if (recommendAmount < min)
+                {
+                    recommendAmount = min;
                 }
             }
             else if (symbol.QuoteCurrency == "btc")

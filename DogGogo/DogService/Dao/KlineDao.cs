@@ -94,6 +94,18 @@ namespace DogService.Dao
             return Database.Query<HistoryKline>(sql, new { date }).ToList();
         }
 
+        public List<HistoryKline> ListTodayKline(string quoteCurrency, string baseCurrency)
+        {
+            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} where Id>@Id order by Id desc";
+            return Database.Query<HistoryKline>(sql, new { Id = Utils.GetIdByDate(DateTime.Now.Date) }).ToList();
+        }
+
+        public List<HistoryKline> List30MinutesKline(string quoteCurrency, string baseCurrency)
+        {
+            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} where Id>@Id order by Id desc";
+            return Database.Query<HistoryKline>(sql, new { Id = Utils.GetIdByDate(DateTime.Now.AddMinutes(-30)) }).ToList();
+        }
+
         public void DeleteAndRecordKlines(string symbolName, HistoryKline line)
         {
             long id = line.Id;

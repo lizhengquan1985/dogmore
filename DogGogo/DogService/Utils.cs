@@ -18,6 +18,11 @@ namespace DogService
             return new DateTime(id * 10000000 + new DateTime(1970, 1, 1, 8, 0, 0).Ticks);
         }
 
+        public static long GetIdByDate(DateTime date)
+        {
+            return (date.Ticks - new DateTime(1970, 1, 1, 8, 0, 0).Ticks) / 10000000;
+        }
+
         /// <summary>
         /// 获取某个日期当天最小值
         /// </summary>

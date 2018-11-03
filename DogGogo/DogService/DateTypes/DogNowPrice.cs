@@ -16,5 +16,8 @@ namespace DogService.DateTypes
         public string QuoteCurrency { get; set; }
         public decimal NowPrice { get; set; }
         public long NowTime { get; set; }
+        public decimal TodayMaxPrice { get; set; }
+        public decimal TodayMinPrice { get; set; }
+        public decimal NearMaxPrice { get; set; }
     }
 }

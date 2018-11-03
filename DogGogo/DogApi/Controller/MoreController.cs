@@ -93,17 +93,15 @@ namespace DogApi.Controller
                             var close = closeDic[symbol.BaseCurrency];
 
                             // 这里有些慢, 50个
-                            var todayList = new KlineDao().ListTodayKline(symbol.BaseCurrency, symbol.QuoteCurrency, DateTime.Now.Date, DateTime.Now);
-                            todayDic.Add(symbol.BaseCurrency, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
-                            todayDic.Add(symbol.BaseCurrency + "-", close / todayList.Min(it => it.Close));
-                            var todaySubList = todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).ToList();
-                            if (todaySubList.Count > 0)
+                            var nowPriceItem = nowPriceList.Find(it => it.SymbolName == symbol.BaseCurrency);
+                            if (nowPriceItem != null)
                             {
-                                todayDic.Add(symbol.BaseCurrency + "+", todaySubList.Max(it => it.Close) / close);
-                            }
-                            else
-                            {
-                                logger.Error($"{Utils.GetDateById(todayList.Max(it => it.Id))} -------- {JsonConvert.SerializeObject(item)}");
+                                if (nowPriceItem.TodayMinPrice != 0)
+                                {
+                                    todayDic.Add(symbol.BaseCurrency, nowPriceItem.TodayMaxPrice / nowPriceItem.TodayMinPrice);
+                                    todayDic.Add(symbol.BaseCurrency + "-", close / nowPriceItem.TodayMinPrice);
+                                }
+                                todayDic.Add(symbol.BaseCurrency + "+", nowPriceItem.NearMaxPrice / close);
                             }
                         }
                         catch (Exception ex)

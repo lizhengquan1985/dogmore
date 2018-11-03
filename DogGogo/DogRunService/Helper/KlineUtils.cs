@@ -181,7 +181,8 @@ namespace DogRunService.Helper
                 var dogEmptySellDao = new DogEmptySellDao();
 
                 // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
-                var lastKlines = dao.List20Kline(symbol.QuoteCurrency, symbol.BaseCurrency);
+                var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+                var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
                 var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-5)).Count;
                 if (minutesAfterCount > 0)
                 {
@@ -195,7 +196,7 @@ namespace DogRunService.Helper
                     if (!nearSellOrBuy)
                     {
                         var bigSell = dogEmptySellDao.GetBiggestDogEmptySell(symbol.QuoteCurrency, symbol.BaseCurrency);
-                        if (bigSell != null && (lastKlines[0].Close/ bigSell.SellTradePrice > (decimal)1.060 || bigSell.SellTradePrice / lastKlines[0].Close > (decimal)1.035))
+                        if (bigSell != null && (lastKlines[0].Close / bigSell.SellTradePrice > (decimal)1.060 || bigSell.SellTradePrice / lastKlines[0].Close > (decimal)1.035))
                         {
                             nearSellOrBuy = true;
                         }
@@ -213,7 +214,9 @@ namespace DogRunService.Helper
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
                 var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 10);
-                new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice { NowPrice = klines[0].Close, NowTime = klines[0].Id, QuoteCurrency = symbol.QuoteCurrency, SymbolName = symbol.BaseCurrency });
+                var todayKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).ToList();
+                var minutesKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date.AddMinutes(-30)).ToList();
+                new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice { NowPrice = klines[0].Close, NowTime = klines[0].Id, QuoteCurrency = symbol.QuoteCurrency, SymbolName = symbol.BaseCurrency, TodayMaxPrice = todayKlines.Max(it => it.Close), TodayMinPrice = todayKlines.Min(it => it.Close), NearMaxPrice = minutesKlines.Max(it => it.Close) });
 
                 // 记录下， 获取api数据太长的数据
                 var totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;

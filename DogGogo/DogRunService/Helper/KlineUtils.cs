@@ -216,7 +216,19 @@ namespace DogRunService.Helper
                 var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 10);
                 var todayKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).ToList();
                 var minutesKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date.AddMinutes(-30)).ToList();
-                new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice { NowPrice = klines[0].Close, NowTime = klines[0].Id, QuoteCurrency = symbol.QuoteCurrency, SymbolName = symbol.BaseCurrency, TodayMaxPrice = todayKlines.Max(it => it.Close), TodayMinPrice = todayKlines.Min(it => it.Close), NearMaxPrice = minutesKlines.Max(it => it.Close) });
+                var nearMaxPrice = (decimal)0;
+                var todayMinPrice = (decimal)0;
+                var todayMaxPrice = (decimal)0;
+                if (todayKlines.Count > 0)
+                {
+                    todayMaxPrice = todayKlines.Max(it => it.Close);
+                    todayMinPrice = todayKlines.Min(it => it.Close);
+                }
+                if (minutesKlines.Count > 0)
+                {
+                    nearMaxPrice = minutesKlines.Max(it => it.Close);
+                }
+                new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice { NowPrice = klines[0].Close, NowTime = klines[0].Id, QuoteCurrency = symbol.QuoteCurrency, SymbolName = symbol.BaseCurrency, TodayMaxPrice = todayMaxPrice, TodayMinPrice = todayMinPrice, NearMaxPrice = nearMaxPrice });
 
                 // 记录下， 获取api数据太长的数据
                 var totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;

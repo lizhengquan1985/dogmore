@@ -22,7 +22,6 @@ namespace DogRunService
         public decimal MaxPrice { get; set; }
         public decimal MinPrice { get; set; }
         public decimal Minute30MaxPrice { get; set; }
-        public decimal Minute30MinPrice { get; set; }
         /// <summary>
         /// 原始数据
         /// </summary>
@@ -58,7 +57,6 @@ namespace DogRunService
                 MaxPrice = historyKlines.Max(it => it.Close),
                 MinPrice = historyKlines.Min(it => it.Close),
                 Minute30MaxPrice = minute30Klines.Max(it => it.Close),
-                Minute30MinPrice = minute30Klines.Min(it => it.Close),
                 HistoryKlines = historyKlines,
             };
             return analyzeResult;
@@ -115,7 +113,7 @@ namespace DogRunService
             // 判断是否有最小值，且小于nowPrice
             var min = klines.Min(it => it.Close);
             var max = klines.Max(it => it.Close);
-            return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.04 < dogMoreBuy.BuyTradePrice;
+            //return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.04 < dogMoreBuy.BuyTradePrice;
 
             var minHuidiao = (decimal)1.005;
             var maxHuidiao = (decimal)1.03;

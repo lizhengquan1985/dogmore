@@ -42,7 +42,7 @@ namespace DogApi.Controller
 
                 var symbols = CoinUtils.GetAllCommonSymbols("usdt");
                 CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
-                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
+                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult);
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@ namespace DogApi.Controller
 
                 var symbols = CoinUtils.GetAllCommonSymbols("usdt");
                 CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
-                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
+                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.01);
             }
             catch (Exception ex)

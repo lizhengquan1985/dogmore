@@ -562,6 +562,7 @@ namespace DogRunService
 
             if (!analyzeResult.CheckCanSellForHuiDiao(dogMoreBuy))
             {
+                logger.Error("11");
                 // 判断是否有回掉
                 return;
             }

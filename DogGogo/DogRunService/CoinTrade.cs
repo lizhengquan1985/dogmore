@@ -99,7 +99,7 @@ namespace DogRunService
                     Console.WriteLine(item.SellTradePrice);
                 }
 
-                var canBuy = JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Min30MinPrice);
+                var canBuy = JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Minute30MinPrice);
                 if (!canBuy)
                 {
                     continue;
@@ -151,7 +151,7 @@ namespace DogRunService
             }
 
             // 判断是否回调0.5%
-            if (!JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Min30MinPrice))
+            if (!JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Minute30MinPrice))
             {
                 return;
             }
@@ -355,7 +355,7 @@ namespace DogRunService
             var hourMin = historyKlines.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.AddHours(-1)).Min(it => it.Open);
             var hourMax = historyKlines.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.AddHours(-1)).Max(it => it.Open);
             if (nowPrice * (decimal)1.05 > analyzeResult.MaxPrice
-                && nowPrice * (decimal)1.005 < analyzeResult.Min30MaxPrice
+                && nowPrice * (decimal)1.005 < analyzeResult.Minute30MaxPrice
                 && control != null
                 && control.HistoryMin > 0
                 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin
@@ -572,7 +572,7 @@ namespace DogRunService
 
             // 判断是否有回调
             // 获取高点数据.
-            var maxPriceNear = analyzeResult.Min30MaxPrice;
+            var maxPriceNear = analyzeResult.Minute30MaxPrice;
             // 改版
             var inDbMaxPrice = new KlineDao().GetMaxClosePrice(dogMoreBuy.QuoteCurrency, dogMoreBuy.SymbolName);
             if(inDbMaxPrice != null && (decimal)inDbMaxPrice > maxPriceNear)

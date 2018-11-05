@@ -20,8 +20,8 @@ namespace DogRunService
         public decimal NowPrice { get; set; }
         public decimal MaxPrice { get; set; }
         public decimal MinPrice { get; set; }
-        public decimal Min30MaxPrice { get; set; }
-        public decimal Min30MinPrice { get; set; }
+        public decimal Minute30MaxPrice { get; set; }
+        public decimal Minute30MinPrice { get; set; }
         /// <summary>
         /// 原始数据
         /// </summary>
@@ -49,11 +49,15 @@ namespace DogRunService
                 return null;
             }
 
+            var minute30Klines = historyKlines.FindAll(it => it.Id > Utils.GetIdByDate(DateTime.Now.AddMinutes(-30)));
+
             AnalyzeResult analyzeResult = new AnalyzeResult()
             {
                 NowPrice = historyKlines[0].Close,
                 MaxPrice = historyKlines.Max(it => it.Close),
                 MinPrice = historyKlines.Min(it => it.Close),
+                Minute30MaxPrice = minute30Klines.Max(it => it.Close),
+                Minute30MinPrice = minute30Klines.Min(it => it.Close),
                 HistoryKlines = historyKlines,
             };
             return analyzeResult;

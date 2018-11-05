@@ -180,7 +180,7 @@ namespace DogRunService
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"{userName}--{JsonConvert.SerializeObject(symbol)}--{ex.Message}", ex);
+                    //logger.Error($"{userName}--{JsonConvert.SerializeObject(symbol)}--{ex.Message}", ex);
                     continue;
                 }
             }
@@ -682,7 +682,16 @@ namespace DogRunService
             }
 
             // 判断是否有回调
-            if (!JudgeSellUtils.CheckCanSellForHuiDiao(dogMoreBuy, nowPrice, flexPointList[0].close))
+            // 获取高点数据.
+            var maxPriceNear = flexPointList[0].close;
+            // 改版
+            var inDbMaxPrice = new KlineDao().GetMaxClosePrice(dogMoreBuy.QuoteCurrency, dogMoreBuy.SymbolName);
+            if(inDbMaxPrice != null && (decimal)inDbMaxPrice > maxPriceNear)
+            {
+                maxPriceNear = (decimal)inDbMaxPrice;
+            }
+
+            if (!JudgeSellUtils.CheckCanSellForHuiDiao(dogMoreBuy, nowPrice, maxPriceNear))
             {
                 if (sellPercent < (decimal)1.04)
                 {
@@ -863,7 +872,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error($"{userName} {JsonConvert.SerializeObject(symbol)} {ex.Message}", ex);
+                //logger.Error($"{userName} {JsonConvert.SerializeObject(symbol)} {ex.Message}", ex);
                 return ex.Message;
             }
             return "----";

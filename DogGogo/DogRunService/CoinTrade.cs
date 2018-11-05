@@ -17,101 +17,6 @@ using System.Threading.Tasks;
 
 namespace DogRunService
 {
-    public class AnalyzeResult
-    {
-        /// <summary>
-        /// 拐点判断标准
-        /// </summary>
-        public decimal FlexPercent { get; set; }
-        /// <summary>
-        /// 分析后的拐点数据
-        /// </summary>
-        public List<FlexPoint> FlexPointList { get; set; }
-        public decimal NowPrice { get; set; }
-        /// <summary>
-        /// 原始数据
-        /// </summary>
-        public List<HistoryKline> HistoryKlines { get; set; }
-
-        static ILog logger = LogManager.GetLogger(typeof(AnalyzeResult));
-
-        /// <summary>
-        /// 当购买或者出售时候,需要一个分析结果, 供判断是否做多,或者做空
-        /// </summary>
-        /// <param name="symbol"></param>
-        /// <param name="isBuy"></param>
-        /// <returns></returns>
-        public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol, bool isBuy)
-        {
-            var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-            var idDate = Utils.GetDateById(historyKlines[0].Id);
-            var now = DateTime.Now;
-            if (historyKlines == null
-                || historyKlines.Count < 100
-                || idDate < now.AddMinutes(-1))
-            {
-                if (idDate.Minute == now.Minute)
-                {
-                    logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  idDate.Minute == now.Minute, {idDate.Second}, {now.Second}");
-                }
-                return null;
-            }
-
-            // 获取最近行情
-            decimal flexPercent = (decimal)1.050;
-            var flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
-            {
-                flexPercent = (decimal)1.045;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
-            {
-                flexPercent = (decimal)1.040;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
-            {
-                flexPercent = (decimal)1.035;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
-            {
-                flexPercent = (decimal)1.03;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
-            {
-                flexPercent = (decimal)1.025;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
-            {
-                flexPercent = (decimal)1.02;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0 || (flexPointList.Count == 1 && ((isBuy && flexPointList[0].isHigh) || (!isBuy && !flexPointList[0].isHigh))))
-            {
-                flexPercent = (decimal)1.015;
-                flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-            }
-            if (flexPointList == null || flexPointList.Count == 0)
-            {
-                //logger.Error($"--------------> 分析{symbol.BaseCurrency}的flexPoint结果数量为0 ");
-                return null;
-            }
-
-            AnalyzeResult analyzeResult = new AnalyzeResult()
-            {
-                FlexPointList = flexPointList,
-                NowPrice = historyKlines[0].Close,
-                HistoryKlines = historyKlines,
-                FlexPercent = flexPercent
-            };
-            return analyzeResult;
-        }
-    }
-
     public class CoinTrade
     {
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
@@ -120,7 +25,7 @@ namespace DogRunService
         {
             try
             {
-                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 if (analyzeResult != null)
                 {
                     Console.WriteLine($"--->domore {index + 1}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
@@ -135,7 +40,7 @@ namespace DogRunService
 
             try
             {
-                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
+                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 if (analyzeResult != null)
                 {
                     Console.WriteLine($"--->doempty {index + 1}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
@@ -151,16 +56,12 @@ namespace DogRunService
 
         private static void RunBuy(CommonSymbols symbol, AnalyzeResult analyzeResult)
         {
-            var flexPointList = analyzeResult.FlexPointList;
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
-            var flexPercent = analyzeResult.FlexPercent;
 
-            // 1.最近一次是最高点
             // 2.不是快速拉升的.
             // 3.低于管控的购入价
-            if (flexPointList[0].isHigh
-                || JudgeBuyUtils.IsQuickRise(symbol, historyKlines)
+            if (JudgeBuyUtils.IsQuickRise(symbol, historyKlines)
                 || !JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
             {
                 return;
@@ -198,7 +99,7 @@ namespace DogRunService
                     Console.WriteLine(item.SellTradePrice);
                 }
 
-                var canBuy = JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, flexPointList[0].close);
+                var canBuy = JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Min30MinPrice);
                 if (!canBuy)
                 {
                     continue;
@@ -223,8 +124,6 @@ namespace DogRunService
         public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult,
             decimal setLadderBuyPercent = (decimal)1.1, bool useSetLadderBuyPercent = false)
         {
-            var flexPointList = analyzeResult.FlexPointList;
-            var flexPercent = analyzeResult.FlexPercent;
             var nowPrice = analyzeResult.NowPrice;
 
             // 判断购入阶梯
@@ -252,7 +151,7 @@ namespace DogRunService
             }
 
             // 判断是否回调0.5%
-            if (!JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, flexPointList[0].close))
+            if (!JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Min30MinPrice))
             {
                 return;
             }
@@ -341,7 +240,7 @@ namespace DogRunService
                         QuoteCurrency = symbol.QuoteCurrency,
                         AccountId = accountId,
                         UserName = userName,
-                        FlexPercent = flexPercent,
+                        FlexPercent = (decimal)1.01,
 
                         BuyQuantity = buyQuantity,
                         BuyOrderPrice = orderPrice,
@@ -350,7 +249,7 @@ namespace DogRunService
                         BuyState = StateConst.PreSubmitted,
                         BuyTradePrice = 0,
                         BuyOrderId = order.Data,
-                        BuyFlex = JsonConvert.SerializeObject(flexPointList),
+                        BuyFlex = "",
                         BuyMemo = "",
                         BuyOrderDetail = "",
                         BuyOrderMatchResults = "",
@@ -360,7 +259,7 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QueryBuyDetailAndUpdate(userName, order.Data);
                 }
-                logger.Error($"入库结束 -----------------------------做多  下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId},分析 {JsonConvert.SerializeObject(flexPointList)}");
+                logger.Error($"入库结束 -----------------------------做多  下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId},");
             }
             catch (Exception ex)
             {
@@ -424,7 +323,7 @@ namespace DogRunService
                         BuyState = StateConst.PreSubmitted,
                         BuyTradePrice = 0,
                         BuyOrderId = order.Data,
-                        BuyFlex = JsonConvert.SerializeObject(analyzeResult.FlexPointList),
+                        BuyFlex = "",
                         BuyMemo = "",
                         BuyOrderDetail = "",
                         BuyOrderMatchResults = "",
@@ -444,16 +343,8 @@ namespace DogRunService
 
         private static void RunSell(CommonSymbols symbol, AnalyzeResult analyzeResult)
         {
-            var flexPointList = analyzeResult.FlexPointList;
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
-            var flexPercent = analyzeResult.FlexPercent;
-
-            if (!flexPointList[0].isHigh)
-            {
-                // 最低点 不适合出售
-                return;
-            }
 
             var userNames = UserPools.GetAllUserName();
 
@@ -463,8 +354,8 @@ namespace DogRunService
             var dayMax = historyKlines.Max(it => it.Open);
             var hourMin = historyKlines.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.AddHours(-1)).Min(it => it.Open);
             var hourMax = historyKlines.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.AddHours(-1)).Max(it => it.Open);
-            if (nowPrice * (decimal)1.05 > flexPointList[0].close
-                && nowPrice * (decimal)1.005 < flexPointList[0].close
+            if (nowPrice * (decimal)1.05 > analyzeResult.MaxPrice
+                && nowPrice * (decimal)1.005 < analyzeResult.Min30MaxPrice
                 && control != null
                 && control.HistoryMin > 0
                 && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin
@@ -541,7 +432,7 @@ namespace DogRunService
 
                         // 出售
                         decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
-                        SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList, $"device:{devide}");
+                        SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:{devide}");
                     }
                     catch (Exception ex)
                     {
@@ -574,8 +465,7 @@ namespace DogRunService
             }
         }
 
-        private static void SellWhenDoEmpty(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice,
-            List<FlexPoint> flexPointList, string sellMemo = "")
+        private static void SellWhenDoEmpty(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, string sellMemo = "")
         {
             try
             {
@@ -610,7 +500,7 @@ namespace DogRunService
                             SellOrderId = order.Data,
                             SellOrderResult = JsonConvert.SerializeObject(order),
                             SellDate = DateTime.Now,
-                            SellFlex = JsonConvert.SerializeObject(flexPointList),
+                            SellFlex = "",
                             SellQuantity = sellQuantity,
                             SellOrderPrice = sellPrice,
                             SellState = StateConst.Submitted,
@@ -648,13 +538,13 @@ namespace DogRunService
             var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
             CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName && it.QuoteCurrency == dogMoreBuy.QuoteCurrency);
             Console.WriteLine(JsonConvert.SerializeObject(symbol));
-            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
                 if (refreshMarket)
                 {
                     KlineUtils.InitMarketInDB(0, symbol, true);
-                    analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+                    analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                     if (analyzeResult == null)
                     {
                         logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null");
@@ -667,11 +557,10 @@ namespace DogRunService
                 }
             }
 
-            var flexPointList = analyzeResult.FlexPointList;
             var nowPrice = analyzeResult.NowPrice;
 
             // 没有大于预期, 也不能收割
-            if (nowPrice < dogMoreBuy.BuyTradePrice * JudgeSellUtils.GetPercent(nowPrice, flexPointList[0].close, flexPointList[0].id, sellPercent)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * sellPercent// JudgeSellUtils.GetPercent(nowPrice, flexPointList[0].close, flexPointList[0].id, sellPercent)
                 || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
             {
                 if (sellPercent < (decimal)1.04)
@@ -683,7 +572,7 @@ namespace DogRunService
 
             // 判断是否有回调
             // 获取高点数据.
-            var maxPriceNear = flexPointList[0].close;
+            var maxPriceNear = analyzeResult.Min30MaxPrice;
             // 改版
             var inDbMaxPrice = new KlineDao().GetMaxClosePrice(dogMoreBuy.QuoteCurrency, dogMoreBuy.SymbolName);
             if(inDbMaxPrice != null && (decimal)inDbMaxPrice > maxPriceNear)
@@ -695,7 +584,7 @@ namespace DogRunService
             {
                 if (sellPercent < (decimal)1.04)
                 {
-                    logger.Error($"------------{dogMoreBuy.SymbolName}----{nowPrice}----{flexPointList[0].close}--{flexPointList[0].close / nowPrice}--> 判断是否有回调");
+                    logger.Error($"------------{dogMoreBuy.SymbolName}----{nowPrice}-----> 判断是否有回调");
                 }
                 return;
             }
@@ -736,7 +625,7 @@ namespace DogRunService
                         SellOrderId = order.Data,
                         SellOrderResult = JsonConvert.SerializeObject(order),
                         SellDate = DateTime.Now,
-                        SellFlex = JsonConvert.SerializeObject(flexPointList),
+                        SellFlex = "",
                         SellQuantity = sellQuantity,
                         SellOrderPrice = sellPrice,
                         SellState = StateConst.Submitted,
@@ -766,20 +655,14 @@ namespace DogRunService
 
         public static void DoEmpty(CommonSymbols symbol, string userName, string accountId)
         {
-            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, false);
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
                 throw new ApplicationException("做空失败，分析出错");
             }
-            var flexPointList = analyzeResult.FlexPointList;
             var nowPrice = analyzeResult.NowPrice;
-            if (!flexPointList[0].isHigh)
-            {
-                // 最低点 不适合出售
-                throw new ApplicationException("做空失败， 最近不是最高");
-            }
 
-            if (nowPrice * (decimal)1.06 < flexPointList[0].close)
+            if (nowPrice * (decimal)1.06 < analyzeResult.MaxPrice)
             {
                 throw new ApplicationException("已经降低了6%， 不要做空，谨慎起见");
             }
@@ -832,38 +715,35 @@ namespace DogRunService
             // 出售
             decimal sellPrice = decimal.Round(nowPrice * (decimal)0.985, symbol.PricePrecision);
 
-            SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, flexPointList);
+            SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice);
         }
 
         public static string BuyWhenDoMoreAnalyze(CommonSymbols symbol, string userName, string accountId, decimal ladderBuyPercent)
         {
-            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
                 // 初始化数据, 再次拿去
                 KlineUtils.InitMarketInDB(0, symbol, true);
-                analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+                analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 if (analyzeResult == null)
                 {
                     throw new ApplicationException("做多失败，分析出错");
                 }
             }
 
-            var flexPointList = analyzeResult.FlexPointList;
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
-            var flexPercent = analyzeResult.FlexPercent;
 
             // 1.最近一次是最高点
             // 2.不是快速拉升的.
             // 3.低于管控的购入价
             var IsQuickRise = JudgeBuyUtils.IsQuickRise(symbol, historyKlines);
             var controlCanBuy = JudgeBuyUtils.ControlCanBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-            if (flexPointList[0].isHigh
-                || IsQuickRise
+            if (IsQuickRise
                 || !controlCanBuy)
             {
-                return $"判断 发现不适合 最高点isHigh:{flexPointList[0].isHigh},IsQuickRise:{IsQuickRise}, controlCanBuy:{controlCanBuy}";
+                return $"判断 发现不适合 最高点IsQuickRise:{IsQuickRise}, controlCanBuy:{controlCanBuy}";
             }
 
             try

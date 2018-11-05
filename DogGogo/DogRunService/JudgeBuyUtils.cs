@@ -14,11 +14,6 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(JudgeBuyUtils));
 
-        public static bool CheckCanBuyForHuiDiao(decimal nowOpen, decimal nearLowOpen)
-        {
-            return nowOpen > nearLowOpen * (decimal)1.005 && nowOpen < nearLowOpen * (decimal)1.06;
-        }
-
         /// <summary>
         /// 上涨很快的,要控制购入.
         /// </summary>

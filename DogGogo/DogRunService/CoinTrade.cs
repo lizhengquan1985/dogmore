@@ -99,17 +99,15 @@ namespace DogRunService
                     Console.WriteLine(item.SellTradePrice);
                 }
 
-                var canBuy = JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Minute30MinPrice);
-                if (!canBuy)
-                {
-                    continue;
-                }
-
                 var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-                PlatformApi api = PlatformApi.GetInstance(userName);
 
                 foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
                 {
+                    if (!analyzeResult.CheckCanBuyForHuiDiao(needBuyDogEmptySellItem))
+                    {
+                        continue;
+                    }
+
                     ShouGeDogEmpty(needBuyDogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
                 }
             }
@@ -132,26 +130,18 @@ namespace DogRunService
             {
                 ladderBuyPercent = setLadderBuyPercent;
             }
-            var minBuyTradePrice = new DogMoreBuyDao().GetMinBuyPriceOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
-            if (minBuyTradePrice <= 0)
+            var dogMoreBuy = new DogMoreBuyDao().GetMinBuyPriceDataOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
+            if (dogMoreBuy != null && dogMoreBuy.BuyTradePrice <= 0)
             {
-                if (symbol.BaseCurrency == "新的啊")
-                {
-                    minBuyTradePrice = 25000;
-                }
-                else
-                {
-                    logger.Error("获取上一次最小购入价位出错");
-                    return;
-                }
+                logger.Error("获取上一次最小购入价位出错");
+                return;
             }
-            if (nowPrice * ladderBuyPercent > minBuyTradePrice || nowPrice * (decimal)1.04 >= minBuyTradePrice)
+            if (nowPrice * ladderBuyPercent > dogMoreBuy.BuyTradePrice || nowPrice * (decimal)1.04 >= dogMoreBuy.BuyTradePrice)
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
             }
 
-            // 判断是否回调0.5%
-            if (!JudgeBuyUtils.CheckCanBuyForHuiDiao(nowPrice, analyzeResult.Minute30MinPrice))
+            if (!analyzeResult.CheckCanBuyForHuiDiao(dogMoreBuy))
             {
                 return;
             }
@@ -259,7 +249,7 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QueryBuyDetailAndUpdate(userName, order.Data);
                 }
-                logger.Error($"入库结束 -----------------------------做多  下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId},");
+                logger.Error($"入库结束 -----------------------------做多  下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, nowPrice：{nowPrice}, accountId：{accountId},");
             }
             catch (Exception ex)
             {
@@ -267,7 +257,7 @@ namespace DogRunService
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }
-            
+
         }
 
         public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbols symbol, AnalyzeResult analyzeResult, decimal percent = (decimal)1.02)
@@ -570,22 +560,9 @@ namespace DogRunService
                 return;
             }
 
-            // 判断是否有回调
-            // 获取高点数据.
-            var maxPriceNear = analyzeResult.Minute30MaxPrice;
-            // 改版
-            var inDbMaxPrice = new KlineDao().GetMaxClosePrice(dogMoreBuy.QuoteCurrency, dogMoreBuy.SymbolName);
-            if(inDbMaxPrice != null && (decimal)inDbMaxPrice > maxPriceNear)
+            if (!analyzeResult.CheckCanSellForHuiDiao(dogMoreBuy))
             {
-                maxPriceNear = (decimal)inDbMaxPrice;
-            }
-
-            if (!JudgeSellUtils.CheckCanSellForHuiDiao(dogMoreBuy, nowPrice, maxPriceNear))
-            {
-                if (sellPercent < (decimal)1.04)
-                {
-                    logger.Error($"------------{dogMoreBuy.SymbolName}----{nowPrice}-----> 判断是否有回调");
-                }
+                // 判断是否有回掉
                 return;
             }
 

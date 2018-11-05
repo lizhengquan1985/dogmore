@@ -180,7 +180,7 @@ namespace DogRunService
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"严重 {userName}--{JsonConvert.SerializeObject(symbol)}--{ex.Message}", ex);
+                    logger.Error($"{userName}--{JsonConvert.SerializeObject(symbol)}--{ex.Message}", ex);
                     continue;
                 }
             }
@@ -863,7 +863,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error($"严重 {userName} {JsonConvert.SerializeObject(symbol)} {ex.Message}", ex);
+                logger.Error($"{userName} {JsonConvert.SerializeObject(symbol)} {ex.Message}", ex);
                 return ex.Message;
             }
             return "----";

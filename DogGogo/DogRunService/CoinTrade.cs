@@ -180,6 +180,7 @@ namespace DogRunService
                 }
                 catch (Exception ex)
                 {
+                    logger.Error($"严重 {userName}--{JsonConvert.SerializeObject(symbol)}--{ex.Message}", ex);
                     continue;
                 }
             }
@@ -328,42 +329,46 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
+                logger.Error($"开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
+                logger.Error($"下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
+
+                if (order.Status == "ok")
+                {
+                    new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
+                    {
+                        SymbolName = symbol.BaseCurrency,
+                        QuoteCurrency = symbol.QuoteCurrency,
+                        AccountId = accountId,
+                        UserName = userName,
+                        FlexPercent = flexPercent,
+
+                        BuyQuantity = buyQuantity,
+                        BuyOrderPrice = orderPrice,
+                        BuyDate = DateTime.Now,
+                        BuyOrderResult = JsonConvert.SerializeObject(order),
+                        BuyState = StateConst.PreSubmitted,
+                        BuyTradePrice = 0,
+                        BuyOrderId = order.Data,
+                        BuyFlex = JsonConvert.SerializeObject(flexPointList),
+                        BuyMemo = "",
+                        BuyOrderDetail = "",
+                        BuyOrderMatchResults = "",
+                        IsFinished = false
+                    });
+
+                    // 下单成功马上去查一次
+                    QueryBuyDetailAndUpdate(userName, order.Data);
+                }
+                logger.Error($"入库结束 -----------------------------做多  下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId},分析 {JsonConvert.SerializeObject(flexPointList)}");
             }
             catch (Exception ex)
             {
-                logger.Error($" ---------------  下的出错  --------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"严重 ---------------  下的出错  --------------{JsonConvert.SerializeObject(req)}");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }
-            if (order.Status == "ok")
-            {
-                new DogMoreBuyDao().CreateDogMoreBuy(new DogMoreBuy()
-                {
-                    SymbolName = symbol.BaseCurrency,
-                    QuoteCurrency = symbol.QuoteCurrency,
-                    AccountId = accountId,
-                    UserName = userName,
-                    FlexPercent = flexPercent,
-
-                    BuyQuantity = buyQuantity,
-                    BuyOrderPrice = orderPrice,
-                    BuyDate = DateTime.Now,
-                    BuyOrderResult = JsonConvert.SerializeObject(order),
-                    BuyState = StateConst.PreSubmitted,
-                    BuyTradePrice = 0,
-                    BuyOrderId = order.Data,
-                    BuyFlex = JsonConvert.SerializeObject(flexPointList),
-                    BuyMemo = "",
-                    BuyOrderDetail = "",
-                    BuyOrderMatchResults = "",
-                    IsFinished = false
-                });
-
-                // 下单成功马上去查一次
-                QueryBuyDetailAndUpdate(userName, order.Data);
-            }
-            logger.Error($"下单 --> 下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, 上一次最低购入价位：{minBuyTradePrice},nowPrice：{nowPrice}, accountId：{accountId},分析 {JsonConvert.SerializeObject(flexPointList)}");
+            
         }
 
         public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbols symbol, AnalyzeResult analyzeResult, decimal percent = (decimal)1.02)
@@ -398,42 +403,43 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
+                logger.Error($"开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
+                logger.Error($"下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
+
+                if (order.Status == "ok")
+                {
+                    new DogEmptyBuyDao().CreateDogEmptyBuy(new DogEmptyBuy()
+                    {
+                        SymbolName = symbol.BaseCurrency,
+                        QuoteCurrency = symbol.QuoteCurrency,
+                        AccountId = dogEmptySell.AccountId,
+                        UserName = dogEmptySell.UserName,
+                        SellOrderId = dogEmptySell.SellOrderId,
+
+                        BuyQuantity = buyQuantity,
+                        BuyOrderPrice = orderPrice,
+                        BuyDate = DateTime.Now,
+                        BuyOrderResult = JsonConvert.SerializeObject(order),
+                        BuyState = StateConst.PreSubmitted,
+                        BuyTradePrice = 0,
+                        BuyOrderId = order.Data,
+                        BuyFlex = JsonConvert.SerializeObject(analyzeResult.FlexPointList),
+                        BuyMemo = "",
+                        BuyOrderDetail = "",
+                        BuyOrderMatchResults = "",
+                    });
+                    // 下单成功马上去查一次
+                    QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
+                }
+                logger.Error($"入库结束 -----------------------------空单收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
             }
             catch (Exception ex)
             {
-                logger.Error($" ---------------  下的出错  -------------- {JsonConvert.SerializeObject(req)}");
+                logger.Error($"严重 ---------------  ShouGeDogEmpty出错  -------------- {JsonConvert.SerializeObject(req)}");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }
-
-            if (order.Status == "ok")
-            {
-                new DogEmptyBuyDao().CreateDogEmptyBuy(new DogEmptyBuy()
-                {
-                    SymbolName = symbol.BaseCurrency,
-                    QuoteCurrency = symbol.QuoteCurrency,
-                    AccountId = dogEmptySell.AccountId,
-                    UserName = dogEmptySell.UserName,
-                    SellOrderId = dogEmptySell.SellOrderId,
-
-                    BuyQuantity = buyQuantity,
-                    BuyOrderPrice = orderPrice,
-                    BuyDate = DateTime.Now,
-                    BuyOrderResult = JsonConvert.SerializeObject(order),
-                    BuyState = StateConst.PreSubmitted,
-                    BuyTradePrice = 0,
-                    BuyOrderId = order.Data,
-                    BuyFlex = JsonConvert.SerializeObject(analyzeResult.FlexPointList),
-                    BuyMemo = "",
-                    BuyOrderDetail = "",
-                    BuyOrderMatchResults = "",
-                });
-                // 下单成功马上去查一次
-                QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
-            }
-            logger.Error($"下单 --> 空单收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
-            logger.Error($"下单 --> 空单收割-下单购买结果 分析 {JsonConvert.SerializeObject(analyzeResult.FlexPointList)}");
         }
 
         private static void RunSell(CommonSymbols symbol, AnalyzeResult analyzeResult)
@@ -561,6 +567,7 @@ namespace DogRunService
                     }
                     catch (Exception ex)
                     {
+                        logger.Error($"收割出错 {ex.Message} {JsonConvert.SerializeObject(needSellDogMoreBuyItem)}", ex);
                         continue;
                     }
                 }
@@ -590,50 +597,53 @@ namespace DogRunService
                 HBResponse<long> order = null;
                 try
                 {
+                    logger.Error($"开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                     order = api.OrderPlace(req);
+                    logger.Error($"下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
+
+                    if (order.Status == "ok")
+                    {
+                        DogEmptySell dogEmptySell = new DogEmptySell()
+                        {
+                            AccountId = accountId,
+                            UserName = userName,
+                            SellOrderId = order.Data,
+                            SellOrderResult = JsonConvert.SerializeObject(order),
+                            SellDate = DateTime.Now,
+                            SellFlex = JsonConvert.SerializeObject(flexPointList),
+                            SellQuantity = sellQuantity,
+                            SellOrderPrice = sellPrice,
+                            SellState = StateConst.Submitted,
+                            SellTradePrice = 0,
+                            SymbolName = symbol.BaseCurrency,
+                            QuoteCurrency = symbol.QuoteCurrency,
+                            SellMemo = sellMemo,
+                            SellOrderDetail = "",
+                            SellOrderMatchResults = "",
+                            FlexPercent = (decimal)1.00,
+                            IsFinished = false
+                        };
+                        new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
+
+                        // 下单成功马上去查一次
+                        QueryEmptySellDetailAndUpdate(userName, order.Data);
+                    }
+                    logger.Error($"入库结束 -----------------------------做空 {JsonConvert.SerializeObject(req)}下单出售结果：" + JsonConvert.SerializeObject(order));
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($" ---------------  下的出错  --------------{JsonConvert.SerializeObject(req)}");
+                    logger.Error($"严重 ---------------  做空出错  --------------{JsonConvert.SerializeObject(req)}");
                     Thread.Sleep(1000 * 60 * 5);
                     throw ex;
                 }
-                if (order.Status == "ok")
-                {
-                    DogEmptySell dogEmptySell = new DogEmptySell()
-                    {
-                        AccountId = accountId,
-                        UserName = userName,
-                        SellOrderId = order.Data,
-                        SellOrderResult = JsonConvert.SerializeObject(order),
-                        SellDate = DateTime.Now,
-                        SellFlex = JsonConvert.SerializeObject(flexPointList),
-                        SellQuantity = sellQuantity,
-                        SellOrderPrice = sellPrice,
-                        SellState = StateConst.Submitted,
-                        SellTradePrice = 0,
-                        SymbolName = symbol.BaseCurrency,
-                        QuoteCurrency = symbol.QuoteCurrency,
-                        SellMemo = sellMemo,
-                        SellOrderDetail = "",
-                        SellOrderMatchResults = "",
-                        FlexPercent = (decimal)1.00,
-                        IsFinished = false
-                    };
-                    new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
-
-                    // 下单成功马上去查一次
-                    QueryEmptySellDetailAndUpdate(userName, order.Data);
-                }
-                logger.Error($"下单 --> req {JsonConvert.SerializeObject(req)}下单出售结果：" + JsonConvert.SerializeObject(order));
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
+                logger.Error($"SellWhenDoEmpty  {ex.Message}", ex);
             }
         }
 
-        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, decimal percent, bool refreshMarket = false)
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, decimal sellPercent, bool refreshMarket = false)
         {
             var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
             CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName && it.QuoteCurrency == dogMoreBuy.QuoteCurrency);
@@ -661,10 +671,10 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             // 没有大于预期, 也不能收割
-            if (nowPrice < dogMoreBuy.BuyTradePrice * JudgeSellUtils.GetPercent(nowPrice, flexPointList[0].close, flexPointList[0].id, percent)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * JudgeSellUtils.GetPercent(nowPrice, flexPointList[0].close, flexPointList[0].id, sellPercent)
                 || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
             {
-                if (percent < (decimal)1.04)
+                if (sellPercent < (decimal)1.04)
                 {
                     logger.Error($"------------{dogMoreBuy.SymbolName}------------> 没有大于预期, 也不能收割");
                 }
@@ -672,9 +682,9 @@ namespace DogRunService
             }
 
             // 判断是否有回调
-            if (!JudgeSellUtils.CheckCanSellForHuiDiao(nowPrice, flexPointList[0].close))
+            if (!JudgeSellUtils.CheckCanSellForHuiDiao(dogMoreBuy, nowPrice, flexPointList[0].close))
             {
-                if (percent < (decimal)1.04)
+                if (sellPercent < (decimal)1.04)
                 {
                     logger.Error($"------------{dogMoreBuy.SymbolName}----{nowPrice}----{flexPointList[0].close}--{flexPointList[0].close / nowPrice}--> 判断是否有回调");
                 }
@@ -702,43 +712,45 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
+                logger.Error($"开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
+                logger.Error($"下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
+
+                // 下单出错, 报了异常, 也需要查询是否下单成功. 查询最近的订单.
+                if (order.Status == "ok")
+                {
+                    DogMoreSell dogMoreSell = new DogMoreSell()
+                    {
+                        AccountId = dogMoreBuy.AccountId,
+                        UserName = dogMoreBuy.UserName,
+                        BuyOrderId = dogMoreBuy.BuyOrderId,
+                        SellOrderId = order.Data,
+                        SellOrderResult = JsonConvert.SerializeObject(order),
+                        SellDate = DateTime.Now,
+                        SellFlex = JsonConvert.SerializeObject(flexPointList),
+                        SellQuantity = sellQuantity,
+                        SellOrderPrice = sellPrice,
+                        SellState = StateConst.Submitted,
+                        SellTradePrice = 0,
+                        SymbolName = symbol.BaseCurrency,
+                        QuoteCurrency = symbol.QuoteCurrency,
+                        SellMemo = "",
+                        SellOrderDetail = "",
+                        SellOrderMatchResults = ""
+                    };
+                    new DogMoreSellDao().CreateDogMoreSell(dogMoreSell);
+
+                    // 下单成功马上去查一次
+                    QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
+                }
+                logger.Error($"入库结束 -----------------------------多单收割 --> {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice}，accountId：{dogMoreBuy.AccountId}");
             }
             catch (Exception ex)
             {
-                logger.Error($" ---------------  下的出错  --------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"严重 ---------------  多单收割出错  --------------{JsonConvert.SerializeObject(req)}");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }
-
-            // 下单出错, 报了异常, 也需要查询是否下单成功. 查询最近的订单.
-            if (order.Status == "ok")
-            {
-                DogMoreSell dogMoreSell = new DogMoreSell()
-                {
-                    AccountId = dogMoreBuy.AccountId,
-                    UserName = dogMoreBuy.UserName,
-                    BuyOrderId = dogMoreBuy.BuyOrderId,
-                    SellOrderId = order.Data,
-                    SellOrderResult = JsonConvert.SerializeObject(order),
-                    SellDate = DateTime.Now,
-                    SellFlex = JsonConvert.SerializeObject(flexPointList),
-                    SellQuantity = sellQuantity,
-                    SellOrderPrice = sellPrice,
-                    SellState = StateConst.Submitted,
-                    SellTradePrice = 0,
-                    SymbolName = symbol.BaseCurrency,
-                    QuoteCurrency = symbol.QuoteCurrency,
-                    SellMemo = "",
-                    SellOrderDetail = "",
-                    SellOrderMatchResults = ""
-                };
-                new DogMoreSellDao().CreateDogMoreSell(dogMoreSell);
-
-                // 下单成功马上去查一次
-                QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
-            }
-            logger.Error($"下单出售 --> 下单出售结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)},nowPrice：{nowPrice}，accountId：{dogMoreBuy.AccountId}");
         }
 
         #region 手动
@@ -851,7 +863,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message);
+                logger.Error($"严重 {userName} {JsonConvert.SerializeObject(symbol)} {ex.Message}", ex);
                 return ex.Message;
             }
             return "----";

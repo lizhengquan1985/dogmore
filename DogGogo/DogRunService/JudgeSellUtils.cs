@@ -1,6 +1,7 @@
 ﻿using DogPlatform.Model;
 using DogRunService.DataTypes;
 using DogService;
+using DogService.DateTypes;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -48,13 +49,27 @@ namespace DogRunService
             return percent;
         }
 
-        public static bool CheckCanSellForHuiDiao(decimal nowPrice, decimal nearHighPrice)
+        public static bool CheckCanSellForHuiDiao(DogMoreBuy dogMoreBuy, decimal nowPrice, decimal nearHighPrice)
         {
+            var minHuidiao = (decimal)1.005;
+            var maxHuidiao = (decimal)1.03;
+            var huidiao = minHuidiao;
+            var upPercent = nowPrice / dogMoreBuy.BuyTradePrice;
+            if (upPercent <= (decimal)1.02)
+            {
+                // 这个太差了吧.
+                return false;
+            }
+
+            huidiao = 1 + ((nowPrice / dogMoreBuy.BuyTradePrice) - 1) / 10;
+            huidiao = Math.Max(huidiao, minHuidiao);
+            huidiao = Math.Min(huidiao, maxHuidiao);
+
             if (nowPrice > nearHighPrice)
             {
                 return true;
             }
-            return nowPrice * (decimal)1.005 < nearHighPrice && nowPrice * (decimal)1.16 > nearHighPrice;
+            return nowPrice * huidiao < nearHighPrice && nowPrice * upPercent > nearHighPrice;
         }
 
         public static bool CheckCanSell(decimal buyPrice, decimal afterBuyHighClosePrice, decimal nowPrice, decimal gaoyuPercentSell = (decimal)1.03, bool needHuitou = true)

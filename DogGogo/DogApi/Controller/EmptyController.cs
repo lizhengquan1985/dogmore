@@ -47,7 +47,7 @@ namespace DogApi.Controller
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
+                logger.Error($"严重 orderId:{orderId}- {ex.Message}", ex);
             }
         }
 
@@ -77,7 +77,7 @@ namespace DogApi.Controller
             }
             catch (Exception ex)
             {
-                logger.Error(ex.Message, ex);
+                logger.Error($"严重 orderId:{orderId} {ex.Message}", ex);
             }
         }
 

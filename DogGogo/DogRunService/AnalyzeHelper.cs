@@ -98,7 +98,7 @@ namespace DogRunService
         {
             // 是否回掉了，可以出售。 肯定要是最高点回掉
 
-            if(dogMoreBuy == null || dogMoreBuy.BuyTradePrice <= 0)
+            if (dogMoreBuy == null || dogMoreBuy.BuyTradePrice <= 0)
             {
                 return false;
             }
@@ -128,7 +128,45 @@ namespace DogRunService
             huidiao = 1 + ((NowPrice / dogMoreBuy.BuyTradePrice) - 1) / 10;
             huidiao = Math.Max(huidiao, minHuidiao);
             huidiao = Math.Min(huidiao, maxHuidiao);
-            
+
+            return NowPrice * huidiao < max && NowPrice * upPercent > max;
+        }
+
+        public bool CheckCanSellForHuiDiao(DogEmptySell dogEmptySell)
+        {
+            // 是否回掉了，可以出售。 肯定要是最高点回掉
+
+            if (dogEmptySell == null || dogEmptySell.SellTradePrice <= 0)
+            {
+                return false;
+            }
+
+            // 找到最近24小时，并且是出售之后的价格数据
+            var klines = HistoryKlines.FindAll(it => it.Id > dogEmptySell.Id);
+            if (klines.Count == 0)
+            {
+                return false;
+            }
+
+            // 判断是否有最小值，且小于nowPrice
+            var min = klines.Min(it => it.Close);
+            var max = klines.Max(it => it.Close);
+            //return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.04 < dogMoreBuy.BuyTradePrice;
+
+            var minHuidiao = (decimal)1.005;
+            var maxHuidiao = (decimal)1.03;
+            var huidiao = minHuidiao;
+            var upPercent = NowPrice / dogEmptySell.SellTradePrice;
+            if (upPercent <= (decimal)1.03)
+            {
+                // 这个太差了吧.
+                return false;
+            }
+
+            huidiao = 1 + ((NowPrice / dogEmptySell.SellTradePrice) - 1) / 10;
+            huidiao = Math.Max(huidiao, minHuidiao);
+            huidiao = Math.Min(huidiao, maxHuidiao);
+
             return NowPrice * huidiao < max && NowPrice * upPercent > max;
         }
     }

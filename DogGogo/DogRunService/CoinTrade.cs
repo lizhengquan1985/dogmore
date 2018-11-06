@@ -338,99 +338,6 @@ namespace DogRunService
 
             var userNames = UserPools.GetAllUserName();
 
-            // 自动做空
-            var control = new DogControlDao().GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
-            var dayMin = historyKlines.Min(it => it.Open);
-            var dayMax = historyKlines.Max(it => it.Open);
-            var hourMin = historyKlines.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.AddHours(-1)).Min(it => it.Open);
-            var hourMax = historyKlines.Where(it => Utils.GetDateById(it.Id) > DateTime.Now.AddHours(-1)).Max(it => it.Open);
-            if (nowPrice * (decimal)1.05 > analyzeResult.MaxPrice
-                && nowPrice * (decimal)1.005 < analyzeResult.Minute30MaxPrice
-                && control != null
-                && control.HistoryMin > 0
-                && nowPrice >= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin
-                && nowPrice >= control.HistoryMin * (decimal)1.3
-                && (
-                    nowPrice >= control.EmptyPrice ||
-                    (
-                    // 24小时上涨30%以上, 并且, 1个小时上涨10%以上.
-                    dayMax % dayMin > (decimal)1.30
-                    && hourMax % hourMin > (decimal)1.10
-                    )
-                ))
-            {
-                foreach (var userName in userNames)
-                {
-                    try
-                    {
-                        // 和上次做空价格要相差8%
-                        var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                        var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-                        if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * emptyLadder)
-                        {
-                            // 上一次还没收割得，相差10%， 要等等
-                            continue;
-                        }
-
-                        var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
-                        var accountId = accountConfig.MainAccountId;
-                        PlatformApi api = PlatformApi.GetInstance(userName);
-
-                        var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
-                        var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
-                        // 要减去未收割得。
-                        var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
-                        if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
-                        {
-                            logger.Error($"未收割得数量大于余额，有些不合理, {symbol.BaseCurrency}, {userName}, {notShougeQuantity}, {balanceItem.balance}");
-                            continue;
-                        }
-                        if ((balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.8)
-                        {
-                            //LogNotBuy(symbol.BaseCurrency, $"收益不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
-                            continue;
-                        }
-
-                        var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
-                        decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
-                        if (sellQuantity * nowPrice > 10)
-                        {
-                            sellQuantity = 10 / nowPrice;
-                        }
-                        if ((balanceItem.balance - notShougeQuantity) * nowPrice < 10)
-                        {
-                            sellQuantity = (balanceItem.balance - notShougeQuantity) / 12;
-                            if ((balanceItem.balance - notShougeQuantity) * nowPrice < 5)
-                            {
-                                sellQuantity = (balanceItem.balance - notShougeQuantity) / 9;
-                                if ((balanceItem.balance - notShougeQuantity) * nowPrice < 2)
-                                {
-                                    sellQuantity = (balanceItem.balance - notShougeQuantity) / 5;
-                                    if ((balanceItem.balance - notShougeQuantity) * nowPrice < 1)
-                                    {
-                                        sellQuantity = (balanceItem.balance - notShougeQuantity) / 3;
-                                    }
-                                }
-                            }
-                        }
-                        sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                        if (sellQuantity * nowPrice < (decimal)0.8)
-                        {
-                            //LogNotBuy(symbol.BaseCurrency, $"做空不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
-                            continue;
-                        }
-
-                        // 出售
-                        decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
-                        SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:{devide}");
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error(ex.Message, ex);
-                    }
-                }
-            }
-
             // 多单的自动波动收割
             foreach (var userName in userNames)
             {
@@ -453,6 +360,90 @@ namespace DogRunService
                     }
                 }
             }
+
+            // 快速下降和不符合管控的，则不考虑做空
+            if (JudgeBuyUtils.IsQuickDrop(symbol, historyKlines)
+                || !JudgeBuyUtils.ControlCanSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
+            {
+                return;
+            }
+
+            foreach (var userName in userNames)
+            {
+                try
+                {
+                    var dogEmptySell = new DogEmptySellDao().GetDogEmptySellOfLastNotFinished(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
+                    if (!analyzeResult.CheckCanSellForHuiDiao(dogEmptySell))
+                    {
+                        continue;
+                    }
+                    // 和上次做空价格要相差8%
+                    var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
+                    var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
+                    if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * emptyLadder)
+                    {
+                        // 上一次还没收割得，相差10%， 要等等
+                        continue;
+                    }
+
+                    var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
+                    var accountId = accountConfig.MainAccountId;
+                    PlatformApi api = PlatformApi.GetInstance(userName);
+
+                    var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+                    var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
+                    // 要减去未收割得。
+                    var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
+                    if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
+                    {
+                        logger.Error($"未收割得数量大于余额，有些不合理, {symbol.BaseCurrency}, {userName}, {notShougeQuantity}, {balanceItem.balance}");
+                        continue;
+                    }
+                    if ((balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.8)
+                    {
+                        //LogNotBuy(symbol.BaseCurrency, $"收益不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                        continue;
+                    }
+
+                    var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
+                    decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
+                    if (sellQuantity * nowPrice > 10)
+                    {
+                        sellQuantity = 10 / nowPrice;
+                    }
+                    if ((balanceItem.balance - notShougeQuantity) * nowPrice < 10)
+                    {
+                        sellQuantity = (balanceItem.balance - notShougeQuantity) / 12;
+                        if ((balanceItem.balance - notShougeQuantity) * nowPrice < 5)
+                        {
+                            sellQuantity = (balanceItem.balance - notShougeQuantity) / 9;
+                            if ((balanceItem.balance - notShougeQuantity) * nowPrice < 2)
+                            {
+                                sellQuantity = (balanceItem.balance - notShougeQuantity) / 5;
+                                if ((balanceItem.balance - notShougeQuantity) * nowPrice < 1)
+                                {
+                                    sellQuantity = (balanceItem.balance - notShougeQuantity) / 3;
+                                }
+                            }
+                        }
+                    }
+                    sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+                    if (sellQuantity * nowPrice < (decimal)0.8)
+                    {
+                        //LogNotBuy(symbol.BaseCurrency, $"做空不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                        continue;
+                    }
+
+                    // 出售
+                    decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
+                    SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:{devide}");
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex.Message, ex);
+                }
+            }
+
         }
 
         private static void SellWhenDoEmpty(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, string sellMemo = "")

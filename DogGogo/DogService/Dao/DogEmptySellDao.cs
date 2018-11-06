@@ -134,6 +134,12 @@ namespace DogService.Dao
             return res;
         }
 
+        public DogEmptySell GetDogEmptySellOfLastNotFinished(string userName, string symbolName, string quoteCurrency)
+        {
+            var sql = $"select * from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and QuoteCurrency=@quoteCurrency and UserName=@userName order by SellOrderPrice desc";
+            return Database.Query<DogEmptySell>(sql, new { symbolName, userName, quoteCurrency }).FirstOrDefault();
+        }
+
         public List<DogEmptySell> ListDogEmptySellFinished(string userName, string symbolName)
         {
             var sql = $"select * from t_dog_empty_sell where IsFinished=1 and SymbolName like @symbolName ";

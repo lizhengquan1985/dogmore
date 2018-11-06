@@ -111,12 +111,12 @@ namespace DogService.Dao
 
         #endregion
 
-        public List<DogMoreBuy> GetNeedSellDogMoreBuy(string accountId, string userName, string quoteCurrency, string symbolName)
+        public List<DogMoreBuy> GetNeedSellDogMoreBuy(string userName, string symbolName, string quoteCurrency)
         {
             var states = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled });
             var states2 = GetStateStringIn(new List<string>() { StateConst.PartialCanceled, StateConst.Filled, StateConst.Canceled });
-            var sql = $"select * from t_dog_more_buy where AccountId='{accountId}' and QuoteCurrency = '{quoteCurrency}' and SymbolName = '{symbolName}' and BuyState in({states}) and IsFinished=0 " +
-                $" and UserName='{userName}' and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where AccountId='{accountId}' and UserName='{userName}' and QuoteCurrency = '{quoteCurrency}' and SellState not in({states})) " +
+            var sql = $"select * from t_dog_more_buy where UserName='{userName}' and QuoteCurrency = '{quoteCurrency}' and SymbolName = '{symbolName}' and BuyState in({states}) and IsFinished=0 " +
+                $" and BuyOrderId not in(select BuyOrderId from t_dog_more_sell where UserName='{userName}' and QuoteCurrency = '{quoteCurrency}' and SellState not in({states})) " +
                 $" order by BuyTradePrice asc limit 0,8";
             return Database.Query<DogMoreBuy>(sql).ToList();
         }

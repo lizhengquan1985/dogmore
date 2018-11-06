@@ -341,21 +341,19 @@ namespace DogRunService
             // 多单的自动波动收割
             foreach (var userName in userNames)
             {
-                var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
-                var accountId = accountConfig.MainAccountId;
-                var needSellDogMoreBuyList = new DogMoreBuyDao().GetNeedSellDogMoreBuy(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
+                var needSellDogMoreBuyList = new DogMoreBuyDao().GetNeedSellDogMoreBuy(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
 
-                foreach (var needSellDogMoreBuyItem in needSellDogMoreBuyList)
+                foreach (var dogMoreBuyItem in needSellDogMoreBuyList)
                 {
-                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(needSellDogMoreBuyItem.SymbolName, needSellDogMoreBuyItem.QuoteCurrency, nowPrice); //(decimal)1.035;
+                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(dogMoreBuyItem.SymbolName, dogMoreBuyItem.QuoteCurrency, nowPrice); //(decimal)1.035;
 
                     try
                     {
-                        ShouGeDogMore(needSellDogMoreBuyItem, gaoyuPercentSell);
+                        ShouGeDogMore(dogMoreBuyItem, gaoyuPercentSell);
                     }
                     catch (Exception ex)
                     {
-                        logger.Error($"收割出错 {ex.Message} {JsonConvert.SerializeObject(needSellDogMoreBuyItem)}", ex);
+                        logger.Error($"收割出错 {ex.Message} {JsonConvert.SerializeObject(dogMoreBuyItem)}", ex);
                         continue;
                     }
                 }

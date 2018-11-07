@@ -153,7 +153,7 @@ namespace DogService
                 // 计算出来阶梯
                 defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, min);
                 defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, max);
-                defaultLadderSellPercent = Math.Max(defaultLadderSellPercent, control.LadderSellPercent);
+                defaultLadderSellPercent = Math.Min(defaultLadderSellPercent, control.LadderSellPercent);
                 return defaultLadderSellPercent;
             }
             catch (Exception ex)

@@ -204,7 +204,7 @@ namespace DogRunService
             {
                 return newSellQuantity;
             }
-            throw new Exception($"计算sellquantity不合理, buyQuantity:{buyQuantity},newSellQuantity:{newSellQuantity}");
+            throw new Exception($"计算sellquantity不合理, buyQuantity:{buyQuantity},newSellQuantity:{newSellQuantity}， 没有赚头");
         }
     }
 }

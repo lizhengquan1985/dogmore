@@ -514,7 +514,7 @@ namespace DogRunService
         {
             var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
             CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName && it.QuoteCurrency == dogMoreBuy.QuoteCurrency);
-            Console.WriteLine(JsonConvert.SerializeObject(symbol));
+
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {

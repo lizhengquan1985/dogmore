@@ -59,6 +59,31 @@ namespace DogRunService
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
 
+            var userNames = UserPools.GetAllUserName();
+
+            // 空单的自动波动收割
+            foreach (var userName in userNames)
+            {
+                var dogEmptySellList = new DogEmptySellDao().GetNeedShougeDogEmptySell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
+                Console.WriteLine("做空收割 " + symbol.BaseCurrency + symbol.QuoteCurrency + $", nowPrice:{nowPrice} 空单数量：" + dogEmptySellList.Count);
+                foreach (var item in dogEmptySellList)
+                {
+                    Console.WriteLine($"      {item.SellTradePrice}");
+                }
+
+                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
+
+                foreach (var dogEmptySellItem in dogEmptySellList)
+                {
+                    if (!analyzeResult.CheckCanBuyForHuiDiao(dogEmptySellItem))
+                    {
+                        continue;
+                    }
+
+                    ShouGeDogEmpty(dogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
+                }
+            }
+
             // 2.不是快速拉升的.
             // 3.低于管控的购入价
             if (JudgeBuyUtils.IsQuickRise(symbol, historyKlines)
@@ -66,8 +91,6 @@ namespace DogRunService
             {
                 return;
             }
-
-            var userNames = UserPools.GetAllUserName();
 
             // 自动波动做多
             foreach (var userName in userNames)
@@ -86,31 +109,6 @@ namespace DogRunService
                 }
             }
 
-            // 空单的自动波动收割
-            foreach (var userName in userNames)
-            {
-                AccountConfig accountConfig = AccountConfigUtils.GetAccountConfig(userName);
-                var accountId = accountConfig.MainAccountId;
-
-                var needBuyDogEmptySellList = new DogEmptySellDao().GetNeedBuyDogEmptySell(accountId, userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                Console.WriteLine(symbol.BaseCurrency + $", nowPrice:{nowPrice} 空单数量：" + needBuyDogEmptySellList.Count + "--");
-                foreach (var item in needBuyDogEmptySellList)
-                {
-                    Console.WriteLine(item.SellTradePrice);
-                }
-
-                var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-
-                foreach (var needBuyDogEmptySellItem in needBuyDogEmptySellList)
-                {
-                    if (!analyzeResult.CheckCanBuyForHuiDiao(needBuyDogEmptySellItem))
-                    {
-                        continue;
-                    }
-
-                    ShouGeDogEmpty(needBuyDogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
-                }
-            }
         }
 
         /// <summary>
@@ -321,7 +319,7 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
                 }
-                logger.Error($"入库结束 -----------------------------空单收割-下单购买结果 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
+                logger.Error($"入库结束 -----------------------------空单收割 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
             }
             catch (Exception ex)
             {

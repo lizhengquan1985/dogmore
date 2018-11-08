@@ -145,27 +145,6 @@ namespace DogApi.Controller
             }
         }
 
-        //[HttpGet]
-        //[ActionName("getFlexCount")]
-        //public async Task<Object> GetFlexCount(string symbolName, string quoteCurrency)
-        //{
-        //    var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
-        //    CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == symbolName);
-        //    KlineUtils.InitOneKine(symbol);
-        //    var key = HistoryKlinePools.GetKey(symbol, "1min");
-        //    var historyKlineData = HistoryKlinePools.Get(key);
-
-        //    var historyKlines = historyKlineData.Data;
-        //    var outFlexPercent = (decimal)0;
-        //    var flexCount = GetFlexpointCount(historyKlines, out outFlexPercent);
-        //    var inDB = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-        //    inDB.LadderSellPercent = outFlexPercent;
-        //    inDB.LadderSellExpiredTime = DateTime.Now.AddYears(1);
-        //    await new DogControlDao().CreateDogControl(inDB);
-
-        //    return flexCount;
-        //}
-
         private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines, out decimal outFlexPercent)
         {
             Dictionary<decimal, int> result = new Dictionary<decimal, int>();
@@ -207,7 +186,7 @@ namespace DogApi.Controller
                             continue;
                         }
 
-                        var nowPriceItem = nowPriceList.Find(it => it.SymbolName == balanceItem.currency);
+                       var nowPriceItem = nowPriceList.Find(it => it.SymbolName == balanceItem.currency);
                         if (nowPriceItem == null)
                         {
                             continue;

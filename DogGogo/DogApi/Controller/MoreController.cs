@@ -3,6 +3,7 @@ using DogApi.DTO;
 using DogPlatform;
 using DogPlatform.Model;
 using DogRunService;
+using DogRunService.Helper;
 using DogService;
 using DogService.Dao;
 using DogService.DateTypes;
@@ -23,14 +24,14 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("shouge")]
-        public async Task shouge(long orderId)
+        public async Task<string> shouge(long orderId)
         {
             try
             {
                 var dogMoreBuy = new DogMoreBuyDao().GetDogMoreBuyByBuyOrderId(orderId);
                 if (dogMoreBuy.IsFinished)
                 {
-                    return;
+                    return "已完成出售";
                 }
 
                 var dogMoreSellList = new DogMoreSellDao().ListDogMoreSellByBuyOrderId(orderId);
@@ -42,14 +43,21 @@ namespace DogApi.Controller
                     ) != null)
                 {
                     // 存在操作中的,则不操作
-                    return;
+                    return "存在出售中的";
                 }
 
-                CoinTrade.ShouGeDogMore(dogMoreBuy, (decimal)1.032, true);
+                var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
+                CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName);
+
+                KlineUtils.InitMarketInDB(0, symbol, true);
+                CoinTrade.ShouGeDogMore(dogMoreBuy, symbol, (decimal)1.032);
+
+                return "操作结束";
             }
             catch (Exception ex)
             {
                 logger.Error(ex.Message, ex);
+                return ex.Message;
             }
         }
 

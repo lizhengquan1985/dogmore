@@ -228,7 +228,6 @@ namespace DogRunService
                         QuoteCurrency = symbol.QuoteCurrency,
                         AccountId = accountId,
                         UserName = userName,
-                        FlexPercent = (decimal)1.01,
 
                         BuyQuantity = buyQuantity,
                         BuyOrderPrice = orderPrice,
@@ -237,7 +236,6 @@ namespace DogRunService
                         BuyState = StateConst.PreSubmitted,
                         BuyTradePrice = 0,
                         BuyOrderId = order.Data,
-                        BuyFlex = "",
                         BuyMemo = "",
                         BuyOrderDetail = "",
                         BuyOrderMatchResults = "",
@@ -311,7 +309,6 @@ namespace DogRunService
                         BuyState = StateConst.PreSubmitted,
                         BuyTradePrice = 0,
                         BuyOrderId = order.Data,
-                        BuyFlex = "",
                         BuyMemo = "",
                         BuyOrderDetail = "",
                         BuyOrderMatchResults = "",
@@ -347,7 +344,7 @@ namespace DogRunService
 
                     try
                     {
-                        ShouGeDogMore(dogMoreBuyItem, gaoyuPercentSell);
+                        ShouGeDogMore(dogMoreBuyItem, symbol, gaoyuPercentSell);
                     }
                     catch (Exception ex)
                     {
@@ -477,7 +474,6 @@ namespace DogRunService
                             SellOrderId = order.Data,
                             SellOrderResult = JsonConvert.SerializeObject(order),
                             SellDate = DateTime.Now,
-                            SellFlex = "",
                             SellQuantity = sellQuantity,
                             SellOrderPrice = sellPrice,
                             SellState = StateConst.Submitted,
@@ -487,7 +483,6 @@ namespace DogRunService
                             SellMemo = sellMemo,
                             SellOrderDetail = "",
                             SellOrderMatchResults = "",
-                            FlexPercent = (decimal)1.00,
                             IsFinished = false
                         };
                         new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
@@ -510,28 +505,12 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, decimal sellPercent, bool refreshMarket = false)
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbols symbol, decimal sellPercent)
         {
-            var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
-            CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName && it.QuoteCurrency == dogMoreBuy.QuoteCurrency);
-
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
-                if (refreshMarket)
-                {
-                    KlineUtils.InitMarketInDB(0, symbol, true);
-                    analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
-                    if (analyzeResult == null)
-                    {
-                        logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null");
-                        return;
-                    }
-                }
-                else
-                {
-                    return;
-                }
+                return;
             }
 
             var nowPrice = analyzeResult.NowPrice;
@@ -549,7 +528,7 @@ namespace DogRunService
 
             if (!analyzeResult.CheckCanSellForHuiDiao(dogMoreBuy))
             {
-                logger.Error("11");
+                Console.WriteLine("不满足回调");
                 // 判断是否有回掉
                 return;
             }
@@ -590,7 +569,6 @@ namespace DogRunService
                         SellOrderId = order.Data,
                         SellOrderResult = JsonConvert.SerializeObject(order),
                         SellDate = DateTime.Now,
-                        SellFlex = "",
                         SellQuantity = sellQuantity,
                         SellOrderPrice = sellPrice,
                         SellState = StateConst.Submitted,

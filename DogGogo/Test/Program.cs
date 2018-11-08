@@ -82,7 +82,6 @@ namespace Test
                     SymbolName = orderDetail.Data.symbol.Replace("usdt", ""),
                     AccountId = account.MainAccountId,
                     UserName = account.UserName,
-                    FlexPercent = (decimal)1.04,
 
                     SellQuantity = orderDetail.Data.amount,
                     SellOrderPrice = orderDetail.Data.price,
@@ -91,7 +90,6 @@ namespace Test
                     SellState = StateConst.Submitting,
                     SellTradePrice = 0,
                     SellOrderId = orderId,
-                    SellFlex = "",
                     SellMemo = "",
                     SellOrderDetail = "",
                     SellOrderMatchResults = "",
@@ -137,7 +135,6 @@ namespace Test
                      //QuoteCurrency = 
                     AccountId = account.MainAccountId,
                     UserName = account.UserName,
-                    FlexPercent = (decimal)1.04,
 
                     BuyQuantity = orderDetail.Data.amount,
                     BuyOrderPrice = orderDetail.Data.price,
@@ -146,7 +143,6 @@ namespace Test
                     BuyState = StateConst.Submitting,
                     BuyTradePrice = 0,
                     BuyOrderId = orderId,
-                    BuyFlex = "",
                     BuyMemo = "",
                     BuyOrderDetail = "",
                     BuyOrderMatchResults = "",

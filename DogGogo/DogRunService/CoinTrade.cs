@@ -228,7 +228,6 @@ namespace DogRunService
                         QuoteCurrency = symbol.QuoteCurrency,
                         AccountId = accountId,
                         UserName = userName,
-                        FlexPercent = (decimal)1.01,
 
                         BuyQuantity = buyQuantity,
                         BuyOrderPrice = orderPrice,
@@ -237,7 +236,6 @@ namespace DogRunService
                         BuyState = StateConst.PreSubmitted,
                         BuyTradePrice = 0,
                         BuyOrderId = order.Data,
-                        BuyFlex = "",
                         BuyMemo = "",
                         BuyOrderDetail = "",
                         BuyOrderMatchResults = "",
@@ -311,7 +309,6 @@ namespace DogRunService
                         BuyState = StateConst.PreSubmitted,
                         BuyTradePrice = 0,
                         BuyOrderId = order.Data,
-                        BuyFlex = "",
                         BuyMemo = "",
                         BuyOrderDetail = "",
                         BuyOrderMatchResults = "",
@@ -477,7 +474,6 @@ namespace DogRunService
                             SellOrderId = order.Data,
                             SellOrderResult = JsonConvert.SerializeObject(order),
                             SellDate = DateTime.Now,
-                            SellFlex = "",
                             SellQuantity = sellQuantity,
                             SellOrderPrice = sellPrice,
                             SellState = StateConst.Submitted,
@@ -487,7 +483,6 @@ namespace DogRunService
                             SellMemo = sellMemo,
                             SellOrderDetail = "",
                             SellOrderMatchResults = "",
-                            FlexPercent = (decimal)1.00,
                             IsFinished = false
                         };
                         new DogEmptySellDao().CreateDogEmptySell(dogEmptySell);
@@ -590,7 +585,6 @@ namespace DogRunService
                         SellOrderId = order.Data,
                         SellOrderResult = JsonConvert.SerializeObject(order),
                         SellDate = DateTime.Now,
-                        SellFlex = "",
                         SellQuantity = sellQuantity,
                         SellOrderPrice = sellPrice,
                         SellState = StateConst.Submitted,

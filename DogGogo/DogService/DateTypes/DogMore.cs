@@ -37,12 +37,10 @@ namespace DogService.DateTypes
         /// </summary>
         public decimal BuyTradePrice { get; set; }
         public string BuyState { get; set; }
-        public string BuyFlex { get; set; }
         public string BuyMemo { get; set; }
         public string BuyOrderDetail { get; set; }
         public string BuyOrderMatchResults { get; set; }
         public DateTime BuyDate { get; set; }
-        public decimal FlexPercent { get; set; }
         public bool IsFinished { get; set; }
     }
 
@@ -65,7 +63,6 @@ namespace DogService.DateTypes
         public decimal SellOrderPrice { get; set; }
         public decimal SellTradePrice { get; set; }
         public string SellState { get; set; }
-        public string SellFlex { get; set; }
         public string SellOrderDetail { get; set; }
         public string SellOrderMatchResults { get; set; }
         public string SellMemo { get; set; }

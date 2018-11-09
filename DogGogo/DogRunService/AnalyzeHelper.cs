@@ -40,7 +40,7 @@ namespace DogRunService
             var now = DateTime.Now;
             if (historyKlines == null
                 || historyKlines.Count < 100
-                || idDate < now.AddMinutes(-1))
+                || idDate < now.AddSeconds(-60))
             {
                 if (idDate.Minute == now.Minute)
                 {

@@ -151,7 +151,7 @@ namespace DogApi.Controller
                     {
                         list.Sort((a, b) =>
                         {
-                            return b.BuyDate > a.BuyDate ? 1 : -1;
+                            return (b.BuyDate.Ticks > a.BuyDate.Ticks || (b.BuyDate.Ticks == a.BuyDate.Ticks && string.Compare(b.SymbolName , a.SymbolName) > 0)) ? 1 : -1;
                         });
                     }
                 }

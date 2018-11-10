@@ -113,11 +113,9 @@ namespace DogRunService
             // 判断是否有最小值，且小于nowPrice
             var min = klines.Min(it => it.Close);
             var max = klines.Max(it => it.Close);
-            //return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.04 < dogMoreBuy.BuyTradePrice;
 
             var minHuidiao = (decimal)1.005;
             var maxHuidiao = (decimal)1.03;
-            var huidiao = minHuidiao;
             var upPercent = NowPrice / dogMoreBuy.BuyTradePrice;
             if (upPercent <= (decimal)1.02)
             {
@@ -125,7 +123,7 @@ namespace DogRunService
                 return false;
             }
 
-            huidiao = 1 + ((NowPrice / dogMoreBuy.BuyTradePrice) - 1) / 10;
+            var huidiao = 1 + ((NowPrice / dogMoreBuy.BuyTradePrice) - 1) / 10;
             huidiao = Math.Max(huidiao, minHuidiao);
             huidiao = Math.Min(huidiao, maxHuidiao);
 

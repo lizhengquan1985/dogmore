@@ -68,7 +68,6 @@ namespace DogRunService
                 Console.WriteLine("做空收割 " + symbol.BaseCurrency + symbol.QuoteCurrency + $", nowPrice:{nowPrice} 空单数量：" + dogEmptySellList.Count);
                 foreach (var dogEmptySellItem in dogEmptySellList)
                 {
-
                     ShouGeDogEmpty(dogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
                 }
             }
@@ -319,6 +318,7 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             var userNames = UserPools.GetAllUserName();
+            decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice); //(decimal)1.035;
 
             // 多单的自动波动收割
             foreach (var userName in userNames)
@@ -327,8 +327,6 @@ namespace DogRunService
 
                 foreach (var dogMoreBuyItem in needSellDogMoreBuyList)
                 {
-                    decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(dogMoreBuyItem.SymbolName, dogMoreBuyItem.QuoteCurrency, nowPrice); //(decimal)1.035;
-
                     try
                     {
                         ShouGeDogMore(dogMoreBuyItem, symbol, gaoyuPercentSell);
@@ -494,6 +492,7 @@ namespace DogRunService
 
         public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol, decimal sellPercent)
         {
+            sellPercent = Math.Max(sellPercent, (decimal)1.03);
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
@@ -503,8 +502,7 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             // 没有大于预期, 也不能收割
-            if (nowPrice < dogMoreBuy.BuyTradePrice * sellPercent// JudgeSellUtils.GetPercent(nowPrice, flexPointList[0].close, flexPointList[0].id, sellPercent)
-                || nowPrice < dogMoreBuy.BuyTradePrice * (decimal)1.03)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * sellPercent)
             {
                 if (sellPercent < (decimal)1.04)
                 {
@@ -541,9 +539,9 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
-                logger.Error($"开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"1开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
-                logger.Error($"下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
+                logger.Error($"2下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
 
                 // 下单出错, 报了异常, 也需要查询是否下单成功. 查询最近的订单.
                 if (order.Status == "ok")
@@ -571,11 +569,11 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
                 }
-                logger.Error($"入库结束 -----------------------------多单收割 --> nowPrice：{nowPrice}，{JsonConvert.SerializeObject(dogMoreBuy)}");
+                logger.Error($"3入库结束 ----------------------------- 多单收割 --> {JsonConvert.SerializeObject(dogMoreBuy)}");
             }
             catch (Exception ex)
             {
-                logger.Error($"严重 ---------------  多单收割出错  --------------");
+                logger.Error($"严重严重 -----------------------------  多单收割出错");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }

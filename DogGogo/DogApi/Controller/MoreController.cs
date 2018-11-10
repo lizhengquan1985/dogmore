@@ -205,26 +205,6 @@ namespace DogApi.Controller
             }
         }
 
-        /// <summary>
-        /// 查看一个购买后出售的详情。
-        /// </summary>
-        /// <param name="buyOrderId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [ActionName("getMoreBuyDetail")]
-        public object GetMoreBuyDetail(long buyOrderId)
-        {
-            try
-            {
-                return GetDogMoreFinishedDTO(buyOrderId);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return null;
-            }
-        }
-
         [HttpGet]
         [ActionName("listMoreBuyIsFinishedDetail")]
         public async Task<List<DogMoreFinishedDTO>> listMoreBuyIsFinishedDetail(string userName, string symbolName, int pageIndex, int pageSize)

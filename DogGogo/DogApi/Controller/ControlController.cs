@@ -186,21 +186,31 @@ namespace DogApi.Controller
                             continue;
                         }
 
-                       var nowPriceItem = nowPriceList.Find(it => it.SymbolName == balanceItem.currency);
+                        var nowPriceItem = nowPriceList.Find(it => it.SymbolName == balanceItem.currency);
                         if (nowPriceItem == null)
                         {
                             continue;
                         }
 
                         var totalQuantity = new DogMoreBuyDao().GetBuyQuantityOfDogMoreBuyIsNotFinished(userName, balanceItem.currency);
+                        var kongAmount = new DogEmptySellDao().GetSellAmountOfDogEmptySellIsNotFinished(userName, balanceItem.currency);
+                        kongAmount = Math.Round(kongAmount, 6);
 
                         Dictionary<string, object> item = new Dictionary<string, object>();
                         item.Add("currency", balanceItem.currency);
                         item.Add("buyQuantity", totalQuantity);
-                        item.Add("balance", balanceItem.balance);
+                        item.Add("balance", Math.Round(balanceItem.balance, 6));
                         item.Add("nowPrice", nowPriceItem.NowPrice);
-                        item.Add("canEmptyQuantity", balanceItem.balance - totalQuantity);
-                        item.Add("canEmptyAmount", (balanceItem.balance - totalQuantity) * nowPriceItem.NowPrice);
+                        item.Add("kongAmount", kongAmount);
+                        if (kongAmount > 0)
+                        {
+                            item.Add("canEmptyQuantity", Math.Round((balanceItem.balance - totalQuantity), 6) + $"({kongAmount})");
+                        }
+                        else
+                        {
+                            item.Add("canEmptyQuantity", Math.Round((balanceItem.balance - totalQuantity), 6));
+                        }
+                        item.Add("canEmptyAmount", Math.Round((balanceItem.balance - totalQuantity - kongAmount) * nowPriceItem.NowPrice, 6));
 
                         result.Add(item);
                     }

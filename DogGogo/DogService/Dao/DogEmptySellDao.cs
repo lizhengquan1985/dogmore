@@ -170,5 +170,24 @@ namespace DogService.Dao
             var sql = $"select * from t_dog_empty_sell where UserName=@UserName and SellOrderId in( select SellOrderId from  ( select max(SellOrderId) SellOrderId,SymbolName from t_dog_empty_sell where UserName=@UserName and QuoteCurrency=@quoteCurrency and IsFinished=0 group by SymbolName) t)  ";
             return Database.Query<DogEmptySell>(sql, new { UserName = userName, quoteCurrency }).ToList();
         }
+
+        public decimal GetSellAmountOfDogEmptySellIsNotFinished(string userName, string quoteCurrency)
+        {
+            var where = $" where IsFinished=0";
+            if (!string.IsNullOrEmpty(userName))
+            {
+                where += $" and UserName = @userName ";
+            }
+
+            where += $" and QuoteCurrency = @quoteCurrency ";
+
+            var sql = $"select sum(SellQuantity*SellTradePrice) from t_dog_empty_sell {where} ";
+            decimal? q = Database.Query<decimal?>(sql, new { quoteCurrency, userName }).FirstOrDefault();
+            if (q == null)
+            {
+                q = (decimal)0;
+            }
+            return (decimal)q;
+        }
     }
 }

@@ -151,7 +151,7 @@ namespace DogApi.Controller
                     {
                         list.Sort((a, b) =>
                         {
-                            return b.BuyDate > a.BuyDate ? 1 : -1;
+                            return (b.BuyDate.Ticks > a.BuyDate.Ticks || (b.BuyDate.Ticks == a.BuyDate.Ticks && string.Compare(b.SymbolName , a.SymbolName) > 0)) ? 1 : -1;
                         });
                     }
                 }
@@ -202,26 +202,6 @@ namespace DogApi.Controller
             {
                 logger.Error(ex.Message, ex);
                 throw ex;
-            }
-        }
-
-        /// <summary>
-        /// 查看一个购买后出售的详情。
-        /// </summary>
-        /// <param name="buyOrderId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [ActionName("getMoreBuyDetail")]
-        public object GetMoreBuyDetail(long buyOrderId)
-        {
-            try
-            {
-                return GetDogMoreFinishedDTO(buyOrderId);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return null;
             }
         }
 

@@ -385,7 +385,7 @@ namespace DogApi.Controller
                 {
                     ladder = (decimal)1.04;
                 }
-                return CoinTrade.BuyWhenDoMoreAnalyze(symbol, userName, AccountConfigUtils.GetAccountConfig(userName).MainAccountId, ladder);
+                return CoinTrade.BuyWhenDoMoreAnalyze(symbol, AccountConfigUtils.GetAccountConfig(userName), ladder);
             }
             catch (Exception ex)
             {

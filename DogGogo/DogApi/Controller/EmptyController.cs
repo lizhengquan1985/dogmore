@@ -41,47 +41,16 @@ namespace DogApi.Controller
                     return;
                 }
 
-                var symbols = CoinUtils.GetAllCommonSymbols(dogEmptySell.QuoteCurrency);
-                CommonSymbol symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
+                CommonSymbol symbol = CoinUtils.GetCommonSymbol(dogEmptySell.SymbolName, dogEmptySell.QuoteCurrency);
 
                 // 先初始化一下
                 KlineUtils.InitMarketInDB(0, symbol, true);
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
-                CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult);
+                CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.025);
             }
             catch (Exception ex)
             {
                 logger.Error($"严重 orderId:{orderId}- {ex.Message}", ex);
-            }
-        }
-
-        [HttpGet]
-        [ActionName("forceShouge")]
-        public async Task forceShouge(long orderId)
-        {
-            try
-            {
-                var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(orderId);
-                if (dogEmptySell.IsFinished)
-                {
-                    return;
-                }
-
-                var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(orderId);
-                if (dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it => it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
-                {
-                    // 存在操作中的,则不操作
-                    return;
-                }
-
-                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-                CommonSymbol symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
-                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
-                CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.01);
-            }
-            catch (Exception ex)
-            {
-                logger.Error($"严重 orderId:{orderId} {ex.Message}", ex);
             }
         }
 

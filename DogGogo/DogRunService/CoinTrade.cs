@@ -56,7 +56,6 @@ namespace DogRunService
 
         private static void RunBuy(CommonSymbol symbol, AnalyzeResult analyzeResult)
         {
-            var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
 
             var userNames = UserPools.GetAllUserName();
@@ -67,18 +66,8 @@ namespace DogRunService
             {
                 var dogEmptySellList = new DogEmptySellDao().GetNeedShougeDogEmptySell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
                 Console.WriteLine("做空收割 " + symbol.BaseCurrency + symbol.QuoteCurrency + $", nowPrice:{nowPrice} 空单数量：" + dogEmptySellList.Count);
-                foreach (var item in dogEmptySellList)
-                {
-                    Console.WriteLine($"      {item.SellTradePrice}");
-                }
-
-
                 foreach (var dogEmptySellItem in dogEmptySellList)
                 {
-                    if (!analyzeResult.CheckCanBuyForHuiDiao(dogEmptySellItem))
-                    {
-                        continue;
-                    }
 
                     ShouGeDogEmpty(dogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
                 }
@@ -93,20 +82,15 @@ namespace DogRunService
             // 自动波动做多
             foreach (var userName in userNames)
             {
-                AccountConfig accountConfig = AccountConfigUtils.GetAccountConfig(userName);
-                var accountId = accountConfig.MainAccountId;
-
                 try
                 {
-                    BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent);
+                    BuyWhenDoMore(symbol, AccountConfigUtils.GetAccountConfig(userName), analyzeResult, ladderBuyPercent);
                 }
                 catch (Exception ex)
                 {
-                    //logger.Error($"{userName}--{JsonConvert.SerializeObject(symbol)}--{ex.Message}", ex);
                     continue;
                 }
             }
-
         }
 
         /// <summary>
@@ -115,9 +99,11 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="userName"></param>
         /// <param name="accountId"></param>
-        public static void BuyWhenDoMore(CommonSymbol symbol, string userName, string accountId, AnalyzeResult analyzeResult,
+        public static void BuyWhenDoMore(CommonSymbol symbol, AccountConfig account, AnalyzeResult analyzeResult,
             decimal ladderBuyPercent)
         {
+            var accountId = account.MainAccountId;
+            var userName = account.UserName;
             var nowPrice = analyzeResult.NowPrice;
             ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.04);
 
@@ -128,7 +114,7 @@ namespace DogRunService
                 if (dogMoreBuy.BuyTradePrice <= 0)
                 {
                     logger.Error("--BuyWhenDoMore-- 获取上一次最小购入价位出错");
-                    return;
+                    throw new ApplicationException("获取上一次最小购入价位出错。");
                 }
                 lastBuyMinPrice = Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice);
             }
@@ -140,7 +126,7 @@ namespace DogRunService
 
             if (!analyzeResult.CheckCanBuyForHuiDiao(dogMoreBuy))
             {
-                return;
+                throw new ApplicationException("没有正常回掉。");
             }
 
             PlatformApi api = PlatformApi.GetInstance(userName);
@@ -151,7 +137,7 @@ namespace DogRunService
             if (!CommonHelper.CheckBalanceForDoMore(symbol.QuoteCurrency, quoteCurrency.balance, notShougeEmptySellAmount))
             {
                 Console.WriteLine($"{symbol.BaseCurrency}{symbol.QuoteCurrency}余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
-                return;
+                throw new ApplicationException("余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
             }
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
 
@@ -252,15 +238,22 @@ namespace DogRunService
 
         }
 
-        public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, decimal percent = (decimal)1.02)
+        public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, decimal ladderBuyPercent)
         {
+            ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.03);
             var nowPrice = analyzeResult.NowPrice;
-            if (nowPrice * percent > dogEmptySell.SellTradePrice)
+            if (nowPrice * ladderBuyPercent > dogEmptySell.SellTradePrice)
+            {
+                Console.WriteLine("没有收益，不能收割");
+                return;
+            }
+
+            if (!analyzeResult.CheckCanBuyForHuiDiao(dogEmptySell))
             {
                 return;
             }
 
-            decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(dogEmptySell.SellQuantity, dogEmptySell.SellTradePrice, nowPrice, symbol.AmountPrecision, symbol);
+            decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(dogEmptySell.SellQuantity, dogEmptySell.SellTradePrice, nowPrice, symbol);
             decimal orderPrice = decimal.Round(nowPrice * (decimal)1.01, symbol.PricePrecision);
 
             OrderPlaceRequest req = new OrderPlaceRequest();
@@ -274,8 +267,6 @@ namespace DogRunService
             if (BuyLimitUtils.Record(dogEmptySell.UserName, symbol.BaseCurrency + symbol.QuoteCurrency))
             {
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-                logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
-                logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
                 Thread.Sleep(1000 * 5);
                 return;
             }
@@ -284,9 +275,9 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
-                logger.Error($"开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"1开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
-                logger.Error($"下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"2下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
 
                 if (order.Status == "ok")
                 {
@@ -312,11 +303,11 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
                 }
-                logger.Error($"入库结束 -----------------------------空单收割 {JsonConvert.SerializeObject(req)}, order：{JsonConvert.SerializeObject(order)}, ,nowPrice：{nowPrice}, accountId：{dogEmptySell.AccountId}");
+                logger.Error($"3入库结束 ----------------------------- 空单收割");
             }
             catch (Exception ex)
             {
-                logger.Error($"严重 ---------------  ShouGeDogEmpty出错  -------------- {JsonConvert.SerializeObject(req)}");
+                logger.Error($"严重严重 --------------- 空单收割出错");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }
@@ -657,7 +648,7 @@ namespace DogRunService
             SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice);
         }
 
-        public static string BuyWhenDoMoreAnalyze(CommonSymbol symbol, string userName, string accountId, decimal ladderBuyPercent)
+        public static string BuyWhenDoMoreAnalyze(CommonSymbol symbol, AccountConfig account, decimal ladderBuyPercent)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
@@ -683,7 +674,7 @@ namespace DogRunService
 
             try
             {
-                BuyWhenDoMore(symbol, userName, accountId, analyzeResult, ladderBuyPercent);
+                BuyWhenDoMore(symbol, account, analyzeResult, ladderBuyPercent);
             }
             catch (Exception ex)
             {

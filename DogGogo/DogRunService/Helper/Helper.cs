@@ -16,9 +16,8 @@ namespace DogRunService.Helper
         /// <param name="sellQuantity"></param>
         /// <param name="sellTradePrice"></param>
         /// <param name="nowPrice"></param>
-        /// <param name="amountPrecision"></param>
         /// <returns></returns>
-        public static decimal CalcBuyQuantityForEmptyShouge(decimal sellQuantity, decimal sellTradePrice, decimal nowPrice, int amountPrecision, CommonSymbol symbol)
+        public static decimal CalcBuyQuantityForEmptyShouge(decimal sellQuantity, decimal sellTradePrice, decimal nowPrice, CommonSymbol symbol)
         {
             if (nowPrice >= sellTradePrice * (decimal)0.99)
             {
@@ -37,7 +36,7 @@ namespace DogRunService.Helper
 
             decimal buyQuantity = sellQuantity * sellTradePrice / nowPrice;
             buyQuantity = buyQuantity - (buyQuantity - sellQuantity) * position;
-            buyQuantity = decimal.Round(buyQuantity, amountPrecision);
+            buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
             if (buyQuantity > sellQuantity && buyQuantity * nowPrice < sellQuantity * sellTradePrice)
             {
                 return buyQuantity;
@@ -46,19 +45,19 @@ namespace DogRunService.Helper
             var newBuyQuantity = buyQuantity;
             if (newBuyQuantity == sellQuantity)
             {
-                if (amountPrecision == 1)
+                if (symbol.AmountPrecision == 1)
                 {
                     newBuyQuantity += (decimal)0.1;
                 }
-                if (amountPrecision == 2)
+                if (symbol.AmountPrecision == 2)
                 {
                     newBuyQuantity += (decimal)0.01;
                 }
-                if (amountPrecision == 3)
+                if (symbol.AmountPrecision == 3)
                 {
                     newBuyQuantity += (decimal)0.001;
                 }
-                if (amountPrecision == 4)
+                if (symbol.AmountPrecision == 4)
                 {
                     newBuyQuantity += (decimal)0.0001;
                 }
@@ -87,11 +86,11 @@ namespace DogRunService.Helper
             {
                 return false;
             }
-            if (quoteCurrency == "eth" && balance - notShougeEmptySellAmount < (decimal)0.01)
+            if (quoteCurrency == "eth" && balance - notShougeEmptySellAmount < (decimal)0.008)
             {
                 return false;
             }
-            if (quoteCurrency == "ht" && balance - notShougeEmptySellAmount < (decimal)1.1)
+            if (quoteCurrency == "ht" && balance - notShougeEmptySellAmount < (decimal)0.9)
             {
                 return false;
             }

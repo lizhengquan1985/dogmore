@@ -21,7 +21,7 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
 
-        public static void Run(int index, CommonSymbols symbol)
+        public static void Run(int index, CommonSymbol symbol)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace DogRunService
             }
         }
 
-        private static void RunBuy(CommonSymbols symbol, AnalyzeResult analyzeResult)
+        private static void RunBuy(CommonSymbol symbol, AnalyzeResult analyzeResult)
         {
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
@@ -117,7 +117,7 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="userName"></param>
         /// <param name="accountId"></param>
-        public static void BuyWhenDoMore(CommonSymbols symbol, string userName, string accountId, AnalyzeResult analyzeResult,
+        public static void BuyWhenDoMore(CommonSymbol symbol, string userName, string accountId, AnalyzeResult analyzeResult,
             decimal setLadderBuyPercent = (decimal)1.1, bool useSetLadderBuyPercent = false)
         {
             var nowPrice = analyzeResult.NowPrice;
@@ -256,7 +256,7 @@ namespace DogRunService
 
         }
 
-        public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbols symbol, AnalyzeResult analyzeResult, decimal percent = (decimal)1.02)
+        public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, decimal percent = (decimal)1.02)
         {
             var nowPrice = analyzeResult.NowPrice;
             if (nowPrice * percent > dogEmptySell.SellTradePrice)
@@ -326,7 +326,7 @@ namespace DogRunService
             }
         }
 
-        private static void RunSell(CommonSymbols symbol, AnalyzeResult analyzeResult)
+        private static void RunSell(CommonSymbol symbol, AnalyzeResult analyzeResult)
         {
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
@@ -439,7 +439,7 @@ namespace DogRunService
 
         }
 
-        private static void SellWhenDoEmpty(string accountId, string userName, CommonSymbols symbol, decimal sellQuantity, decimal sellPrice, string sellMemo = "")
+        private static void SellWhenDoEmpty(string accountId, string userName, CommonSymbol symbol, decimal sellQuantity, decimal sellPrice, string sellMemo = "")
         {
             try
             {
@@ -505,7 +505,7 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbols symbol, decimal sellPercent)
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol, decimal sellPercent)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
@@ -596,7 +596,7 @@ namespace DogRunService
 
         #region 手动
 
-        public static void DoEmpty(CommonSymbols symbol, string userName, string accountId)
+        public static void DoEmpty(CommonSymbol symbol, string userName, string accountId)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
@@ -661,7 +661,7 @@ namespace DogRunService
             SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice);
         }
 
-        public static string BuyWhenDoMoreAnalyze(CommonSymbols symbol, string userName, string accountId, decimal ladderBuyPercent)
+        public static string BuyWhenDoMoreAnalyze(CommonSymbol symbol, string userName, string accountId, decimal ladderBuyPercent)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)

@@ -16,7 +16,7 @@ namespace Alert
     /// </summary>
     public class EmptyOrderTask
     {
-        public static void Run(List<CommonSymbols> symbols)
+        public static void Run(List<CommonSymbol> symbols)
         {
             Task.Run(() =>
             {
@@ -59,7 +59,7 @@ namespace Alert
             });
         }
 
-        public static void Shouge(CommonSymbols symbol, decimal price, string orderId)
+        public static void Shouge(CommonSymbol symbol, decimal price, string orderId)
         {
             try
             {
@@ -84,7 +84,7 @@ namespace Alert
             Thread.Sleep(1000 * 5);
         }
 
-        public static void ForceShouge(CommonSymbols symbol, decimal price, string orderId)
+        public static void ForceShouge(CommonSymbol symbol, decimal price, string orderId)
         {
             try
             {

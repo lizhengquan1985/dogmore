@@ -33,7 +33,7 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="isBuy"></param>
         /// <returns></returns>
-        public static AnalyzeResult GetAnalyzeResult(CommonSymbols symbol)
+        public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol)
         {
             var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             var idDate = Utils.GetDateById(historyKlines[0].Id);

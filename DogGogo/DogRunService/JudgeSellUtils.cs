@@ -149,7 +149,7 @@ namespace DogRunService
             return higher;
         }
 
-        public static decimal CalcSellQuantityForMoreShouge(decimal buyQuantity, decimal buyTradePrice, decimal nowPrice, CommonSymbols symbol)
+        public static decimal CalcSellQuantityForMoreShouge(decimal buyQuantity, decimal buyTradePrice, decimal nowPrice, CommonSymbol symbol)
         {
             if (nowPrice <= buyTradePrice * (decimal)1.01)
             {

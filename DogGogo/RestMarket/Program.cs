@@ -26,7 +26,7 @@ namespace RestMarket
 
             CoinUtils.Init();
 
-            var runCoins = new List<CommonSymbols>();
+            var runCoins = new List<CommonSymbol>();
             runCoins.AddRange(InitUsdtData());
             runCoins.AddRange(InitBtcData());
             runCoins.AddRange(InitEthData());
@@ -38,7 +38,7 @@ namespace RestMarket
             Console.ReadLine();
         }
 
-        public static List<CommonSymbols> InitUsdtData()
+        public static List<CommonSymbol> InitUsdtData()
         {
             // 准备好各种对
             var symbols = CoinUtils.GetAllCommonSymbols("usdt");
@@ -49,7 +49,7 @@ namespace RestMarket
             return symbols.ToList();
         }
 
-        public static List<CommonSymbols> InitBtcData()
+        public static List<CommonSymbol> InitBtcData()
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
@@ -65,7 +65,7 @@ namespace RestMarket
         }
 
 
-        public static List<CommonSymbols> InitEthData()
+        public static List<CommonSymbol> InitEthData()
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
@@ -82,7 +82,7 @@ namespace RestMarket
         }
 
 
-        public static List<CommonSymbols> InitHtData()
+        public static List<CommonSymbol> InitHtData()
         {
             // 准备好各种对
             var symbols = CoinUtils.GetAllCommonSymbols("ht");
@@ -93,7 +93,7 @@ namespace RestMarket
             return symbols.ToList();
         }
 
-        private static void RunCoin(List<CommonSymbols> symbols)
+        private static void RunCoin(List<CommonSymbol> symbols)
         {
             Task.Run(() =>
             {

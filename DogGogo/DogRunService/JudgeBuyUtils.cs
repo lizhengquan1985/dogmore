@@ -20,7 +20,7 @@ namespace DogRunService
         /// <param name="coin"></param>
         /// <param name="historyKlines">24小时的数据</param>
         /// <returns></returns>
-        public static bool IsQuickRise(CommonSymbols symbol, List<HistoryKline> historyKlines)
+        public static bool IsQuickRise(CommonSymbol symbol, List<HistoryKline> historyKlines)
         {
             // 暂时判断 1个小时内是否上涨超过12%， 如果超过，则控制下
             var nowClose = historyKlines[0].Close;
@@ -59,7 +59,7 @@ namespace DogRunService
             return isQuickRise;
         }
 
-        public static bool IsQuickDrop(CommonSymbols symbol, List<HistoryKline> historyKlines)
+        public static bool IsQuickDrop(CommonSymbol symbol, List<HistoryKline> historyKlines)
         {
             // 暂时判断 1个小时内是否上涨超过12%， 如果超过，则控制下
             var nowClose = historyKlines[0].Close;

@@ -18,7 +18,7 @@ namespace DogRunService.Helper
         /// <param name="nowPrice"></param>
         /// <param name="amountPrecision"></param>
         /// <returns></returns>
-        public static decimal CalcBuyQuantityForEmptyShouge(decimal sellQuantity, decimal sellTradePrice, decimal nowPrice, int amountPrecision, CommonSymbols symbol)
+        public static decimal CalcBuyQuantityForEmptyShouge(decimal sellQuantity, decimal sellTradePrice, decimal nowPrice, int amountPrecision, CommonSymbol symbol)
         {
             if (nowPrice >= sellTradePrice * (decimal)0.99)
             {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DogPlatform.Model
 {
-    public class CommonSymbols
+    public class CommonSymbol
     {
         /// <summary>
         /// 如 x-rp,e-os, s-oc, a-ct

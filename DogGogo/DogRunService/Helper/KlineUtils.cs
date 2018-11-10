@@ -30,7 +30,7 @@ namespace DogRunService.Helper
             }
         }
 
-        private static void RunHistoryKline(CommonSymbols symbol)
+        private static void RunHistoryKline(CommonSymbol symbol)
         {
             Task.Run(() =>
             {
@@ -61,7 +61,7 @@ namespace DogRunService.Helper
             });
         }
 
-        public static void InitKlineInToPool(CommonSymbols symbol)
+        public static void InitKlineInToPool(CommonSymbol symbol)
         {
             try
             {
@@ -89,7 +89,7 @@ namespace DogRunService.Helper
         /// 获取行情数据
         /// </summary>
         /// <param name="symbol"></param>
-        public static void InitOneKine(CommonSymbols symbol)
+        public static void InitOneKine(CommonSymbol symbol)
         {
             try
             {
@@ -163,7 +163,7 @@ namespace DogRunService.Helper
         }
 
 
-        public static void CheckTableExistAndCreate(CommonSymbols symbol)
+        public static void CheckTableExistAndCreate(CommonSymbol symbol)
         {
             new KlineDao().CheckTableExistsAndCreate(symbol.QuoteCurrency, symbol.BaseCurrency);
         }
@@ -172,7 +172,7 @@ namespace DogRunService.Helper
         /// 获取行情数据， 防止频繁rest， 因为api调用次数太多。
         /// </summary>
         /// <param name="symbol"></param>
-        public static void InitMarketInDB(int index, CommonSymbols symbol, bool forceUpdate = false)
+        public static void InitMarketInDB(int index, CommonSymbol symbol, bool forceUpdate = false)
         {
             try
             {

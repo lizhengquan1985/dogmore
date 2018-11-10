@@ -43,7 +43,7 @@ namespace Alert
         }
 
 
-        static void ReadAutoBuySellText(List<CommonSymbols> symbols)
+        static void ReadAutoBuySellText(List<CommonSymbol> symbols)
         {
             var fileName = System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName;
             var root = Path.GetDirectoryName(fileName);

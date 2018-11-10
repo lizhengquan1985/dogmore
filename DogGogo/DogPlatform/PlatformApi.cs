@@ -95,9 +95,9 @@ namespace DogPlatform
             return result.Data;
         }
 
-        public List<CommonSymbols> GetCommonSymbols()
+        public List<CommonSymbol> GetCommonSymbols()
         {
-            var result = SendRequestNoSignature<List<CommonSymbols>>(API_COMMON_SYMBOLS);
+            var result = SendRequestNoSignature<List<CommonSymbol>>(API_COMMON_SYMBOLS);
             return result.Data;
         }
 

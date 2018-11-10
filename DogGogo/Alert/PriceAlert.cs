@@ -11,7 +11,7 @@ namespace Alert
 {
     class PriceAlert
     {
-        public static void RunAlert(CommonSymbols symbol, decimal big, decimal small)
+        public static void RunAlert(CommonSymbol symbol, decimal big, decimal small)
         {
             Task.Run(() =>
             {

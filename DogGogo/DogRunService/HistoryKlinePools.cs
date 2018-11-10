@@ -15,7 +15,7 @@ namespace DogRunService
         /// </summary>
         private static ConcurrentDictionary<string, HistoryKlineData> historyKlines = new ConcurrentDictionary<string, HistoryKlineData>();
 
-        public static string GetKey(CommonSymbols symbol, string period)
+        public static string GetKey(CommonSymbol symbol, string period)
         {
             return symbol.BaseCurrency + "-" + symbol.QuoteCurrency + "-" + period;
         }

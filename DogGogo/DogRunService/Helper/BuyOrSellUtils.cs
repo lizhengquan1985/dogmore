@@ -20,7 +20,7 @@ namespace DogRunService.Helper
             RunCoin(symbols.Where(it => it.BaseCurrency != "btc" && it.BaseCurrency != "ven").ToList());
         }
 
-        private static void RunCoin(List<CommonSymbols> symbols)
+        private static void RunCoin(List<CommonSymbol> symbols)
         {
             Task.Run(() =>
             {

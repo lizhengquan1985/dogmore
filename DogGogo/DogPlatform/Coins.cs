@@ -9,10 +9,10 @@ namespace DogPlatform
 {
     public class CoinUtils
     {
-        private static Dictionary<string, CommonSymbols> usdtCoins = new Dictionary<string, CommonSymbols>();
-        private static Dictionary<string, CommonSymbols> btcCoins = new Dictionary<string, CommonSymbols>();
-        private static Dictionary<string, CommonSymbols> ethCoins = new Dictionary<string, CommonSymbols>();
-        private static Dictionary<string, CommonSymbols> htCoins = new Dictionary<string, CommonSymbols>();
+        private static Dictionary<string, CommonSymbol> usdtCoins = new Dictionary<string, CommonSymbol>();
+        private static Dictionary<string, CommonSymbol> btcCoins = new Dictionary<string, CommonSymbol>();
+        private static Dictionary<string, CommonSymbol> ethCoins = new Dictionary<string, CommonSymbol>();
+        private static Dictionary<string, CommonSymbol> htCoins = new Dictionary<string, CommonSymbol>();
 
         public static void Init()
         {
@@ -68,7 +68,7 @@ namespace DogPlatform
             }
         }
 
-        public static List<CommonSymbols> GetAllCommonSymbols(string quoteCurrency)
+        public static List<CommonSymbol> GetAllCommonSymbols(string quoteCurrency)
         {
             if (quoteCurrency == "usdt")
             {
@@ -90,6 +90,13 @@ namespace DogPlatform
                 return htCoins.Values.ToList();
             }
             throw new ApplicationException("error");
+        }
+
+        public static CommonSymbol GetCommonSymbol(string baseCurrency, string quoteCurrency)
+        {
+            var symbols = GetAllCommonSymbols(quoteCurrency);
+            var symbol = symbols.Find(it => it.BaseCurrency == baseCurrency);
+            return symbol;
         }
     }
 }

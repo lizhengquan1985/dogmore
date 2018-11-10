@@ -42,7 +42,7 @@ namespace DogApi.Controller
                 }
 
                 var symbols = CoinUtils.GetAllCommonSymbols(dogEmptySell.QuoteCurrency);
-                CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
+                CommonSymbol symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
 
                 // 先初始化一下
                 KlineUtils.InitMarketInDB(0, symbol, true);
@@ -75,7 +75,7 @@ namespace DogApi.Controller
                 }
 
                 var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-                CommonSymbols symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
+                CommonSymbol symbol = symbols.Find(it => it.BaseCurrency == dogEmptySell.SymbolName);
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.01);
             }

@@ -65,10 +65,21 @@ namespace DogRunService
             foreach (var userName in userNames)
             {
                 var dogEmptySellList = new DogEmptySellDao().GetNeedShougeDogEmptySell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
+                if (dogEmptySellList == null || dogEmptySellList.Count == 0)
+                {
+                    continue;
+                }
+
                 Console.WriteLine("做空收割 " + symbol.BaseCurrency + symbol.QuoteCurrency + $", nowPrice:{nowPrice} 空单数量：" + dogEmptySellList.Count);
                 foreach (var dogEmptySellItem in dogEmptySellList)
                 {
-                    ShouGeDogEmpty(dogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
+                    try
+                    {
+                        ShouGeDogEmpty(dogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
                 }
             }
 
@@ -87,7 +98,6 @@ namespace DogRunService
                 }
                 catch (Exception ex)
                 {
-                    continue;
                 }
             }
         }
@@ -116,16 +126,16 @@ namespace DogRunService
                     throw new ApplicationException("获取上一次最小购入价位出错。");
                 }
                 lastBuyMinPrice = Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice);
+
+                if (!analyzeResult.CheckCanBuyForHuiDiao(dogMoreBuy))
+                {
+                    throw new ApplicationException("没有正常回掉。");
+                }
             }
 
             if (nowPrice * ladderBuyPercent > lastBuyMinPrice)
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
-            }
-
-            if (!analyzeResult.CheckCanBuyForHuiDiao(dogMoreBuy))
-            {
-                throw new ApplicationException("没有正常回掉。");
             }
 
             PlatformApi api = PlatformApi.GetInstance(userName);
@@ -677,6 +687,8 @@ namespace DogRunService
             catch (Exception ex)
             {
                 //logger.Error($"{userName} {JsonConvert.SerializeObject(symbol)} {ex.Message}", ex);
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex);
                 return ex.Message;
             }
             return "----";

@@ -207,7 +207,7 @@ namespace DogRunService.Helper
                         return;
                     }
                 }
-                Console.WriteLine($"---> {index + 1}   {symbol.BaseCurrency}{symbol.QuoteCurrency}");
+                Console.WriteLine($"--->InitMarketInDB {index + 1}   {symbol.BaseCurrency}{symbol.QuoteCurrency}");
 
                 var begin = DateTime.Now;
 

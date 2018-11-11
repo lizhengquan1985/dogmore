@@ -132,14 +132,14 @@ namespace AutoTrade
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime >= 60)
+                    if (useTime >= 30)
                     {
                         logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
                     }
                     else
                     {
                         Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
-                        Thread.Sleep(1000 * (60 - (int)useTime));
+                        Thread.Sleep(1000 * (30 - (int)useTime));
                     }
                 }
             });

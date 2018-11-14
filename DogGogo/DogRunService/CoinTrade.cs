@@ -716,7 +716,7 @@ namespace DogRunService
                             maxPrice = item.price;
                         }
                     }
-                    if (orderMatchResult.Status == "ok")
+                    if (orderMatchResult.Status == "ok" && maxPrice > 0)
                     {
                         new DogMoreBuyDao().UpdateDogMoreBuySuccess(orderId, orderDetail, orderMatchResult, maxPrice);
                     }
@@ -771,7 +771,7 @@ namespace DogRunService
                             minPrice = item.price;
                         }
                     }
-                    if (orderMatchResult.Status == "ok")
+                    if (orderMatchResult.Status == "ok" && minPrice > 0)
                     {
                         // 完成
                         new DogMoreSellDao().UpdateDogMoreSellWhenSuccess(orderId, orderDetail, orderMatchResult, minPrice);

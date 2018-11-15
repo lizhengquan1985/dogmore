@@ -315,9 +315,8 @@ namespace DogRunService
                 }
             }
 
-            // 快速下降和不符合管控的，则不考虑做空
-            if (JudgeBuyUtils.IsQuickDrop(symbol, historyKlines)
-                || !JudgeBuyUtils.ControlCanSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
+            // 不符合管控的，则不考虑做空
+            if (!JudgeBuyUtils.ControlCanSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
             {
                 return;
             }

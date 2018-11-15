@@ -188,10 +188,14 @@ namespace DogRunService.Helper
                 {
                     var smallBuy = dogMoreBuyDao.GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);
                     var nearSellOrBuy = false;
-                    var buyTradePrice = smallBuy.BuyTradePrice;
-                    if(buyTradePrice <= 0)
+                    var buyTradePrice = (decimal)0;
+                    if (smallBuy != null)
                     {
-                        buyTradePrice = smallBuy.BuyOrderPrice;
+                        buyTradePrice = smallBuy.BuyTradePrice;
+                        if (buyTradePrice <= 0)
+                        {
+                            buyTradePrice = smallBuy.BuyOrderPrice;
+                        }
                     }
                     if (smallBuy != null && (lastKlines[0].Close / buyTradePrice > (decimal)1.04 || smallBuy.BuyTradePrice / lastKlines[0].Close > (decimal)1.048))
                     {

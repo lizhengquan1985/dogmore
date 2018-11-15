@@ -127,7 +127,7 @@ namespace DogRunService
             huidiao = Math.Max(huidiao, minHuidiao);
             huidiao = Math.Min(huidiao, maxHuidiao);
 
-            return NowPrice * huidiao < max && NowPrice * upPercent > max;
+            return NowPrice * huidiao < max && NowPrice * upPercent * 2 > max;
         }
 
         public bool CheckCanSellForHuiDiao(DogEmptySell dogEmptySell)

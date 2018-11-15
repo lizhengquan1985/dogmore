@@ -149,41 +149,7 @@ namespace DogRunService
                 throw new ApplicationException("余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
             }
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-
-            if (symbol.QuoteCurrency == "usdt")
-            {
-                var ladderPosition = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-                var min = (decimal)1.5;
-                if (ladderPosition < (decimal)0.2)
-                {
-                    min = (decimal)2;
-                }
-                if (recommendAmount < min)
-                {
-                    recommendAmount = min;
-                }
-            }
-            else if (symbol.QuoteCurrency == "btc")
-            {
-                if (recommendAmount < (decimal)0.0004)
-                {
-                    recommendAmount = (decimal)0.0004;
-                }
-            }
-            else if (symbol.QuoteCurrency == "eth")
-            {
-                if (recommendAmount < (decimal)0.005)
-                {
-                    recommendAmount = (decimal)0.005;
-                }
-            }
-            else if (symbol.QuoteCurrency == "ht")
-            {
-                if (recommendAmount < (decimal)0.9)
-                {
-                    recommendAmount = (decimal)0.9;
-                }
-            }
+            recommendAmount = DogControlUtils.GetRecommendBuyAmount(symbol, recommendAmount, nowPrice);
 
             // 购买的要求
             decimal buyQuantity = recommendAmount / nowPrice;

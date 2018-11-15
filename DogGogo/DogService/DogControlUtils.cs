@@ -1,4 +1,5 @@
-﻿using DogService.Dao;
+﻿using DogPlatform.Model;
+using DogService.Dao;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -14,41 +15,47 @@ namespace DogService
     public class DogControlUtils
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
+        static Dictionary<string, int> coinCount = new Dictionary<string, int> {
+            { "usdt", 51 }, { "btc", 14 }, { "eth", 24 }, { "ht", 10 }
+        };
 
-        public static decimal? GetEmptyPrice(string symbolName, string quoteCurrency)
+        public static decimal GetRecommendBuyAmount(CommonSymbol symbol, decimal recommendAmount, decimal nowPrice)
         {
-            try
+            if (symbol.QuoteCurrency == "usdt")
             {
-                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control == null)
+                var ladderPosition = GetLadderPosition(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
+                var min = (decimal)1.5;
+                if (ladderPosition < (decimal)0.2)
                 {
-                    return null;
+                    min = (decimal)2;
                 }
-                return control.EmptyPrice;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return null;
-            }
-        }
-
-        public static decimal? GetMaxInputPrice(string symbolName, string quoteCurrency)
-        {
-            try
-            {
-                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control == null)
+                if (recommendAmount < min)
                 {
-                    return null;
+                    recommendAmount = min;
                 }
-                return control.MaxInputPrice;
             }
-            catch (Exception ex)
+            else if (symbol.QuoteCurrency == "btc")
             {
-                logger.Error($"GetMaxInputPrice-->  {symbolName}{quoteCurrency}----------{ex.Message}", ex);
-                return null;
+                if (recommendAmount < (decimal)0.0004)
+                {
+                    recommendAmount = (decimal)0.0004;
+                }
             }
+            else if (symbol.QuoteCurrency == "eth")
+            {
+                if (recommendAmount < (decimal)0.006)
+                {
+                    recommendAmount = (decimal)0.006;
+                }
+            }
+            else if (symbol.QuoteCurrency == "ht")
+            {
+                if (recommendAmount < (decimal)0.9)
+                {
+                    recommendAmount = (decimal)0.9;
+                }
+            }
+            return recommendAmount;
         }
 
         public static decimal GetLadderBuy(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.1)
@@ -212,17 +219,18 @@ namespace DogService
             }
         }
 
-        public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice, int divide = 700)
+        public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice)
         {
             try
             {
+                int divide = coinCount[symbolName] * 20;
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {
                     return divide;
                 }
-                var max = 1500;
-                var min = 200;
+                var max = coinCount[symbolName] * 30;
+                var min = Math.Max(coinCount[symbolName] * 4, 100);
 
                 // 防止价格波动后的, 分隔过合理. 下
                 if (control.HistoryMax < control.HistoryMin * (decimal)2)

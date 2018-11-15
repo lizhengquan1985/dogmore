@@ -221,9 +221,9 @@ namespace DogService
 
         public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice)
         {
+            int divide = coinCount[symbolName] * 20;
             try
             {
-                int divide = coinCount[symbolName] * 20;
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {

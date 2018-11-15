@@ -325,8 +325,7 @@ namespace DogRunService
             {
                 try
                 {
-                    var dogEmptySell = new DogEmptySellDao().GetDogEmptySellOfLastNotFinished(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                    if (!analyzeResult.CheckCanSellForHuiDiao(dogEmptySell))
+                    if (!analyzeResult.CheckCanSellForHuiDiao())
                     {
                         continue;
                     }
@@ -343,47 +342,32 @@ namespace DogRunService
                     var accountId = accountConfig.MainAccountId;
                     PlatformApi api = PlatformApi.GetInstance(userName);
 
-                    var accountInfo = api.GetAccountBalance(AccountConfigUtils.GetAccountConfig(userName).MainAccountId);
+                    var accountInfo = api.GetAccountBalance(accountId);
                     var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
                     // 要减去未收割得。
                     var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
-                    if (notShougeQuantity >= balanceItem.balance || notShougeQuantity <= 0)
+                    if (
+                        (symbol.QuoteCurrency == "usdt" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)6.5)
+                        || (symbol.QuoteCurrency == "btc" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.002)
+                        || (symbol.QuoteCurrency == "etc" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.02)
+                        || (symbol.QuoteCurrency == "ht" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)2.2)
+                        )
                     {
-                        logger.Error($"未收割得数量大于余额，有些不合理, {symbol.BaseCurrency}, {userName}, {notShougeQuantity}, {balanceItem.balance}");
-                        continue;
-                    }
-                    if ((balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.8)
-                    {
-                        //LogNotBuy(symbol.BaseCurrency, $"收益不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                        Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},余量{(balanceItem.balance - notShougeQuantity) * nowPrice}不多， 不适合做空, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, nowPrice：{nowPrice}");
                         continue;
                     }
 
                     var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
-                    decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide; // 暂定每次做空1/12
-                    if (sellQuantity * nowPrice > 10)
-                    {
-                        sellQuantity = 10 / nowPrice;
-                    }
-                    if ((balanceItem.balance - notShougeQuantity) * nowPrice < 10)
-                    {
-                        sellQuantity = (balanceItem.balance - notShougeQuantity) / 12;
-                        if ((balanceItem.balance - notShougeQuantity) * nowPrice < 5)
-                        {
-                            sellQuantity = (balanceItem.balance - notShougeQuantity) / 9;
-                            if ((balanceItem.balance - notShougeQuantity) * nowPrice < 2)
-                            {
-                                sellQuantity = (balanceItem.balance - notShougeQuantity) / 5;
-                                if ((balanceItem.balance - notShougeQuantity) * nowPrice < 1)
-                                {
-                                    sellQuantity = (balanceItem.balance - notShougeQuantity) / 3;
-                                }
-                            }
-                        }
-                    }
+                    decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide;
                     sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-                    if (sellQuantity * nowPrice < (decimal)0.8)
+                    if (
+                        (symbol.QuoteCurrency == "usdt" && sellQuantity * nowPrice < (decimal)1.0)
+                        || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.001)
+                        || (symbol.QuoteCurrency == "etc" && sellQuantity * nowPrice < (decimal)0.005)
+                        || (symbol.QuoteCurrency == "ht" && sellQuantity * nowPrice < (decimal)0.8)
+                        )
                     {
-                        //LogNotBuy(symbol.BaseCurrency, $"做空不超过0.8usdt,, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, {nowPrice}, yu: {(balanceItem.balance - notShougeQuantity) * nowPrice}");
+                        Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做空不超过{sellQuantity * nowPrice},, sellQuantity: {sellQuantity},  nowPrice:{nowPrice}");
                         continue;
                     }
 

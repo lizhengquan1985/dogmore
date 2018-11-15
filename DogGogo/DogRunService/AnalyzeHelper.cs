@@ -91,7 +91,7 @@ namespace DogRunService
 
             // 判断是否有最小值，且小于nowPrice
             var min = klines.Min(it => it.Close);
-            return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.04 < dogMoreBuy.BuyTradePrice;
+            return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.03 < dogMoreBuy.BuyTradePrice;
         }
 
         public bool CheckCanSellForHuiDiao(DogMoreBuy dogMoreBuy)
@@ -130,42 +130,35 @@ namespace DogRunService
             return NowPrice * huidiao < max && NowPrice * upPercent * 2 > max;
         }
 
-        public bool CheckCanSellForHuiDiao(DogEmptySell dogEmptySell)
+        public bool CheckCanSellForHuiDiao()
         {
-            // 是否回掉了，可以出售。 肯定要是最高点回掉
-
-            if (dogEmptySell == null || dogEmptySell.SellTradePrice <= 0)
+            if (HistoryKlines.Count < 100)
             {
-                return false;
-            }
-
-            // 找到最近24小时，并且是出售之后的价格数据
-            var klines = HistoryKlines.FindAll(it => it.Id > dogEmptySell.Id);
-            if (klines.Count == 0)
-            {
+                Console.WriteLine($"    由于数据量太少 无法分析是否回掉，不能确定是否可以出售");
                 return false;
             }
 
             // 判断是否有最小值，且小于nowPrice
-            var min = klines.Min(it => it.Close);
-            var max = klines.Max(it => it.Close);
-            //return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.04 < dogMoreBuy.BuyTradePrice;
-
-            var minHuidiao = (decimal)1.005;
-            var maxHuidiao = (decimal)1.03;
-            var huidiao = minHuidiao;
-            var upPercent = NowPrice / dogEmptySell.SellTradePrice;
-            if (upPercent <= (decimal)1.03)
+            var historyKline = new HistoryKline() { Id = 0, Close = (decimal)100000 };
+            foreach (var item in HistoryKlines)
             {
-                // 这个太差了吧.
-                return false;
+                if (item.Close < historyKline.Close)
+                {
+                    historyKline = item;
+                }
+                else if (item.Close == historyKline.Close && item.Id > historyKline.Id)
+                {
+                    historyKline = item;
+                }
             }
+            var klines = HistoryKlines.FindAll(it => it.Id > historyKline.Id);
 
-            huidiao = 1 + ((NowPrice / dogEmptySell.SellTradePrice) - 1) / 10;
-            huidiao = Math.Max(huidiao, minHuidiao);
-            huidiao = Math.Min(huidiao, maxHuidiao);
+            var max = klines.Max(it => it.Close); 
 
-            return NowPrice * huidiao < max && NowPrice * upPercent > max;
+            var minHuidiao = (decimal)1.008;
+            var maxHuidiao = (decimal)1.1;
+
+            return NowPrice * minHuidiao < max && NowPrice * maxHuidiao > max;
         }
     }
 }

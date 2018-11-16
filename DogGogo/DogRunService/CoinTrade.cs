@@ -116,24 +116,13 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
             ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.04);
 
-            var dogMoreBuy = new DogMoreBuyDao().GetMinBuyPriceDataOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
-            var lastBuyMinPrice = (decimal)10000;
-            if (dogMoreBuy != null)
+            if (!analyzeResult.CheckCanBuyForHuiDiao())
             {
-                if (dogMoreBuy.BuyTradePrice <= 0)
-                {
-                    logger.Error("--BuyWhenDoMore-- 获取上一次最小购入价位出错");
-                    throw new ApplicationException("获取上一次最小购入价位出错。");
-                }
-                lastBuyMinPrice = Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice);
-
-                if (!analyzeResult.CheckCanBuyForHuiDiao(dogMoreBuy))
-                {
-                    throw new ApplicationException("没有正常回掉。");
-                }
+                throw new ApplicationException("没有正常回掉。");
             }
 
-            if (nowPrice * ladderBuyPercent > lastBuyMinPrice)
+            var dogMoreBuy = new DogMoreBuyDao().GetMinBuyPriceDataOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
+            if (dogMoreBuy != null && nowPrice * ladderBuyPercent > Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice))
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
             }

@@ -78,20 +78,20 @@ namespace DogRunService
             return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.04 < dogEmptySell.SellTradePrice;
         }
 
-        public bool CheckCanBuyForHuiDiao(DogMoreBuy dogMoreBuy)
+        public bool CheckCanBuyForHuiDiao()
         {
-            // 是否回掉了，可以购买。 肯定要是最低点回掉
-
-            // 找到最近24小时，并且是出售之后的价格数据
-            var klines = HistoryKlines.FindAll(it => it.Id > dogMoreBuy.Id);
-            if (klines.Count == 0)
+            if (HistoryKlines.Count < 100)
             {
+                Console.WriteLine($"    由于数据量太少 无法分析是否回掉，不能确定是否可以出售");
                 return false;
             }
 
-            // 判断是否有最小值，且小于nowPrice
-            var min = klines.Min(it => it.Close);
-            return NowPrice > min * (decimal)1.005 && NowPrice * (decimal)1.03 < dogMoreBuy.BuyTradePrice;
+            var min = HistoryKlines.Min(it => it.Close);
+
+            var minHuidiao = (decimal)1.005;
+            var maxHuidiao = (decimal)1.15;
+
+            return NowPrice > min * minHuidiao && NowPrice < min * maxHuidiao;
         }
 
         public bool CheckCanSellForHuiDiao(DogMoreBuy dogMoreBuy)
@@ -138,25 +138,10 @@ namespace DogRunService
                 return false;
             }
 
-            // 判断是否有最小值，且小于nowPrice
-            var historyKline = new HistoryKline() { Id = 0, Close = (decimal)100000 };
-            foreach (var item in HistoryKlines)
-            {
-                if (item.Close < historyKline.Close)
-                {
-                    historyKline = item;
-                }
-                else if (item.Close == historyKline.Close && item.Id > historyKline.Id)
-                {
-                    historyKline = item;
-                }
-            }
-            var klines = HistoryKlines.FindAll(it => it.Id > historyKline.Id);
-
-            var max = klines.Max(it => it.Close); 
+            var max = HistoryKlines.Max(it => it.Close); 
 
             var minHuidiao = (decimal)1.008;
-            var maxHuidiao = (decimal)1.1;
+            var maxHuidiao = (decimal)1.125;
 
             return NowPrice * minHuidiao < max && NowPrice * maxHuidiao > max;
         }

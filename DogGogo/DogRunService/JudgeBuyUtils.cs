@@ -17,9 +17,8 @@ namespace DogRunService
         public static bool ControlCanBuy(string symbolName, string quoteCurrency, decimal nowPrice)
         {
             var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-            if (control == null || nowPrice > control.MaxInputPrice)
+            if (control == null || control.HistoryMin <= 0 || nowPrice > control.MaxInputPrice)
             {
-                Console.WriteLine($"{symbolName}{quoteCurrency} -- 由于管控,不能购入 MaxInputPrice:{(control?.MaxInputPrice.ToString() ?? "无设置")}, nowPrice:{nowPrice}");
                 return false;
             }
             return true;
@@ -30,14 +29,12 @@ namespace DogRunService
             var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
             if (control == null || control.HistoryMin <= 0)
             {
-                Console.WriteLine($"    {symbolName}{quoteCurrency}由于管控，未设置管控null,不能出售");
                 // 未管控的不能操作
                 return false;
             }
 
             if (nowPrice <= control.EmptyPrice || nowPrice < control.HistoryMin * 2 || nowPrice <= (control.HistoryMax - control.HistoryMin) * (decimal)0.6 + control.HistoryMin)
             {
-                Console.WriteLine($"    {symbolName}{quoteCurrency}由于管控,不能出售 要大于CanEmptyPrice:{control.EmptyPrice}才能出售 >=nowPrice:{nowPrice}");
                 return false;
             }
 

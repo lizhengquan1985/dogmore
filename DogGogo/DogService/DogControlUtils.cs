@@ -221,7 +221,7 @@ namespace DogService
 
         public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice)
         {
-            int divide = coinCount[symbolName] * 20;
+            int divide = coinCount[quoteCurrency] * 20;
             try
             {
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
@@ -229,8 +229,8 @@ namespace DogService
                 {
                     return divide;
                 }
-                var max = coinCount[symbolName] * 30;
-                var min = Math.Max(coinCount[symbolName] * 4, 100);
+                var max = coinCount[quoteCurrency] * 30;
+                var min = Math.Max(coinCount[quoteCurrency] * 4, 100);
 
                 // 防止价格波动后的, 分隔过合理. 下
                 if (control.HistoryMax < control.HistoryMin * (decimal)2)

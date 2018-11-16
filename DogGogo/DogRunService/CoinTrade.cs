@@ -325,8 +325,10 @@ namespace DogRunService
             {
                 try
                 {
+                    Console.WriteLine($"---> before doempty {userName}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                     if (!analyzeResult.CheckCanSellForHuiDiao())
                     {
+                        Console.WriteLine($"---> doempty no huidiao");
                         continue;
                     }
                     // 和上次做空价格要相差8%
@@ -335,6 +337,7 @@ namespace DogRunService
                     if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * emptyLadder)
                     {
                         // 上一次还没收割得，相差10%， 要等等
+                        Console.WriteLine($"---> doempty no emptyLadder");
                         continue;
                     }
 

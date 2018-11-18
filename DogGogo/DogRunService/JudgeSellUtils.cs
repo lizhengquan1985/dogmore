@@ -1,4 +1,5 @@
-﻿using DogPlatform.Model;
+﻿using DogPlatform;
+using DogPlatform.Model;
 using DogRunService.DataTypes;
 using DogService;
 using DogService.DateTypes;
@@ -171,10 +172,10 @@ namespace DogRunService
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
             Console.WriteLine($" ------------ {buyQuantity}, {sellQuantity}, {symbol.AmountPrecision}");
 
-            if (buyQuantity > sellQuantity && buyQuantity * buyTradePrice < sellQuantity * nowPrice)
-            {
-                return sellQuantity;
-            }
+            //if (buyQuantity > sellQuantity && buyQuantity * buyTradePrice < sellQuantity * nowPrice)
+            //{
+            //    return sellQuantity;
+            //}
 
             var newSellQuantity = sellQuantity;
             if (newSellQuantity == buyQuantity)
@@ -196,14 +197,17 @@ namespace DogRunService
                     newSellQuantity -= (decimal)0.1;
                 }
             }
-            if (newSellQuantity == buyQuantity && symbol.AmountPrecision == 0 && symbol.BaseCurrency == "xrp")
+
+            if (!CoinUtils.IsBiggerThenLeast(symbol.BaseCurrency, symbol.QuoteCurrency, sellQuantity))
             {
-                return newSellQuantity;
+                newSellQuantity = CoinUtils.GetLeast(symbol.BaseCurrency, symbol.QuoteCurrency);
             }
+
             if (buyQuantity > newSellQuantity && buyQuantity * buyTradePrice < newSellQuantity * nowPrice)
             {
                 return newSellQuantity;
             }
+
             throw new Exception($"计算sellquantity不合理, buyQuantity:{buyQuantity},newSellQuantity:{newSellQuantity}， 没有赚头");
         }
     }

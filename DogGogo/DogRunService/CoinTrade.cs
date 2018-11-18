@@ -142,6 +142,12 @@ namespace DogRunService
 
             // 购买的要求
             decimal buyQuantity = recommendAmount / nowPrice;
+            if (!CoinUtils.IsBiggerThenLeastBuyForDoMore(symbol.BaseCurrency, symbol.QuoteCurrency, buyQuantity))
+            {
+                Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做多数量太少，不符合最小交易额度");
+                return;
+            }
+
             buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
             decimal orderPrice = decimal.Round(nowPrice * (decimal)1.006, symbol.PricePrecision);
 
@@ -218,6 +224,11 @@ namespace DogRunService
             }
 
             decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(dogEmptySell.SellQuantity, dogEmptySell.SellTradePrice, nowPrice, symbol);
+            if (buyQuantity <= dogEmptySell.SellQuantity || nowPrice * buyQuantity >= dogEmptySell.SellQuantity * dogEmptySell.SellTradePrice)
+            {
+                Console.WriteLine($"     {symbol.BaseCurrency}{symbol.QuoteCurrency}没有实现双向收益， 不能收割空单");
+                return;
+            }
             decimal orderPrice = decimal.Round(nowPrice * (decimal)1.01, symbol.PricePrecision);
 
             OrderPlaceRequest req = new OrderPlaceRequest();
@@ -352,6 +363,13 @@ namespace DogRunService
                     var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
                     decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide;
                     sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
+
+                    if (!CoinUtils.IsBiggerThenLeast(symbol.BaseCurrency, symbol.QuoteCurrency, sellQuantity))
+                    {
+                        Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做空数量太少，不符合最小交易额度");
+                        continue;
+                    }
+
                     if (
                         (symbol.QuoteCurrency == "usdt" && sellQuantity * nowPrice < (decimal)1.0)
                         || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.001)
@@ -470,10 +488,11 @@ namespace DogRunService
             }
 
             decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
-            if (sellQuantity > dogMoreBuy.BuyQuantity)
+
+            if (sellQuantity >= dogMoreBuy.BuyQuantity || sellQuantity * nowPrice <= dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice)
             {
                 // 一定要赚才能出售
-                logger.Error($"{dogMoreBuy.SymbolName} sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}");
+                logger.Error($"{dogMoreBuy.SymbolName}{dogMoreBuy.QuoteCurrency} 未实现双向收益 sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}，sellQuantity * nowPrice：{sellQuantity * nowPrice}，dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice：{dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice}");
                 return;
             }
 

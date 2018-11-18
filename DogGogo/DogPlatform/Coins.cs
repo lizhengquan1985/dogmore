@@ -13,6 +13,67 @@ namespace DogPlatform
         private static Dictionary<string, CommonSymbol> btcCoins = new Dictionary<string, CommonSymbol>();
         private static Dictionary<string, CommonSymbol> ethCoins = new Dictionary<string, CommonSymbol>();
         private static Dictionary<string, CommonSymbol> htCoins = new Dictionary<string, CommonSymbol>();
+        // 购入时候考虑大于最小交易额度的10%
+        private static Dictionary<string, decimal> usdtLeastBuy = new Dictionary<string, decimal> {
+            {"btc",(decimal)0.0001 },
+            {"xrp",(decimal)1 },
+            {"eth",(decimal)0.001 },
+            {"bch",(decimal)0.001 }
+        };
+
+        private static decimal GetPrecisionValue(int precision)
+        {
+            if (precision == 0)
+            {
+                return 1;
+            }
+            if (precision == 1)
+            {
+                return (decimal)0.1;
+            }
+            if (precision == 2)
+            {
+                return (decimal)0.01;
+            }
+            if (precision == 3)
+            {
+                return (decimal)0.001;
+            }
+            if (precision == 4)
+            {
+                return (decimal)0.0001;
+            }
+            Console.WriteLine($"不合理的精度值" + precision);
+            return 0;
+        }
+
+        public static bool IsBiggerThenLeastBuyForDoMore(string symbolName, string quoteCurrency, decimal quantity)
+        {
+            if (quoteCurrency == "usdt" && usdtLeastBuy.ContainsKey(symbolName))
+            {
+                var symbol = usdtCoins[symbolName];
+                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.1 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06;
+            }
+            return true;
+        }
+
+        public static bool IsBiggerThenLeast(string symbolName, string quoteCurrency, decimal quantity)
+        {
+            if (quoteCurrency == "usdt" && usdtLeastBuy.ContainsKey(symbolName))
+            {
+                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.01;
+            }
+            return true;
+        }
+
+        public static decimal GetLeast(string symbolName, string quoteCurrency)
+        {
+            if (quoteCurrency == "usdt" && usdtLeastBuy.ContainsKey(symbolName))
+            {
+                return usdtLeastBuy[symbolName] * (decimal)1.005;
+            }
+            throw new ApplicationException("不知道最小购买额度");
+        }
 
         public static void Init()
         {

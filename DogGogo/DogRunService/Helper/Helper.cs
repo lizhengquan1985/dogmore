@@ -82,6 +82,10 @@ namespace DogRunService.Helper
             {
                 return false;
             }
+            if (quoteCurrency == "usdt" && balance - notShougeEmptySellAmount < (decimal)2)
+            {
+                return false;
+            }
             if (quoteCurrency == "btc" && balance - notShougeEmptySellAmount < (decimal)0.0004)
             {
                 return false;

@@ -53,7 +53,7 @@ namespace RestMarket
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            var addCoins = "xmr,bch,eth,ltc,etc,eos,omg,xrp,dash,zec,ada,steem,iota,ardr,ht".Split(',').ToList();
+            var addCoins = "xmr,bch,eth,ltc,etc,eos,omg,xrp,dash,zec,ada,steem,iota,ardr,ht,steem".Split(',').ToList();
             var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
@@ -119,7 +119,7 @@ namespace RestMarket
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime > 60)
+                    if (useTime > 40)
                     {
                         logger.Error($"一轮总共耗时：{useTime}秒");
                     }
@@ -127,7 +127,7 @@ namespace RestMarket
                     {
                         Console.WriteLine($"一轮总共耗时：{useTime}秒");
 
-                        Thread.Sleep((60 - (int)useTime) * 1000);
+                        Thread.Sleep((40 - (int)useTime) * 1000);
                     }
                 }
             });

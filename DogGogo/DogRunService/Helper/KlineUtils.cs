@@ -199,7 +199,7 @@ namespace DogRunService.Helper
                     }
                     if (smallBuy != null && (lastKlines[0].Close / buyTradePrice > (decimal)1.04 || smallBuy.BuyTradePrice / lastKlines[0].Close > (decimal)1.048))
                     {
-                        Console.WriteLine($"--->aa {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} {lastKlines[0].Close},{smallBuy.BuyTradePrice}");
+                        Console.WriteLine($"--->有接近最近购买价格的 {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} {lastKlines[0].Close},{smallBuy.BuyTradePrice}");
                         nearSellOrBuy = true;
                     }
                     if (!nearSellOrBuy)
@@ -222,8 +222,8 @@ namespace DogRunService.Helper
 
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
-                var count = 10;
-                if(last24Klines.Count >0 && (DateTime.Now - Utils.GetDateById( last24Klines.Max(it=>it.Id))).TotalMinutes > 10)
+                var count = 5;
+                if(last24Klines.Count >0 && (DateTime.Now - Utils.GetDateById( last24Klines.Max(it=>it.Id))).TotalMinutes >= count)
                 {
                     count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes);
                     if(count > 1000)

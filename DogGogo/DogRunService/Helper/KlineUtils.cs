@@ -222,7 +222,17 @@ namespace DogRunService.Helper
 
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
-                var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, 10);
+                var count = 10;
+                if(last24Klines.Count >0 && (DateTime.Now - Utils.GetDateById( last24Klines.Max(it=>it.Id))).TotalMinutes > 10)
+                {
+                    count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes);
+                    if(count > 1000)
+                    {
+                        count = 1000;
+                    }
+                    Console.WriteLine($" 拉取数量{count}");
+                }
+                var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, count);
                 var todayKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).ToList();
                 var minutesKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date.AddMinutes(-30)).ToList();
                 var nearMaxPrice = (decimal)0;

@@ -28,7 +28,6 @@ namespace DogRunService
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 if (analyzeResult != null)
                 {
-                    Console.WriteLine($"--->domore {index + 1}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                     // 计算是否适合购买
                     RunBuy(symbol, analyzeResult);
                 }
@@ -43,7 +42,6 @@ namespace DogRunService
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 if (analyzeResult != null)
                 {
-                    Console.WriteLine($"--->doempty {index + 1}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                     // 计算是否适合出售
                     RunSell(symbol, analyzeResult);
                 }

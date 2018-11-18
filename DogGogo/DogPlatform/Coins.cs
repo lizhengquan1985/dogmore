@@ -18,7 +18,9 @@ namespace DogPlatform
             {"btc",(decimal)0.0001 },
             {"xrp",(decimal)1 },
             {"eth",(decimal)0.001 },
-            {"bch",(decimal)0.001 }
+            {"bch",(decimal)0.001 },
+            {"ltc",(decimal)0.001 },
+            {"etc",(decimal)0.01 }
         };
 
         private static decimal GetPrecisionValue(int precision)

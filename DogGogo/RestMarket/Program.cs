@@ -119,7 +119,7 @@ namespace RestMarket
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime > 40)
+                    if (useTime > 50)
                     {
                         logger.Error($"一轮总共耗时：{useTime}秒");
                     }
@@ -127,7 +127,7 @@ namespace RestMarket
                     {
                         Console.WriteLine($"一轮总共耗时：{useTime}秒");
 
-                        Thread.Sleep((40 - (int)useTime) * 1000);
+                        Thread.Sleep((50 - (int)useTime) * 1000);
                     }
                 }
             });

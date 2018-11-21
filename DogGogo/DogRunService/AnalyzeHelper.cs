@@ -1,4 +1,5 @@
 ﻿using DogPlatform.Model;
+using DogRunService.Helper;
 using DogService;
 using DogService.Dao;
 using DogService.DateTypes;
@@ -33,8 +34,14 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="isBuy"></param>
         /// <returns></returns>
-        public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol)
+        public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol, bool refresh = false)
         {
+            // 判断最小购买的价格是否接近， 如果接近，再去获取一次
+            if (refresh)
+            {
+                KlineUtils.InitMarketInDB(0, symbol);
+            }
+
             var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             var idDate = Utils.GetDateById(historyKlines[0].Id);
             var now = DateTime.Now;
@@ -89,7 +96,7 @@ namespace DogRunService
             var min = HistoryKlines.Min(it => it.Close);
 
             var minHuidiao = (decimal)1.005;
-            var maxHuidiao = (decimal)1.15;
+            var maxHuidiao = (decimal)1.35;
 
             return NowPrice > min * minHuidiao && NowPrice < min * maxHuidiao;
         }

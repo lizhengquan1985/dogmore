@@ -23,14 +23,15 @@ namespace DogRunService
 
         public static void Run(int index, CommonSymbol symbol)
         {
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+            if (analyzeResult == null)
+            {
+                return;
+            }
             try
             {
-                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
-                if (analyzeResult != null)
-                {
-                    // 计算是否适合购买
-                    RunBuy(symbol, analyzeResult);
-                }
+                // 计算是否适合购买
+                RunBuy(symbol, analyzeResult);
             }
             catch (Exception ex)
             {
@@ -39,12 +40,8 @@ namespace DogRunService
 
             try
             {
-                AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
-                if (analyzeResult != null)
-                {
-                    // 计算是否适合出售
-                    RunSell(symbol, analyzeResult);
-                }
+                // 计算是否适合出售
+                RunSell(symbol, analyzeResult);
             }
             catch (Exception ex)
             {

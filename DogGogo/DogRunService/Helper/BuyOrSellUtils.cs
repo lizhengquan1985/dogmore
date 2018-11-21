@@ -62,7 +62,6 @@ namespace DogRunService.Helper
                     }
                     else
                     {
-                        Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
                         Thread.Sleep(1000 * (60 - (int)useTime));
                     }
                 }

@@ -36,23 +36,23 @@ namespace DogService
             }
             else if (symbol.QuoteCurrency == "btc")
             {
-                if (recommendAmount < (decimal)0.0004)
+                if (recommendAmount < (decimal)0.0006)
                 {
-                    recommendAmount = (decimal)0.0004;
+                    recommendAmount = (decimal)0.0006;
                 }
             }
             else if (symbol.QuoteCurrency == "eth")
             {
-                if (recommendAmount < (decimal)0.006)
+                if (recommendAmount < (decimal)0.008)
                 {
-                    recommendAmount = (decimal)0.006;
+                    recommendAmount = (decimal)0.008;
                 }
             }
             else if (symbol.QuoteCurrency == "ht")
             {
-                if (recommendAmount < (decimal)0.9)
+                if (recommendAmount < (decimal)1.1)
                 {
-                    recommendAmount = (decimal)0.9;
+                    recommendAmount = (decimal)1.1;
                 }
             }
             return recommendAmount;

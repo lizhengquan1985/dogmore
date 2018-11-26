@@ -1,4 +1,5 @@
 ﻿using DogService.DateTypes;
+using SharpDapper;
 using SharpDapper.Extensions;
 using System;
 using System.Collections.Generic;
@@ -66,6 +67,16 @@ namespace DogService.Dao
             using (var tx = Database.BeginTransaction())
             {
                 await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { SymbolName = symbolName, QuoteCurrency = quoteCurrency });
+                tx.Commit();
+            }
+        }
+
+        public async Task DeleteData(string symbolName, string quoteCurrency)
+        {
+            using (var tx = Database.BeginTransaction())
+            {
+                var sql = $"delete from t_{quoteCurrency}_{symbolName} where id<{Utils.GetIdByDate(DateTime.Now.AddMinutes(-200))}";
+                await Database.ExecuteAsync(sql);
                 tx.Commit();
             }
         }

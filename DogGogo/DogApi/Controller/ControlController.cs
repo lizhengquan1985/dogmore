@@ -67,7 +67,25 @@ namespace DogApi.Controller
                     }
                     closeDic.Add(item.SymbolName, item.NowPrice);
                 }
-                return new { list = res, closeDic };
+                var pre50 = new List<string>
+                {
+                    "btc","xrp","eth","bchabc","bch",
+                    "eos","xlm","usdt","ltc","bsv",
+                    "xmr","ada","trx","iota","dash",
+                    "xem","bnb","ont","neo","etc",
+                    "lky","xtz","btg","zec","bcx",
+
+                    "doge","ht","bcn","vet","mkr",
+                    "okb","fto","qtum","zrx","dcr",
+                    "xuc","bcd","omg","lsk","bat",
+                    "aoa","ae","xrb","maid","bts",
+                };
+
+                var notIn = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);
+                var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
+                pre50.RemoveAll(it => string.IsNullOrEmpty(it) || res.Find(item => item.SymbolName == it) != null);
+                pre50.RemoveAll(it => commonSymbols.Find(item => item.BaseCurrency == it) == null);
+                return new { list = res, closeDic, pre50, notIn = notIn.Select(it => it.SymbolName).ToList(), allItems = res.Select(it => it.SymbolName).ToList() };
             }
             catch (Exception ex)
             {
@@ -244,6 +262,17 @@ namespace DogApi.Controller
             {
                 logger.Error(ex.Message, ex);
                 throw ex;
+            }
+        }
+
+        [HttpGet]
+        [ActionName("initAccountInfo")]
+        public async Task DeleteData(string quoteCurrency)
+        {
+            var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
+            foreach (var commonSymbol in commonSymbols)
+            {
+                await new DogControlDao().DeleteData(commonSymbol.BaseCurrency, commonSymbol.QuoteCurrency);
             }
         }
     }

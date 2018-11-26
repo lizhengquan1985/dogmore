@@ -24,21 +24,21 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("shouge")]
-        public async Task shouge(long orderId)
+        public async Task<string> shouge(long orderId)
         {
             try
             {
                 var dogEmptySell = new DogEmptySellDao().GetDogEmptySellBySellOrderId(orderId);
                 if (dogEmptySell.IsFinished)
                 {
-                    return;
+                    return "已经完成的不操作";
                 }
 
                 var dogEmptyBuyList = new DogEmptyBuyDao().ListDogEmptyBuyBySellOrderId(orderId);
                 if (dogEmptyBuyList.Count > 0 && dogEmptyBuyList.Find(it => it.BuyState != StateConst.Canceled.ToString() && it.BuyState != StateConst.PartialFilled.ToString() && it.BuyState != StateConst.Filled.ToString()) != null)
                 {
                     // 存在操作中的,则不操作
-                    return;
+                    return "存在操作中的,则不操作";
                 }
 
                 CommonSymbol symbol = CoinUtils.GetCommonSymbol(dogEmptySell.SymbolName, dogEmptySell.QuoteCurrency);
@@ -46,11 +46,16 @@ namespace DogApi.Controller
                 // 先初始化一下
                 KlineUtils.InitMarketInDB(0, symbol, true);
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
-                CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.025);
+                if (analyzeResult == null)
+                {
+                    return "分析结果未null";
+                }
+                return CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.025);
             }
             catch (Exception ex)
             {
                 logger.Error($"严重 orderId:{orderId}- {ex.Message}", ex);
+                return ex.Message;
             }
         }
 

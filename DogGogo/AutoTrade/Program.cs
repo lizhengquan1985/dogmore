@@ -87,7 +87,7 @@ namespace AutoTrade
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addCoins = "ada,ae,ardr,bat,btm,bts,eos,gnt,hc,hit,ht,icx,iota,lsk,omg,ont,pai,qtum,steem,trx,vet,xlm,xmr,zrx".Split(',').ToList();
+            var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx" };
             var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)

@@ -203,26 +203,26 @@ namespace DogRunService
 
         }
 
-        public static void ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, decimal ladderBuyPercent)
+        public static string ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, decimal ladderBuyPercent)
         {
             ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.03);
             var nowPrice = analyzeResult.NowPrice;
             if (nowPrice * ladderBuyPercent > dogEmptySell.SellTradePrice)
             {
                 Console.WriteLine("没有收益，不能收割");
-                return;
+                return "没有收益，不能收割";
             }
 
             if (!analyzeResult.CheckCanBuyForHuiDiao(dogEmptySell))
             {
-                return;
+                return "没有回调";
             }
 
             decimal buyQuantity = CommonHelper.CalcBuyQuantityForEmptyShouge(dogEmptySell.SellQuantity, dogEmptySell.SellTradePrice, nowPrice, symbol);
             if (buyQuantity <= dogEmptySell.SellQuantity || nowPrice * buyQuantity >= dogEmptySell.SellQuantity * dogEmptySell.SellTradePrice)
             {
                 Console.WriteLine($"     {symbol.BaseCurrency}{symbol.QuoteCurrency}没有实现双向收益， 不能收割空单");
-                return;
+                return "没有实现双向收益， 不能收割空单";
             }
             decimal orderPrice = decimal.Round(nowPrice * (decimal)1.01, symbol.PricePrecision);
 
@@ -238,7 +238,7 @@ namespace DogRunService
             {
                 logger.Error(" --------------------- 两个小时内购买次数太多，暂停一会 --------------------- ");
                 Thread.Sleep(1000 * 5);
-                return;
+                return " 两个小时内购买次数太多，暂停一会";
             }
 
             PlatformApi api = PlatformApi.GetInstance(dogEmptySell.UserName);
@@ -274,6 +274,7 @@ namespace DogRunService
                     QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
                 }
                 logger.Error($"3入库结束 ----------------------------- 空单收割");
+                return "运行结束";
             }
             catch (Exception ex)
             {

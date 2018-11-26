@@ -53,7 +53,7 @@ namespace RestMarket
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            var addCoins = "xmr,bch,eth,ltc,etc,eos,omg,xrp,dash,zec,ada,steem,iota,ardr,ht,steem".Split(',').ToList();
+            var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "ht", "iota", "lsk", "ltc", "neo", "omg", "ont", "qtum", "steem", "trx", "vet", "xem", "xlm", "xmr", "xrp", "zec", "zrx" };
             var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
@@ -69,8 +69,7 @@ namespace RestMarket
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addCoins = "ada,ae,ardr,bat,btm,bts,eos,gnt,hc,hit,ht,icx,iota,lsk,omg,ont,pai,qtum,steem,trx,vet,xlm,xmr,zrx".Split(',').ToList();
-            //            iost,smt,ela, gxs, 
+            var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx" };
             var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
 
             foreach (var symbol in addSymbols)
@@ -125,7 +124,10 @@ namespace RestMarket
                     }
                     else
                     {
-                        Console.WriteLine($"一轮总共耗时：{useTime}秒");
+                        if (useTime > 30)
+                        {
+                            Console.WriteLine($"一轮总共耗时：{useTime}秒");
+                        }
 
                         Thread.Sleep((50 - (int)useTime) * 1000);
                     }

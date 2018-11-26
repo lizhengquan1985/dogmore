@@ -16,8 +16,28 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
         static Dictionary<string, int> coinCount = new Dictionary<string, int> {
-            { "usdt", 51 }, { "btc", 14 }, { "eth", 24 }, { "ht", 10 }
+            { "usdt", 52 }, { "btc", 15 }, { "eth", 24 }, { "ht", 10 }
         };
+
+        public static void InitAsync()
+        {
+            foreach (var key in coinCount.Keys)
+            {
+                try
+                {
+                    long count = new DogControlDao().GetCount(key).Result;
+                    if (count >= coinCount[key])
+                    {
+                        coinCount[key] = (int)count;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex.Message, ex);
+                }
+            }
+
+        }
 
         public static decimal GetRecommendBuyAmount(CommonSymbol symbol, decimal recommendAmount, decimal nowPrice)
         {
@@ -62,8 +82,8 @@ namespace DogService
         {
             try
             {
-                var max = (decimal)1.135;
-                var min = (decimal)1.055;
+                var max = (decimal)1.12;
+                var min = (decimal)1.06;
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null)
                 {

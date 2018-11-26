@@ -47,6 +47,15 @@ namespace DogService.Dao
                 throw new ApplicationException("管控数据出错");
             }
 
+            if (dogControl.LadderBuyPercent <= (decimal)1.05)
+            {
+                dogControl.LadderBuyPercent = (decimal)1.055;
+            }
+            if (dogControl.LadderBuyPercent >= (decimal)1.15)
+            {
+                dogControl.LadderBuyPercent = (decimal)1.12;
+            }
+
             using (var tx = Database.BeginTransaction())
             {
                 await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
@@ -69,6 +78,12 @@ namespace DogService.Dao
                 await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { SymbolName = symbolName, QuoteCurrency = quoteCurrency });
                 tx.Commit();
             }
+        }
+
+        public async Task<long> GetCount(string quoteCurrency)
+        {
+            var sql = $"select count(1) from t_dog_control where QuoteCurrency=@QuoteCurrency and IsValid={true}";
+            return (await Database.QueryAsync<long>(sql, new { QuoteCurrency = quoteCurrency })).FirstOrDefault();
         }
 
         public async Task DeleteData(string symbolName, string quoteCurrency)

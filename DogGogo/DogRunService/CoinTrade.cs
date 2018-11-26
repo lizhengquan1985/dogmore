@@ -485,7 +485,7 @@ namespace DogRunService
 
             decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
 
-            if (sellQuantity >= dogMoreBuy.BuyQuantity || sellQuantity * nowPrice <= dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice)
+            if (sellQuantity >= dogMoreBuy.BuyQuantity || sellQuantity * nowPrice * (decimal)0.98 <= dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice)
             {
                 // 一定要赚才能出售
                 logger.Error($"{dogMoreBuy.SymbolName}{dogMoreBuy.QuoteCurrency} 未实现双向收益 sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}，sellQuantity * nowPrice：{sellQuantity * nowPrice}，dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice：{dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice}");

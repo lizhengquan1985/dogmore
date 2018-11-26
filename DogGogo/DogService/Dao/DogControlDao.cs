@@ -46,6 +46,15 @@ namespace DogService.Dao
                 throw new ApplicationException("管控数据出错");
             }
 
+            if (dogControl.LadderBuyPercent <= (decimal)1.05)
+            {
+                dogControl.LadderBuyPercent = (decimal)1.055;
+            }
+            if (dogControl.LadderBuyPercent >= (decimal)1.15)
+            {
+                dogControl.LadderBuyPercent = (decimal)1.12;
+            }
+
             using (var tx = Database.BeginTransaction())
             {
                 await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { dogControl.SymbolName, dogControl.QuoteCurrency });

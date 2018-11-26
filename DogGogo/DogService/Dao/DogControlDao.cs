@@ -1,4 +1,5 @@
 ﻿using DogService.DateTypes;
+using SharpDapper;
 using SharpDapper.Extensions;
 using System;
 using System.Collections.Generic;
@@ -77,6 +78,12 @@ namespace DogService.Dao
                 await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { SymbolName = symbolName, QuoteCurrency = quoteCurrency });
                 tx.Commit();
             }
+        }
+
+        public async Task<long> GetCount(string quoteCurrency)
+        {
+            var sql = $"select count(1) from t_dog_control where QuoteCurrency=@QuoteCurrency and IsValid={true}";
+            return (await Database.QueryAsync<long>(sql, new { QuoteCurrency = quoteCurrency })).FirstOrDefault();
         }
     }
 }

@@ -2,6 +2,7 @@
 using DogPlatform.Model;
 using DogRunService;
 using DogRunService.Helper;
+using DogService;
 using log4net;
 using log4net.Config;
 using System;
@@ -36,6 +37,8 @@ namespace AutoTrade
 
             UserPools.Push("xx");
             UserPools.Push("qq");
+
+            DogControlUtils.InitAsync();
 
             // 不停的对每个币做操作
             BeginTradeAllSymbol();

@@ -96,6 +96,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller\CoinsPre45.cs" />
     <Compile Include="Controller\ControlController.cs" />
     <Compile Include="Controller\DayController.cs" />
     <Compile Include="Controller\EmptyController.cs" />

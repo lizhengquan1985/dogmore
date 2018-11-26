@@ -67,19 +67,7 @@ namespace DogApi.Controller
                     }
                     closeDic.Add(item.SymbolName, item.NowPrice);
                 }
-                var pre50 = new List<string>
-                {
-                    "btc","xrp","eth","bchabc","bch",
-                    "eos","xlm","usdt","ltc","bsv",
-                    "xmr","ada","trx","iota","dash",
-                    "xem","bnb","ont","neo","etc",
-                    "lky","xtz","btg","zec","bcx",
-
-                    "doge","ht","bcn","vet","mkr",
-                    "okb","fto","qtum","zrx","dcr",
-                    "xuc","bcd","omg","lsk","bat",
-                    "aoa","ae","xrb","maid","bts",
-                };
+                var pre50 = CoinsPre45.GetPreCoins();
 
                 var notIn = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);
                 var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);

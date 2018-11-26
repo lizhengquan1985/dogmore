@@ -21,21 +21,45 @@ namespace DogService
 
         public static void InitAsync()
         {
-            foreach (var key in coinCount.Keys)
+            try
             {
-                try
                 {
-                    long count = new DogControlDao().GetCount(key).Result;
-                    if (count >= coinCount[key])
+                    long count = new DogControlDao().GetCount("usdt").Result;
+                    if (count >= coinCount["usdt"])
                     {
-                        coinCount[key] = (int)count;
+                        coinCount["usdt"] = (int)count;
                     }
                 }
-                catch (Exception ex)
+
                 {
-                    logger.Error(ex.Message, ex);
+                    long count = new DogControlDao().GetCount("btc").Result;
+                    if (count >= coinCount["btc"])
+                    {
+                        coinCount["btc"] = (int)count;
+                    }
+                }
+
+                {
+                    long count = new DogControlDao().GetCount("eth").Result;
+                    if (count >= coinCount["eth"])
+                    {
+                        coinCount["eth"] = (int)count;
+                    }
+                }
+
+                {
+                    long count = new DogControlDao().GetCount("ht").Result;
+                    if (count >= coinCount["ht"])
+                    {
+                        coinCount["ht"] = (int)count;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+            }
+
 
         }
 

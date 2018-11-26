@@ -47,13 +47,13 @@ namespace DogService.Dao
                 throw new ApplicationException("管控数据出错");
             }
 
-            if (dogControl.LadderBuyPercent <= (decimal)1.05)
+            if (dogControl.LadderBuyPercent <= (decimal)1.055)
             {
                 dogControl.LadderBuyPercent = (decimal)1.055;
             }
-            if (dogControl.LadderBuyPercent >= (decimal)1.15)
+            if (dogControl.LadderSellPercent >= (decimal)1.12)
             {
-                dogControl.LadderBuyPercent = (decimal)1.12;
+                dogControl.LadderSellPercent = (decimal)1.12;
             }
 
             using (var tx = Database.BeginTransaction())

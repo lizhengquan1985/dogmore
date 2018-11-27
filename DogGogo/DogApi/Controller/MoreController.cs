@@ -151,7 +151,7 @@ namespace DogApi.Controller
                     {
                         list.Sort((a, b) =>
                         {
-                            return (b.BuyDate.Ticks > a.BuyDate.Ticks || (b.BuyDate.Ticks == a.BuyDate.Ticks && string.Compare(b.SymbolName , a.SymbolName) > 0)) ? 1 : -1;
+                            return (b.BuyDate.Ticks > a.BuyDate.Ticks || (b.BuyDate.Ticks == a.BuyDate.Ticks && string.Compare(b.SymbolName, a.SymbolName) > 0)) ? 1 : -1;
                         });
                     }
                 }
@@ -230,23 +230,35 @@ namespace DogApi.Controller
         private async Task<DogMoreFinishedDTO> GetDogMoreFinishedDTO(long buyOrderId)
         {
             var dogMoreBuy = new DogMoreBuyDao().GetByBuyOrderId(buyOrderId);
-            var orderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(dogMoreBuy.BuyOrderMatchResults);
+            HBResponse<List<OrderMatchResult>> orderMatchResult = null;
             var buyQuantity = (decimal)0;
             var buyAmount = (decimal)0;
             var buyFees = (decimal)0;
-            foreach (var item in orderMatchResult.Data)
+            try
             {
-                buyAmount += item.FilledAmount * item.price;
-                if (item.symbol.IndexOf("ven") >= 0)
+                orderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(dogMoreBuy.BuyOrderMatchResults);
+                foreach (var item in orderMatchResult.Data)
                 {
-                    buyQuantity += item.FilledAmount * 100;
+                    buyAmount += item.FilledAmount * item.price;
+                    if (item.symbol.IndexOf("ven") >= 0)
+                    {
+                        buyQuantity += item.FilledAmount * 100;
+                    }
+                    else
+                    {
+                        buyQuantity += item.FilledAmount;
+                    }
+                    buyFees += item.FilledFees;
                 }
-                else
-                {
-                    buyQuantity += item.FilledAmount;
-                }
-                buyFees += item.FilledFees;
             }
+            catch (Exception ex)
+            {
+                buyQuantity = dogMoreBuy.BuyQuantity;
+                buyAmount = dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice;
+
+                logger.Error(ex.Message, ex);
+            }
+
 
             // 交易量，交易总额，  出售总额 出售数量， 
             var sellQuantity = (decimal)0;

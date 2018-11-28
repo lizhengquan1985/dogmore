@@ -420,5 +420,38 @@ namespace DogApi.Controller
 
             return new { balanceItem, list, totalQuantity };
         }
+
+        [HttpGet]
+        [ActionName("buyTest")]
+        public async Task BuyTest()
+        {
+            var symbols = CoinUtils.GetAllCommonSymbols("ht");
+            var account = AccountConfigUtils.GetAccountConfig("qq");
+
+            foreach (var symbol in symbols)
+            {
+                PlatformApi api = PlatformApi.GetInstance("qq");
+                OrderPlaceRequest req = new OrderPlaceRequest();
+                req.account_id = account.MainAccountId;
+                req.amount = "0.00001";
+                req.price = "0.00001";
+                req.source = "api";
+                req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
+                req.type = "buy-limit";
+
+
+                HBResponse<long> order = null;
+                try
+                {
+                    order = api.OrderPlace(req);
+
+                    logger.Error($"3 ------------------------");
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex.Message, ex);
+                }
+            }
+        }
     }
 }

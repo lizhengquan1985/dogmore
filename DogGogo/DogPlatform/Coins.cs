@@ -22,6 +22,18 @@ namespace DogPlatform
             {"ltc",(decimal)0.001 },
             {"etc",(decimal)0.01 }
         };
+        private static Dictionary<string, decimal> btcLeastBuy = new Dictionary<string, decimal> {
+            { "bat",1},
+            { "ardr",1},
+            {"eth",(decimal)0.001 },
+        };
+        private static Dictionary<string, decimal> ethLeastBuy = new Dictionary<string, decimal>
+        {
+        };
+        private static Dictionary<string, decimal> htLeastBuy = new Dictionary<string, decimal>
+        {
+            {"xrp",(decimal)0.1 },
+        };
 
         private static decimal GetPrecisionValue(int precision)
         {
@@ -55,6 +67,21 @@ namespace DogPlatform
             {
                 var symbol = usdtCoins[symbolName];
                 return quantity >= usdtLeastBuy[symbolName] * (decimal)1.1 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
+            }
+            if (quoteCurrency == "btc" && btcLeastBuy.ContainsKey(symbolName))
+            {
+                var symbol = usdtCoins[symbolName];
+                return quantity >= btcLeastBuy[symbolName] * (decimal)1.1 && quantity >= (btcLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
+            }
+            if (quoteCurrency == "eth" && ethLeastBuy.ContainsKey(symbolName))
+            {
+                var symbol = usdtCoins[symbolName];
+                return quantity >= ethLeastBuy[symbolName] * (decimal)1.1 && quantity >= (ethLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
+            }
+            if (quoteCurrency == "ht" && htLeastBuy.ContainsKey(symbolName))
+            {
+                var symbol = usdtCoins[symbolName];
+                return quantity >= htLeastBuy[symbolName] * (decimal)1.1 && quantity >= (htLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
             }
             return true;
         }

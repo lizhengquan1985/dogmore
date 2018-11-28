@@ -17,10 +17,10 @@ namespace DogApi.Controller
                     "eos","xlm","usdt","ltc","bsv",
                     "xmr","ada","trx","iota","dash",
                     "xem","bnb","ont","neo","etc",
-                    "lky","xtz","btg","zec","bcx",
+                    "xtz","btg","zec","bcx",
 
                     "doge","ht","bcn","vet","mkr",
-                    "okb","fto","qtum","zrx","dcr",
+                    "okb","qtum","zrx","dcr",
                     "xuc","bcd","omg","lsk","bat",
                     "aoa","ae","xrb","maid","bts",
                 });
@@ -34,7 +34,7 @@ namespace DogApi.Controller
                     "etc", "xtz","btg","zec",
 
                     "doge","ht","vet","mkr","okb",
-                    "fto","zrx","qtum","dcr","xuc",
+                    "zrx","qtum","dcr","xuc",
                     "bcd","omg","lsk","bcn","bat",
                     "xrb","aoa","ae","bts", "dgb",
                 });

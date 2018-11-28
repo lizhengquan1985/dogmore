@@ -742,6 +742,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
+                logger.Error(ex.Message, ex);
                 logger.Error("QuerySellDetailAndUpdate 查询结果时候出错");
             }
         }

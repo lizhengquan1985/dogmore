@@ -423,9 +423,9 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("buyTest")]
-        public async Task BuyTest()
+        public async Task BuyTest(string quoteCurrency)
         {
-            var symbols = CoinUtils.GetAllCommonSymbols("ht");
+            var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
             var account = AccountConfigUtils.GetAccountConfig("qq");
 
             foreach (var symbol in symbols)
@@ -439,17 +439,15 @@ namespace DogApi.Controller
                 req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
                 req.type = "buy-limit";
 
-
-                HBResponse<long> order = null;
                 try
                 {
-                    order = api.OrderPlace(req);
+                    HBResponse<long> order = api.OrderPlace(req);
 
                     logger.Error($"3 ------------------------");
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(ex.Message, ex);
+                    logger.Error($"{ symbol.BaseCurrency + symbol.QuoteCurrency}"+ex.Message, ex);
                 }
             }
         }

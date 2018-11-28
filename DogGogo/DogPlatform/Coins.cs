@@ -33,6 +33,15 @@ namespace DogPlatform
         private static Dictionary<string, decimal> htLeastBuy = new Dictionary<string, decimal>
         {
             {"xrp",(decimal)0.1 },
+            {"iost",(decimal)1 },
+            {"dash",(decimal)0.0001 },
+            {"eos",(decimal)0.01 },
+            {"bch",(decimal)0.0001 },
+            {"ltc",(decimal)0.001 },
+            {"etc",(decimal)0.01 },
+            {"mt",(decimal)1 },
+            {"kcash",(decimal)1 },
+            {"hpt",(decimal)1 },
         };
 
         private static decimal GetPrecisionValue(int precision)

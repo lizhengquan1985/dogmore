@@ -80,9 +80,15 @@ namespace DogService.Dao
 
         public void UpdateDogMoreBuySuccess(long buyOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal buyTradePrice)
         {
+            var results = JsonConvert.SerializeObject(orderMatchResult);
+            if (results.Length > 8000)
+            {
+                logger.Error($"{results}");
+                results = results.Substring(0, 8000);
+            }
             using (var tx = Database.BeginTransaction())
             {
-                var sql = $"update t_dog_more_buy set BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where BuyOrderId ='{buyOrderId}'";
+                var sql = $"update t_dog_more_buy set BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{results}' where BuyOrderId ='{buyOrderId}'";
                 Database.Execute(sql);
                 tx.Commit();
             }
@@ -90,9 +96,15 @@ namespace DogService.Dao
 
         public void UpdateDogMoreBuySuccess(long buyOrderId, decimal buyQuantity, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal buyTradePrice)
         {
+            var results = JsonConvert.SerializeObject(orderMatchResult);
+            if(results.Length > 8000)
+            {
+                logger.Error($"{results}");
+                results = results.Substring(0, 8000);
+            }
             using (var tx = Database.BeginTransaction())
             {
-                var sql = $"update t_dog_more_buy set BuyQuantity={buyQuantity}, BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where BuyOrderId ='{buyOrderId}'";
+                var sql = $"update t_dog_more_buy set BuyQuantity={buyQuantity}, BuyTradePrice={buyTradePrice}, BuyState='{orderDetail.Data.state}' ,BuyOrderDetail='{JsonConvert.SerializeObject(orderDetail)}', BuyOrderMatchResults='{results}' where BuyOrderId ='{buyOrderId}'";
                 Database.Execute(sql);
                 tx.Commit();
             }

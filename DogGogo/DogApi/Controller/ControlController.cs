@@ -254,13 +254,20 @@ namespace DogApi.Controller
         }
 
         [HttpGet]
-        [ActionName("initAccountInfo")]
+        [ActionName("deleteData")]
         public async Task DeleteData(string quoteCurrency)
         {
             var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
             foreach (var commonSymbol in commonSymbols)
             {
-                await new DogControlDao().DeleteData(commonSymbol.BaseCurrency, commonSymbol.QuoteCurrency);
+                try
+                {
+                    await new DogControlDao().DeleteData(commonSymbol.BaseCurrency, commonSymbol.QuoteCurrency);
+                }
+                catch(Exception ex)
+                {
+
+                }
             }
         }
     }

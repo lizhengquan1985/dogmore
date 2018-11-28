@@ -705,7 +705,8 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error("QueryBuyDetailAndUpdate  查询数据出错");
+                logger.Error(ex.Message, ex);
+                logger.Error($"QueryBuyDetailAndUpdate, orderId:{orderId}  查询数据出错");
             }
         }
 

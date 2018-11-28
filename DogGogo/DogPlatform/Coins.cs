@@ -54,7 +54,7 @@ namespace DogPlatform
             if (quoteCurrency == "usdt" && usdtLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = usdtCoins[symbolName];
-                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.1 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06;
+                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.1 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
             }
             return true;
         }

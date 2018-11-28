@@ -196,6 +196,10 @@ namespace DogRunService
                 {
                     newSellQuantity -= (decimal)0.1;
                 }
+                else if (symbol.AmountPrecision == 0)
+                {
+                    newSellQuantity -= (decimal)1;
+                }
             }
 
             if (!CoinUtils.IsBiggerThenLeast(symbol.BaseCurrency, symbol.QuoteCurrency, sellQuantity))

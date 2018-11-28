@@ -90,7 +90,7 @@ namespace DogService.Dao
         {
             using (var tx = Database.BeginTransaction())
             {
-                var sql = $"delete from t_{quoteCurrency}_{symbolName} where id<{Utils.GetIdByDate(DateTime.Now.AddMinutes(-200))}";
+                var sql = $"delete from t_{quoteCurrency}_{symbolName} where id<{Utils.GetIdByDate(DateTime.Now.AddMinutes(-600))}";
                 await Database.ExecuteAsync(sql);
                 tx.Commit();
             }

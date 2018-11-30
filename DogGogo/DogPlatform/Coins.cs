@@ -79,17 +79,17 @@ namespace DogPlatform
             }
             if (quoteCurrency == "btc" && btcLeastBuy.ContainsKey(symbolName))
             {
-                var symbol = usdtCoins[symbolName];
+                var symbol = btcCoins[symbolName];
                 return quantity >= btcLeastBuy[symbolName] * (decimal)1.1 && quantity >= (btcLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
             }
             if (quoteCurrency == "eth" && ethLeastBuy.ContainsKey(symbolName))
             {
-                var symbol = usdtCoins[symbolName];
+                var symbol = ethCoins[symbolName];
                 return quantity >= ethLeastBuy[symbolName] * (decimal)1.1 && quantity >= (ethLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
             }
             if (quoteCurrency == "ht" && htLeastBuy.ContainsKey(symbolName))
             {
-                var symbol = usdtCoins[symbolName];
+                var symbol = htCoins[symbolName];
                 return quantity >= htLeastBuy[symbolName] * (decimal)1.1 && quantity >= (htLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
             }
             return true;

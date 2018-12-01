@@ -98,7 +98,7 @@ namespace DogRunService
             var min = HistoryKlines.Min(it => it.Close);
 
             var minHuidiao = (decimal)1.005;
-            var maxHuidiao = (decimal)1.35;
+            var maxHuidiao = (decimal)1.888;
 
             return NowPrice > min * minHuidiao && NowPrice < min * maxHuidiao;
         }

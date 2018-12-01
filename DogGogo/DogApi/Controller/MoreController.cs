@@ -72,7 +72,7 @@ namespace DogApi.Controller
         {
             try
             {
-                var list = new List<DogMoreBuy>();
+                var list = new List<DogMoreBuyDTO>();
                 var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
                 var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
                 Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
@@ -88,6 +88,11 @@ namespace DogApi.Controller
                 if (string.IsNullOrEmpty(symbolName))
                 {
                     list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName, quoteCurrency);
+                    var countSymbol = new DogMoreBuyDao().CountSymbol(userName, quoteCurrency);
+                    foreach (var item in list)
+                    {
+                        item.Count = countSymbol.Find(it => it.SymbolName == item.SymbolName)?.Count ?? 0;
+                    }
                     list = list.Where(it => it.SymbolName != "btc" && it.SymbolName != "ven" && it.SymbolName != "hsr").ToList();
                     foreach (var symbol in symbols)
                     {
@@ -447,7 +452,7 @@ namespace DogApi.Controller
                 }
                 catch (Exception ex)
                 {
-                    logger.Error($"{ symbol.BaseCurrency + symbol.QuoteCurrency}"+ex.Message, ex);
+                    logger.Error($"{ symbol.BaseCurrency + symbol.QuoteCurrency}" + ex.Message, ex);
                 }
             }
         }

@@ -44,6 +44,11 @@ namespace DogService.DateTypes
         public bool IsFinished { get; set; }
     }
 
+    public class DogMoreBuyDTO: DogMoreBuy
+    {
+        public int Count { get; set; }
+    }
+
     [Table("t_dog_more_sell")]
     public class DogMoreSell
     {

@@ -228,7 +228,7 @@ namespace DogService.Dao
             return (decimal)q;
         }
 
-        public List<DogMoreBuy> listMoreBuyIsNotFinished(string userName, string symbolName, string quoteCurrency)
+        public List<DogMoreBuyDTO> listMoreBuyIsNotFinished(string userName, string symbolName, string quoteCurrency)
         {
 
             var where = $" where IsFinished=0 and QuoteCurrency=@quoteCurrency ";
@@ -241,15 +241,21 @@ namespace DogService.Dao
                 where += $" and SymbolName = @symbolName ";
             }
             var sql = $"select * from t_dog_more_buy {where} order by BuyTradePrice asc";
-            return Database.Query<DogMoreBuy>(sql, new { symbolName, userName, quoteCurrency }).ToList();
+            return Database.Query<DogMoreBuyDTO>(sql, new { symbolName, userName, quoteCurrency }).ToList();
         }
 
-        public List<DogMoreBuy> listEveryMinPriceMoreBuyIsNotFinished(string userName, string quoteCurrency)
+        public List<DogMoreBuyDTO> listEveryMinPriceMoreBuyIsNotFinished(string userName, string quoteCurrency)
         {
             var sql = $"select * from t_dog_more_buy where BuyOrderId in(" +
                 $" select BuyOrderId from ( " +
                 $"  select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where quoteCurrency=@quoteCurrency and {(string.IsNullOrEmpty(userName) ? "" : $" UserName = @userName and ")} IsFinished=0 group by SymbolName) t)  ";
-            return Database.Query<DogMoreBuy>(sql, new { userName, quoteCurrency }).ToList();
+            return Database.Query<DogMoreBuyDTO>(sql, new { userName, quoteCurrency }).ToList();
+        }
+
+        public List<DogMoreBuyDTO> CountSymbol(string userName, string quoteCurrency)
+        {
+            var sql = $"select SymbolName, count(1) Count from t_dog_more_buy where quoteCurrency=@quoteCurrency and {(string.IsNullOrEmpty(userName) ? "" : $" UserName = @userName and ")} IsFinished=0 group by SymbolName";
+            return Database.Query<DogMoreBuyDTO>(sql, new { userName, quoteCurrency }).ToList();
         }
 
         public List<DogMoreBuy> listDogMoreBuyIsFinished(string userName, string symbolName)

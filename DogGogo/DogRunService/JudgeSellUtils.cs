@@ -177,6 +177,11 @@ namespace DogRunService
             //    return sellQuantity;
             //}
 
+            if (sellQuantity == buyQuantity && symbol.BaseCurrency == "bsv" && symbol.QuoteCurrency == "usdt")
+            {
+                return sellQuantity;
+            }
+
             var newSellQuantity = sellQuantity;
             if (newSellQuantity == buyQuantity)
             {

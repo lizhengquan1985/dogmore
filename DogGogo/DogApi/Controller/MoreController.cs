@@ -438,8 +438,8 @@ namespace DogApi.Controller
                 PlatformApi api = PlatformApi.GetInstance("qq");
                 OrderPlaceRequest req = new OrderPlaceRequest();
                 req.account_id = account.MainAccountId;
-                req.amount = "0.00001";
-                req.price = "0.00001";
+                req.amount = "0.0000001";
+                req.price = "0.001";
                 req.source = "api";
                 req.symbol = symbol.BaseCurrency + symbol.QuoteCurrency;
                 req.type = "buy-limit";

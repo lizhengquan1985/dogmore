@@ -143,6 +143,11 @@ namespace DogRunService
                 return;
             }
 
+            if (symbol.BaseCurrency == "bsv" && symbol.QuoteCurrency == "usdt" && buyQuantity < (decimal)0.08)
+            {
+                return;
+            }
+
             buyQuantity = decimal.Round(buyQuantity, symbol.AmountPrecision);
             decimal orderPrice = decimal.Round(nowPrice * (decimal)1.006, symbol.PricePrecision);
 

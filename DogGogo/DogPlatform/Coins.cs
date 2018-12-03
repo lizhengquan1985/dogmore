@@ -70,27 +70,87 @@ namespace DogPlatform
             return 0;
         }
 
+        public static decimal CalcPreQ(CommonSymbol symbol, decimal quantity)
+        {
+            string symbolName = symbol.BaseCurrency;
+            string quoteCurrency = symbol.QuoteCurrency;
+            var leastBy = (decimal)0;
+            if (quoteCurrency == "usdt" && usdtLeastBuy.ContainsKey(symbolName))
+            {
+                leastBy = usdtLeastBuy[symbolName];
+            }
+            if (quoteCurrency == "btc" && btcLeastBuy.ContainsKey(symbolName))
+            {
+                leastBy = btcLeastBuy[symbolName];
+            }
+            if (quoteCurrency == "eth" && ethLeastBuy.ContainsKey(symbolName))
+            {
+                leastBy = ethLeastBuy[symbolName];
+            }
+            if (quoteCurrency == "ht" && htLeastBuy.ContainsKey(symbolName))
+            {
+                leastBy = htLeastBuy[symbolName];
+            }
+            if(leastBy == 0)
+            {
+                // 如果没有设置， 则原值返回
+                return quantity;
+            }
+            var amountPrecisionValue = GetPrecisionValue(symbol.AmountPrecision);
+            if (leastBy == amountPrecisionValue)
+            {
+                if(leastBy * 10 > quantity * 2)
+                {
+                    throw new ApplicationException("----");
+                }
+                else
+                {
+                    return leastBy * 10;
+                }
+            }
+            else if (leastBy > amountPrecisionValue)
+            {
+                if(quantity > leastBy)
+                {
+                    return quantity;
+                }
+                else if(quantity * 2 > leastBy)
+                {
+                    return leastBy;
+                }
+                else
+                {
+                    throw new ApplicationException("----");
+                }
+            }
+            else
+            {
+                throw new ApplicationException("--222--");
+            }
+        }
+
         public static bool IsBiggerThenLeastBuyForDoMore(string symbolName, string quoteCurrency, decimal quantity)
         {
+            // 最小购买的+精度的
             if (quoteCurrency == "usdt" && usdtLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = usdtCoins[symbolName];
-                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.1 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
+                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.1 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
             }
             if (quoteCurrency == "btc" && btcLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = btcCoins[symbolName];
-                return quantity >= btcLeastBuy[symbolName] * (decimal)1.1 && quantity >= (btcLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
+                return quantity >= btcLeastBuy[symbolName] * (decimal)1.1 && quantity >= (btcLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
             }
             if (quoteCurrency == "eth" && ethLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = ethCoins[symbolName];
-                return quantity >= ethLeastBuy[symbolName] * (decimal)1.1 && quantity >= (ethLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
+                return quantity >= ethLeastBuy[symbolName] * (decimal)1.1 && quantity >= (ethLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
             }
             if (quoteCurrency == "ht" && htLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = htCoins[symbolName];
-                return quantity >= htLeastBuy[symbolName] * (decimal)1.1 && quantity >= (htLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 20;
+                return quantity >= htLeastBuy[symbolName] * (decimal)1.1 && quantity >= (htLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
             }
             return true;
         }

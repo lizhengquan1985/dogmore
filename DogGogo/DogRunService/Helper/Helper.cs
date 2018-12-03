@@ -90,7 +90,7 @@ namespace DogRunService.Helper
             {
                 return false;
             }
-            if (quoteCurrency == "eth" && balance - notShougeEmptySellAmount < (decimal)0.008)
+            if (quoteCurrency == "eth" && balance - notShougeEmptySellAmount < (decimal)0.01)
             {
                 return false;
             }

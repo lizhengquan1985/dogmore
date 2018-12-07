@@ -53,8 +53,9 @@ namespace RestMarket
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "ht", "iota", "lsk", "ltc", "neo", "omg", "ont", "qtum", "steem", "trx", "vet", "xem", "xlm", "xmr", "xrp", "zec", "zrx" };
-            var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+            //var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "ht", "iota", "lsk", "ltc", "neo", "omg", "ont", "qtum", "steem", "trx", "vet", "xem", "xlm", "xmr", "xrp", "zec", "zrx" };
+            //var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+            var addSymbols = btcSymbols;
 
             foreach (var symbol in addSymbols)
             {
@@ -69,8 +70,9 @@ namespace RestMarket
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx" };
-            var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+            //var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx" };
+            //var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+            var addSymbols = ethSymbols;
 
             foreach (var symbol in addSymbols)
             {

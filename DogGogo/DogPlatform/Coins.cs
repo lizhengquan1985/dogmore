@@ -29,6 +29,31 @@ namespace DogPlatform
         };
         private static Dictionary<string, decimal> ethLeastBuy = new Dictionary<string, decimal>
         {
+            {"xmr",(decimal)0.0001 },
+            {"eos",(decimal)0.1 },
+            {"omg",(decimal)0.01 },
+            {"iota",(decimal)0.01 },
+            {"ada",(decimal)0.1 },
+            {"steem",(decimal)0.01 },
+            {"zrx",(decimal)0.1 },
+            {"ont",(decimal)0.01 },
+            {"ht",(decimal)0.1 },
+            {"btm",(decimal)0.1 },
+            {"trx",(decimal)1 },
+            {"bts",(decimal)0.1 },
+            {"hc",(decimal)0.01 },
+            {"icx",(decimal)0.01 },
+            {"qtum",(decimal)0.01 },
+            {"lsk",(decimal)0.001 },
+            {"bat",(decimal)1 },
+            {"gnt",(decimal)0.1 },
+            {"dcr",(decimal)0.001 },
+            {"pai",(decimal)0.1 },
+            {"dgb",(decimal)1 },
+            {"xlm",(decimal)0.1 },
+            {"hit",(decimal)1 },
+            {"vet",(decimal)1 },
+            {"ae",(decimal)0.01 },
         };
         private static Dictionary<string, decimal> htLeastBuy = new Dictionary<string, decimal>
         {
@@ -177,12 +202,16 @@ namespace DogPlatform
             else if (quoteCurrency == "btc")
             {
                 var res = btcCoins.Values.ToList();
-                return res;
+                var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "ht", "iota", "lsk", "ltc", "neo", "omg", "ont", "qtum", "steem", "trx", "vet", "xem", "xlm", "xmr", "xrp", "zec", "zrx" };
+                var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+                return addSymbols;
             }
             else if (quoteCurrency == "eth")
             {
                 var res = ethCoins.Values.ToList();
-                return res;
+                var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx" };
+                var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
+                return addSymbols;
             }
             else if (quoteCurrency == "ht")
             {

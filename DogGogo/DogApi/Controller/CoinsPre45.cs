@@ -13,16 +13,17 @@ namespace DogApi.Controller
             List<List<string>> historyCoins = new List<List<string>>();
             historyCoins.Add(new List<string>
                 {
-                    "btc","xrp","eth","bchabc","bch",
-                    "eos","xlm","usdt","ltc","bsv",
-                    "xmr","ada","trx","iota","dash",
-                    "xem","bnb","ont","neo","etc",
-                    "xtz","btg","zec","bcx",
+                    "btc","xrp","eth","usdt","xlm",
+                    "bch","bsv","eos","ltc","trx",
+                    "ada","xmr", "xem","iota","bnb",
+                   "dash","neo","etc","ont", "doge",
+                    "ht","zec","vet","btg","xtz",
 
-                    "doge","ht","bcn","vet","mkr",
-                    "okb","qtum","zrx","dcr",
-                    "xuc","bcd","omg","lsk","bat",
-                    "aoa","ae","xrb","maid","bts",
+                   "okb","zrx","xuc","dcr",//waves
+                    "qtum","bat","lsk","omg","xrb",
+                    "bts",//fct  dgb zil  zb
+                    "ae",//xvg    icx atp  link
+                    "aoa","maid","bcx","bcn","mkr","bcd",
                 });
 
             historyCoins.Add(new List<string>

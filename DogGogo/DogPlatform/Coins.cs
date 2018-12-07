@@ -116,7 +116,7 @@ namespace DogPlatform
             {
                 leastBy = htLeastBuy[symbolName];
             }
-            if(leastBy == 0)
+            if (leastBy == 0)
             {
                 // 如果没有设置， 则原值返回
                 return quantity;
@@ -124,7 +124,7 @@ namespace DogPlatform
             var amountPrecisionValue = GetPrecisionValue(symbol.AmountPrecision);
             if (leastBy == amountPrecisionValue)
             {
-                if(leastBy * 10 > quantity * 2)
+                if (leastBy * 10 > quantity * 2)
                 {
                     throw new ApplicationException("----");
                 }
@@ -135,11 +135,11 @@ namespace DogPlatform
             }
             else if (leastBy > amountPrecisionValue)
             {
-                if(quantity > leastBy)
+                if (quantity > leastBy)
                 {
                     return quantity;
                 }
-                else if(quantity * 2 > leastBy)
+                else if (quantity * 2 > leastBy)
                 {
                     return leastBy;
                 }
@@ -269,7 +269,7 @@ namespace DogPlatform
             else if (quoteCurrency == "eth")
             {
                 var res = ethCoins.Values.ToList();
-                var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx" };
+                var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx", "waves", "xvg" };
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;
             }

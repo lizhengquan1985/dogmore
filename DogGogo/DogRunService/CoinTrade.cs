@@ -135,6 +135,8 @@ namespace DogRunService
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
             recommendAmount = DogControlUtils.GetRecommendBuyAmount(symbol, recommendAmount, nowPrice);
 
+          
+
             // 购买的要求
             decimal buyQuantity = recommendAmount / nowPrice;
             if (!CoinUtils.IsBiggerThenLeastBuyForDoMore(symbol.BaseCurrency, symbol.QuoteCurrency, buyQuantity))

@@ -66,14 +66,19 @@ namespace DogService.Dao
         public void UpdateDogMoreSellWhenSuccess(long sellOrderId, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal sellTradePrice)
         {
             var dogMoreSell = GetDogMoreSellBySellOrderId(sellOrderId);
-
+            var results = JsonConvert.SerializeObject(orderMatchResult);
+            if (results.Length > 8000)
+            {
+                logger.Error($"{results}");
+                results = results.Substring(0, 8000);
+            }
             using (var tx = Database.BeginTransaction())
             {
                 var sqlBuy = $"update t_dog_more_buy set IsFinished=1 where BuyOrderId={dogMoreSell.BuyOrderId}";
                 Database.Execute(sqlBuy);
 
                 var sqlSell = $"update t_dog_more_sell set SellTradePrice={sellTradePrice}, SellState='{orderDetail.Data.state}' ,SellOrderDetail='{JsonConvert.SerializeObject(orderDetail)}'," +
-                    $" SellOrderMatchResults='{JsonConvert.SerializeObject(orderMatchResult)}' where SellOrderId ='{sellOrderId}'";
+                    $" SellOrderMatchResults='{JsonConvert.SerializeObject(results)}' where SellOrderId ='{sellOrderId}'";
                 Database.Execute(sqlSell);
                 tx.Commit();
             }

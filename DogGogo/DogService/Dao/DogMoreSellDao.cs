@@ -78,7 +78,7 @@ namespace DogService.Dao
                 Database.Execute(sqlBuy);
 
                 var sqlSell = $"update t_dog_more_sell set SellTradePrice={sellTradePrice}, SellState='{orderDetail.Data.state}' ,SellOrderDetail='{JsonConvert.SerializeObject(orderDetail)}'," +
-                    $" SellOrderMatchResults='{JsonConvert.SerializeObject(results)}' where SellOrderId ='{sellOrderId}'";
+                    $" SellOrderMatchResults='{results}' where SellOrderId ='{sellOrderId}'";
                 Database.Execute(sqlSell);
                 tx.Commit();
             }

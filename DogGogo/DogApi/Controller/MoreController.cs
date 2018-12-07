@@ -275,19 +275,29 @@ namespace DogApi.Controller
 
             foreach (var sell in dogMoreSellList)
             {
-                var sellOrderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(sell.SellOrderMatchResults);
-                if (sellOrderMatchResult != null && sellOrderMatchResult.Data != null && sellOrderMatchResult.Data.Count > 0)
+                try
                 {
-                    foreach (var item in sellOrderMatchResult.Data)
+                    var sellOrderMatchResult = JsonConvert.DeserializeObject<HBResponse<List<OrderMatchResult>>>(sell.SellOrderMatchResults);
+                    if (sellOrderMatchResult != null && sellOrderMatchResult.Data != null && sellOrderMatchResult.Data.Count > 0)
                     {
-                        sellAmount += item.FilledAmount * item.price;
-                        sellQuantity += item.FilledAmount;
-                        sellFees += item.FilledFees;
-                        if (item.price < sellTradePrice)
+                        foreach (var item in sellOrderMatchResult.Data)
                         {
-                            sellTradePrice = item.price;
+                            sellAmount += item.FilledAmount * item.price;
+                            sellQuantity += item.FilledAmount;
+                            sellFees += item.FilledFees;
+                            if (item.price < sellTradePrice)
+                            {
+                                sellTradePrice = item.price;
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    sellAmount = sell.SellTradePrice * sell.SellQuantity;
+                    sellQuantity += sell.SellQuantity;
+                    sellFees += 0;
+                    sellTradePrice = sell.SellTradePrice;
                 }
                 if (sell.SellDate > sellDate)
                 {

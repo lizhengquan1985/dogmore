@@ -235,6 +235,10 @@ namespace DogRunService.Helper
                     Console.WriteLine($" 拉取数量{count}");
                 }
                 var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, count);
+                if(klines == null || klines.Count == 0)
+                {
+                    return;
+                }
                 var todayKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).ToList();
                 var minutesKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date.AddMinutes(-30)).ToList();
                 var nearMaxPrice = (decimal)0;

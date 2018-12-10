@@ -92,7 +92,7 @@ namespace DogApi.Controller
             {
                 // 先计算最近500天的数据, 如果数据量少, 则计算4小时数据1000天
                 PlatformApi api = PlatformApi.GetInstance("xx");
-                var klines = api.GetHistoryKline(symbolName + quoteCurrency, "1day", 1000);
+                var klines = api.GetHistoryKline(symbolName + quoteCurrency, "1day", 500);
                 if(klines.Count < 180)
                 {
                     klines = api.GetHistoryKline(symbolName + quoteCurrency, "4hour", 1000);

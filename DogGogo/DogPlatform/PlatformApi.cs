@@ -110,6 +110,10 @@ namespace DogPlatform
         {
             var parameters = $"symbol={symbol}&period={period}&size={size}";
             var result = SendRequestNoSignature<List<HistoryKline>>(API_MARKET_HISTORY_KLINE, parameters);
+            if (result == null)
+            {
+                return null;
+            }
             return result.Data;
         }
 
@@ -186,7 +190,7 @@ namespace DogPlatform
                 logger.Error(resourcePath);
                 logger.Error(JsonConvert.SerializeObject(result.Content));
                 //logger.Error(ex.Message, ex);
-                throw ex;
+                return null;
             }
         }
 

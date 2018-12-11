@@ -162,7 +162,7 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("initAccountInfo")]
-        public async Task<object> InitAccountInfo(string userName, string quoteCurrency, string sort)
+        public async Task<object> InitAccountInfo(string userName, string quoteCurrency, string sort, bool stat)
         {
             try
             {
@@ -210,14 +210,17 @@ namespace DogApi.Controller
 
                         result.Add(item);
 
-                        new DogStatSymbolDao().CreateDogStatSymbol(new DogStatSymbol
+                        if (stat)
                         {
-                            Amount = balanceItem.balance,
-                            CreateTime = DateTime.Now,
-                            EarnAmount = (decimal)item["canEmptyQuantity"],
-                            StatDate = DateTime.Now.ToString("yyyy-MM-dd"),
-                            SymbolName = balanceItem.currency
-                        });
+                            new DogStatSymbolDao().CreateDogStatSymbol(new DogStatSymbol
+                            {
+                                Amount = balanceItem.balance,
+                                CreateTime = DateTime.Now,
+                                EarnAmount = (decimal)item["canEmptyQuantity"],
+                                StatDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                                SymbolName = balanceItem.currency
+                            });
+                        }
                     }
                     catch (Exception ex)
                     {

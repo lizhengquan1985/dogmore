@@ -15,5 +15,6 @@ namespace DogService.DateTypes
         public decimal Amount { get; set; }
         public DateTime CreateTime { get; set; }
         public decimal EarnAmount { get; set; }
+        public string UserName { get; set; }
     }
 }

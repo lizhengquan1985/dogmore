@@ -218,7 +218,8 @@ namespace DogApi.Controller
                                 CreateTime = DateTime.Now,
                                 EarnAmount = (decimal)item["canEmptyQuantity"],
                                 StatDate = DateTime.Now.ToString("yyyy-MM-dd"),
-                                SymbolName = balanceItem.currency
+                                SymbolName = balanceItem.currency,
+                                UserName = userName
                             });
                         }
                     }
@@ -275,16 +276,17 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("listDogStatCurrency")]
-        public async Task<object> ListDogStatCurrency()
+        public async Task<object> ListDogStatCurrency(string userName)
         {
             var dateList = new List<string>();
 
             for (int i = 0; i <= 30; i++)
             {
-                dateList.Add(DateTime.Now.AddDays(i - 30).ToString("yyyy-MM-dd"));
+                var date = DateTime.Now.AddDays(0 - i).ToString("yyyy-MM-dd");
+                dateList.Add(date);
             }
 
-            var result = new DogStatSymbolDao().ListDogStatSymbol(dateList);
+            var result = new DogStatSymbolDao().ListDogStatSymbol(userName, dateList);
             var symbolList = result.Select(it => it.SymbolName).ToList();
             symbolList.Sort((a, b) => string.Compare(a, b));
 
@@ -292,7 +294,7 @@ namespace DogApi.Controller
             foreach (var symbol in symbolList)
             {
                 Dictionary<string, string> item = new Dictionary<string, string>();
-                item.Add("symbol", symbol);
+                item.Add("symbolName", symbol);
                 for (int i = 0; i <= 30; i++)
                 {
                     var date = DateTime.Now.AddDays(0 - i).ToString("yyyy-MM-dd");
@@ -300,7 +302,7 @@ namespace DogApi.Controller
                 }
                 data.Add(item);
             }
-            return data;
+            return new { data, dateList };
         }
     }
 }

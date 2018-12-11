@@ -93,7 +93,7 @@ namespace DogApi.Controller
                 // 先计算最近500天的数据, 如果数据量少, 则计算4小时数据1000天
                 PlatformApi api = PlatformApi.GetInstance("xx");
                 var klines = api.GetHistoryKline(symbolName + quoteCurrency, "1day", 500);
-                if(klines.Count < 180)
+                if (klines.Count < 180)
                 {
                     klines = api.GetHistoryKline(symbolName + quoteCurrency, "4hour", 1000);
                 }
@@ -209,6 +209,15 @@ namespace DogApi.Controller
                         item.Add("canEmptyAmount", Math.Round((balanceItem.balance - totalQuantity - kongAmount) * nowPriceItem.NowPrice, 6));
 
                         result.Add(item);
+
+                        new DogStatSymbolDao().CreateDogStatSymbol(new DogStatSymbol
+                        {
+                            Amount = balanceItem.balance,
+                            CreateTime = DateTime.Now,
+                            EarnAmount = (decimal)item["canEmptyQuantity"],
+                            StatDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                            SymbolName = balanceItem.currency
+                        });
                     }
                     catch (Exception ex)
                     {
@@ -254,11 +263,41 @@ namespace DogApi.Controller
                 {
                     await new DogControlDao().DeleteData(commonSymbol.BaseCurrency, commonSymbol.QuoteCurrency);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                 }
             }
+        }
+
+        [HttpGet]
+        [ActionName("listDogStatCurrency")]
+        public async Task<object> ListDogStatCurrency()
+        {
+            var dateList = new List<string>();
+
+            for (int i = 0; i <= 30; i++)
+            {
+                dateList.Add(DateTime.Now.AddDays(i - 30).ToString("yyyy-MM-dd"));
+            }
+
+            var result = new DogStatSymbolDao().ListDogStatSymbol(dateList);
+            var symbolList = result.Select(it => it.SymbolName).ToList();
+            symbolList.Sort((a, b) => string.Compare(a, b));
+
+            List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
+            foreach (var symbol in symbolList)
+            {
+                Dictionary<string, string> item = new Dictionary<string, string>();
+                item.Add("symbol", symbol);
+                for (int i = 0; i <= 30; i++)
+                {
+                    var date = DateTime.Now.AddDays(0 - i).ToString("yyyy-MM-dd");
+                    item.Add(date, result.Find(it => it.SymbolName == symbol && it.StatDate == date)?.EarnAmount.ToString() ?? "");
+                }
+                data.Add(item);
+            }
+            return data;
         }
     }
 }

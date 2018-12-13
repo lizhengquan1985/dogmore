@@ -67,7 +67,7 @@ namespace DogApi.Controller
                     list = res,
                     closeDic,
                     noRunPre50 = pre50,
-                    notInControl = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null),
+                    notInControl = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList(),
                     hasControlButNotInPre50 = notInPre50.Select(it => it.SymbolName).ToList(),
                     allItems = res.Select(it => it.SymbolName).ToList()
                 };

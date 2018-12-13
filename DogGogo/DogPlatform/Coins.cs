@@ -95,7 +95,7 @@ namespace DogPlatform
             return 0;
         }
 
-        public static decimal CalcPreQ(CommonSymbol symbol, decimal quantity)
+        public static decimal CalcTradeQuantity(CommonSymbol symbol, decimal quantity)
         {
             string symbolName = symbol.BaseCurrency;
             string quoteCurrency = symbol.QuoteCurrency;
@@ -116,7 +116,7 @@ namespace DogPlatform
             {
                 leastBy = htLeastBuy[symbolName];
             }
-            if (leastBy == 0)
+            if (leastBy <= 0)
             {
                 // 如果没有设置， 则原值返回
                 return quantity;
@@ -124,24 +124,34 @@ namespace DogPlatform
             var amountPrecisionValue = GetPrecisionValue(symbol.AmountPrecision);
             if (leastBy == amountPrecisionValue)
             {
-                if (leastBy * 10 > quantity * 2)
+                if(quantity > leastBy * 8)
+                {
+                    return quantity;
+                }
+
+                if (leastBy * 8 > quantity * 2)
                 {
                     throw new ApplicationException("----");
                 }
                 else
                 {
-                    return leastBy * 10;
+                    return leastBy * 8;
                 }
             }
             else if (leastBy > amountPrecisionValue)
             {
-                if (quantity > leastBy)
+                if(leastBy > quantity * 2)
+                {
+                    throw new ApplicationException("----");
+                }
+
+                if (quantity > leastBy * (decimal)1.1)
                 {
                     return quantity;
                 }
                 else if (quantity * 2 > leastBy)
                 {
-                    return leastBy;
+                    return leastBy * (decimal)1.1;
                 }
                 else
                 {

@@ -135,10 +135,10 @@ namespace DogRunService
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
             recommendAmount = DogControlUtils.GetRecommendBuyAmount(symbol, recommendAmount, nowPrice);
 
-          
-
             // 购买的要求
             decimal buyQuantity = recommendAmount / nowPrice;
+            buyQuantity = CoinUtils.CalcTradeQuantity(symbol, buyQuantity);
+
             if (!CoinUtils.IsBiggerThenLeastBuyForDoMore(symbol.BaseCurrency, symbol.QuoteCurrency, buyQuantity))
             {
                 Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做多数量太少，不符合最小交易额度");

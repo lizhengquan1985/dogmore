@@ -15,12 +15,33 @@ namespace DogPlatform
         private static Dictionary<string, CommonSymbol> htCoins = new Dictionary<string, CommonSymbol>();
         // 购入时候考虑大于最小交易额度的10%
         private static Dictionary<string, decimal> usdtLeastBuy = new Dictionary<string, decimal> {
-            {"btc",(decimal)0.0001 },
-            {"xrp",(decimal)1 },
-            {"eth",(decimal)0.001 },
-            {"bch",(decimal)0.001 },
-            {"ltc",(decimal)0.001 },
-            {"etc",(decimal)0.01 }
+        /*检查*/ {"btc",(decimal)0.0001 },
+        /*检查*/ {"xrp",(decimal)1 },
+        /*检查*/ {"eth",(decimal)0.001 },
+        /*检查*/ {"bch",(decimal)0.001 },
+        /*检查*/ {"ltc",(decimal)0.001 },
+
+        /*检查*/ {"etc",(decimal)0.01 },
+        /*检查*/ {"eos",(decimal)0.01 },
+        /*检查*/ {"ht",(decimal)0.1 },
+        /*检查*/ {"ada",(decimal)0.1 },
+        /*检查*/ {"dash",(decimal)0.001 },
+
+        /*检查*/ {"omg",(decimal)0.01 },
+
+        /*检查*/ {"bsv",(decimal)0.01 },
+        /*检查*/ {"bix",(decimal)0.1 },
+        /*检查*/ {"ela",(decimal)0.01 },
+        /*检查*/ {"smt",(decimal)1 },
+        /*检查*/ {"steem",(decimal)0.01 },
+        /*检查*/ {"snt",(decimal)0.1 },
+        /*检查*/ {"xem",(decimal)0.1 },
+        /*检查*/ {"storj",(decimal)0.01 },
+        /*检查*/ {"mds",(decimal)0.1 },
+        /*检查*/ {"itc",(decimal)0.01 },
+        /*检查*/ {"neo",(decimal)0.001 },
+        /*检查*/ {"ela",(decimal)0.01 },
+        /*检查*/ {"xmr",(decimal)0.001 }
         };
         private static Dictionary<string, decimal> btcLeastBuy = new Dictionary<string, decimal> {
             { "bat",1},

@@ -183,6 +183,20 @@ namespace DogApi.Controller
                         }
 
                         var nowPriceItem = nowPriceList.Find(it => it.SymbolName == balanceItem.currency);
+
+                        if (stat && balanceItem.currency == "usdt")
+                        {
+                            new DogStatSymbolDao().CreateDogStatSymbol(new DogStatSymbol
+                            {
+                                Amount = balanceItem.balance,
+                                CreateTime = DateTime.Now,
+                                EarnAmount = balanceItem.balance,
+                                StatDate = DateTime.Now.ToString("yyyy-MM-dd"),
+                                SymbolName = balanceItem.currency,
+                                UserName = userName
+                            });
+                        }
+
                         if (nowPriceItem == null)
                         {
                             continue;
@@ -287,8 +301,20 @@ namespace DogApi.Controller
             }
 
             var result = new DogStatSymbolDao().ListDogStatSymbol(userName, dateList);
-            var symbolList = result.Select(it => it.SymbolName).ToList();
-            symbolList.Sort((a, b) => string.Compare(a, b));
+            var symbolList = result.Select(it => it.SymbolName).Distinct().ToList();
+            symbolList.Sort((a, b) =>
+            {
+                if (a == "usdt" || a == "btc" || a == "eth" || a == "ht")
+                {
+                    return -1;
+                }
+                if (b == "usdt" || b == "btc" || b == "eth" || b == "ht")
+                {
+                    return 1;
+                }
+
+                return string.Compare(a, b);
+            });
 
             List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
             foreach (var symbol in symbolList)

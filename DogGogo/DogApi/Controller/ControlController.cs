@@ -290,11 +290,16 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("listDogStatCurrency")]
-        public async Task<object> ListDogStatCurrency(string userName)
+        public async Task<object> ListDogStatCurrency(string userName, int intervalDay = 1)
         {
             var dateList = new List<string>();
 
-            for (int i = 0; i <= 30; i++)
+            if (intervalDay < 1)
+            {
+                intervalDay = 1;
+            }
+
+            for (int i = 0; i <= 15 * intervalDay; i = i + intervalDay)
             {
                 var date = DateTime.Now.AddDays(0 - i).ToString("yyyy-MM-dd");
                 dateList.Add(date);

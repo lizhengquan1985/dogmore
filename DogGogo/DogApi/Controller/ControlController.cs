@@ -55,11 +55,22 @@ namespace DogApi.Controller
                 }
                 var pre50 = CoinsPre45.GetPreCoins();
 
-                var notIn = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);
+                var notInPre50 = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);
                 var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
-                pre50.RemoveAll(it => string.IsNullOrEmpty(it) || res.Find(item => item.SymbolName == it) != null);
-                pre50.RemoveAll(it => commonSymbols.Find(item => item.BaseCurrency == it) == null);
-                return new { list = res, closeDic, pre50, notIn = notIn.Select(it => it.SymbolName).ToList(), allItems = res.Select(it => it.SymbolName).ToList() };
+                var notControlButRun = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList();
+
+                var commonSymbols22 = CoinUtils.GetAllCommonSymbols22(quoteCurrency);
+                pre50.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
+                pre50.RemoveAll(it => commonSymbols22.Find(item => item.BaseCurrency == it) == null);
+                return new
+                {
+                    list = res,
+                    closeDic,
+                    noRunPre50 = pre50,
+                    notInControl = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null),
+                    hasControlButNotInPre50 = notInPre50.Select(it => it.SymbolName).ToList(),
+                    allItems = res.Select(it => it.SymbolName).ToList()
+                };
             }
             catch (Exception ex)
             {

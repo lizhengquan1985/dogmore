@@ -53,16 +53,11 @@ namespace RestMarket
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            //var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "ht", "iota", "lsk", "ltc", "neo", "omg", "ont", "qtum", "steem", "trx", "vet", "xem", "xlm", "xmr", "xrp", "zec", "zrx" };
-            //var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
-            var addSymbols = btcSymbols;
-
-            foreach (var symbol in addSymbols)
+            foreach (var symbol in btcSymbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
-            return addSymbols.ToList();
+            return btcSymbols.ToList();
         }
 
 
@@ -70,14 +65,11 @@ namespace RestMarket
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addSymbols = ethSymbols;
-
-            foreach (var symbol in addSymbols)
+            foreach (var symbol in ethSymbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
-            return addSymbols.ToList();
+            return ethSymbols.ToList();
         }
 
 

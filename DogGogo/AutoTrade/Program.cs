@@ -60,58 +60,46 @@ namespace AutoTrade
         public static List<CommonSymbol> InitUsdtData()
         {
             // 准备好各种对
-            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-
-            foreach (var symbol in symbols)
+            var usdtSymbols = CoinUtils.GetAllCommonSymbols("usdt");
+            foreach (var symbol in usdtSymbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
-            return symbols.ToList();
+            return usdtSymbols.ToList();
         }
 
         public static List<CommonSymbol> InitBtcData()
         {
             // 准备好各种对
             var btcSymbols = CoinUtils.GetAllCommonSymbols("btc");
-            var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "ht", "iota", "lsk", "ltc", "neo", "omg", "ont", "qtum", "steem", "trx", "vet", "xem", "xlm", "xmr", "xrp", "zec", "zrx" };
-            var addSymbols = btcSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
-
-            foreach (var symbol in addSymbols)
+            foreach (var symbol in btcSymbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
-            return addSymbols.ToList();
+            return btcSymbols.ToList();
         }
-
 
         public static List<CommonSymbol> InitEthData()
         {
             // 准备好各种对
             var ethSymbols = CoinUtils.GetAllCommonSymbols("eth");
-            var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "hc", "hit", "ht", "icx", "iota", "lsk", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx" };
-            var addSymbols = ethSymbols.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
-
-            foreach (var symbol in addSymbols)
+            foreach (var symbol in ethSymbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
-            return addSymbols.ToList();
+            return ethSymbols.ToList();
         }
 
 
         public static List<CommonSymbol> InitHtData()
         {
             // 准备好各种对
-            var symbols = CoinUtils.GetAllCommonSymbols("ht");
-            foreach (var symbol in symbols)
+            var htSymbols = CoinUtils.GetAllCommonSymbols("ht");
+            foreach (var symbol in htSymbols)
             {
                 KlineUtils.CheckTableExistAndCreate(symbol);
             }
-
-            return symbols.ToList();
+            return htSymbols.ToList();
         }
 
         private static void RunCoin(List<CommonSymbol> symbols)

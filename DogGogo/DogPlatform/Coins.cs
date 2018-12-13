@@ -28,10 +28,35 @@ namespace DogPlatform
         /*检查*/ {"dash",(decimal)0.001 },
 
         /*检查*/ {"omg",(decimal)0.01 },
+        /*检查*/ {"zec",(decimal)0.001 },
+        /*检查*/ {"iota",(decimal)0.01 },
+        /*检查*/ {"xmr",(decimal)0.001 },
+        /*检查*/ {"hb10",(decimal)0.1 }, // 15
+        
+        /*检查*/ {"nano",(decimal)0.1 },
+        /*检查*/ {"gxc",(decimal)0.1 },
+        /*检查*/ {"hit",(decimal)1 },
+        /*检查*/ {"btm",(decimal)0.1 },
+        /*检查*/ {"pai",(decimal)0.1 }, // 20
+        
+        /*检查*/ {"hpt",(decimal)1 },
+        /*检查*/ {"ela",(decimal)0.01 },
+        /*检查*/ {"ont",(decimal)0.01 },
+        /*检查*/ {"iost",(decimal)1 },
+        /*检查*/ {"qtum",(decimal)0.01 }, // 25
+        
+        /*检查*/ {"trx",(decimal)1 },
+        /*检查*/ {"dta",(decimal)1 },
+        /*检查*/ {"zil",(decimal)1 },
+        /*检查*/ {"ocn",(decimal)1 },
+        /*检查*/ {"cmt",(decimal)1 }, // 30
+
+        /*检查*/ {"elf",(decimal)0.1 },
+        /*检查*/ {"gnt",(decimal)0.1 },
+        /*检查*/ {"soc",(decimal)0.1 },
 
         /*检查*/ {"bsv",(decimal)0.01 },
         /*检查*/ {"bix",(decimal)0.1 },
-        /*检查*/ {"ela",(decimal)0.01 },
         /*检查*/ {"smt",(decimal)1 },
         /*检查*/ {"steem",(decimal)0.01 },
         /*检查*/ {"snt",(decimal)0.1 },
@@ -39,9 +64,7 @@ namespace DogPlatform
         /*检查*/ {"storj",(decimal)0.01 },
         /*检查*/ {"mds",(decimal)0.1 },
         /*检查*/ {"itc",(decimal)0.01 },
-        /*检查*/ {"neo",(decimal)0.001 },
-        /*检查*/ {"ela",(decimal)0.01 },
-        /*检查*/ {"xmr",(decimal)0.001 }
+        /*检查*/ {"neo",(decimal)0.001 }
         };
         private static Dictionary<string, decimal> btcLeastBuy = new Dictionary<string, decimal> {
             { "bat",1},

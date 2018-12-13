@@ -229,22 +229,22 @@ namespace DogPlatform
             if (quoteCurrency == "usdt" && usdtLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = usdtCoins[symbolName];
-                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.1 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
+                return quantity >= usdtLeastBuy[symbolName] * (decimal)1.06 && quantity >= (usdtLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.03 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 6;
             }
             if (quoteCurrency == "btc" && btcLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = btcCoins[symbolName];
-                return quantity >= btcLeastBuy[symbolName] * (decimal)1.1 && quantity >= (btcLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
+                return quantity >= btcLeastBuy[symbolName] * (decimal)1.06 && quantity >= (btcLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.03 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 6;
             }
             if (quoteCurrency == "eth" && ethLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = ethCoins[symbolName];
-                return quantity >= ethLeastBuy[symbolName] * (decimal)1.1 && quantity >= (ethLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
+                return quantity >= ethLeastBuy[symbolName] * (decimal)1.06 && quantity >= (ethLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.03 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 6;
             }
             if (quoteCurrency == "ht" && htLeastBuy.ContainsKey(symbolName))
             {
                 var symbol = htCoins[symbolName];
-                return quantity >= htLeastBuy[symbolName] * (decimal)1.1 && quantity >= (htLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.06 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 10;
+                return quantity >= htLeastBuy[symbolName] * (decimal)1.06 && quantity >= (htLeastBuy[symbolName] + GetPrecisionValue(symbol.AmountPrecision)) * (decimal)1.03 && quantity >= GetPrecisionValue(symbol.AmountPrecision) * 6;
             }
             return true;
         }

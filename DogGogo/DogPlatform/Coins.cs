@@ -190,6 +190,7 @@ namespace DogPlatform
 
                 if (leastBy * 8 > quantity * 2)
                 {
+                    Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                     throw new ApplicationException("----");
                 }
                 else
@@ -201,6 +202,7 @@ namespace DogPlatform
             {
                 if (leastBy > quantity * 2)
                 {
+                    Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                     throw new ApplicationException("----");
                 }
 
@@ -214,6 +216,7 @@ namespace DogPlatform
                 }
                 else
                 {
+                    Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                     throw new ApplicationException("----");
                 }
             }

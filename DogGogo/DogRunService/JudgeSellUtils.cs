@@ -217,6 +217,11 @@ namespace DogRunService
                 return newSellQuantity;
             }
 
+            if (symbol.BaseCurrency == "xrp")
+            {
+                return decimal.Round(buyQuantity, symbol.AmountPrecision);
+            }
+
             throw new Exception($"计算sellquantity不合理, buyQuantity:{buyQuantity},newSellQuantity:{newSellQuantity}， 没有赚头");
         }
     }

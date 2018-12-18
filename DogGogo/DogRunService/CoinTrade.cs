@@ -494,12 +494,11 @@ namespace DogRunService
 
             if (sellQuantity >= dogMoreBuy.BuyQuantity || sellQuantity * nowPrice * (decimal)0.98 <= dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice)
             {
-                if(symbol.BaseCurrency != "bsv")
+                if (symbol.BaseCurrency != "xrp")
                 {
-
-                // 一定要赚才能出售
-                logger.Error($"{dogMoreBuy.SymbolName}{dogMoreBuy.QuoteCurrency} 未实现双向收益 sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}，sellQuantity * nowPrice：{sellQuantity * nowPrice}，dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice：{dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice}");
-                return;
+                    // 一定要赚才能出售
+                    logger.Error($"{dogMoreBuy.SymbolName}{dogMoreBuy.QuoteCurrency} 未实现双向收益 sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}，sellQuantity * nowPrice：{sellQuantity * nowPrice}，dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice：{dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice}");
+                    return;
                 }
             }
 
@@ -814,6 +813,7 @@ namespace DogRunService
             try
             {
                 var needChangeBuyStateDogEmptyBuyList = new DogEmptyBuyDao().ListNeedChangeBuyStateDogEmptyBuy();
+                Console.WriteLine($"needChangeBuyStateDogEmptyBuyList: {needChangeBuyStateDogEmptyBuyList.Count}");
                 foreach (var item in needChangeBuyStateDogEmptyBuyList)
                 {
                     // 如果长时间没有出售成功， 则取消订单。
@@ -865,6 +865,8 @@ namespace DogRunService
                 PlatformApi api = PlatformApi.GetInstance(userName);
 
                 var orderDetail = api.QueryOrderDetail(orderId);
+
+                Console.WriteLine($"orderDetail: {JsonConvert.SerializeObject(orderDetail)}");
                 if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);

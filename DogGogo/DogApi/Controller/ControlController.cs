@@ -26,6 +26,34 @@ namespace DogApi.Controller
         {
             try
             {
+                // 默认 1.05, 
+                dogControl.SymbolLevel = Math.Max(0, dogControl.SymbolLevel);
+                dogControl.SymbolLevel = Math.Min(10, dogControl.SymbolLevel);
+                if (dogControl.LadderBuyPercent < (decimal)(1.05 + 0.005 * dogControl.SymbolLevel))
+                {
+                    dogControl.LadderBuyPercent = (decimal)(1.05 + 0.005 * dogControl.SymbolLevel);
+                }
+
+                dogControl.UpIndex = Math.Max(0, dogControl.UpIndex);
+                dogControl.UpIndex = Math.Min(20, dogControl.UpIndex);
+
+                dogControl.DownIndex = Math.Max(0, dogControl.DownIndex);
+                dogControl.DownIndex = Math.Min(20, dogControl.DownIndex);
+
+                // 每点增加0.01
+                // usdt  1.08起售， 
+                // btc   1.05 
+                // eth   1.05 
+                // ht   1.05
+                if (dogControl.QuoteCurrency == "usdt")
+                {
+                    dogControl.LadderSellPercent = Math.Max((decimal)dogControl.LadderSellPercent, (decimal)(1.08 + dogControl.UpIndex * 0.01));
+                }
+                else
+                {
+                    dogControl.LadderSellPercent = Math.Max((decimal)dogControl.LadderSellPercent, (decimal)(1.05 + dogControl.UpIndex * 0.01));
+                }
+
                 await new DogControlDao().CreateDogControl(dogControl);
             }
             catch (Exception ex)

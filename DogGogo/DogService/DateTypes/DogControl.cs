@@ -41,5 +41,8 @@ namespace DogService.DateTypes
 
         public decimal HistoryMax { get; set; }
         public decimal HistoryMin { get; set; }
+        public int UpIndex { get; set; }
+        public int DownIndex { get; set; }
+        public int SymbolLevel { get; set; }
     }
 }

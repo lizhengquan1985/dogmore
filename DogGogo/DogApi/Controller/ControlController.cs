@@ -241,7 +241,7 @@ namespace DogApi.Controller
                             {
                                 Amount = balanceItem.balance,
                                 CreateTime = DateTime.Now,
-                                EarnAmount = (decimal)item["canEmptyQuantity"],
+                                EarnAmount = (decimal)Math.Round((balanceItem.balance - totalQuantity - kongAmount), 6),
                                 StatDate = DateTime.Now.ToString("yyyy-MM-dd"),
                                 SymbolName = balanceItem.currency,
                                 UserName = userName

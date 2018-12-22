@@ -183,19 +183,19 @@ namespace DogPlatform
             var amountPrecisionValue = GetPrecisionValue(symbol.AmountPrecision);
             if (leastBy == amountPrecisionValue)
             {
-                if (quantity > leastBy * 8)
+                if (quantity > leastBy * 9)
                 {
                     return quantity;
                 }
 
-                if (leastBy * 8 > quantity * 2)
+                if (leastBy * 10 > quantity * 2)
                 {
                     Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                     throw new ApplicationException("----");
                 }
                 else
                 {
-                    return leastBy * 8;
+                    return leastBy * 10;
                 }
             }
             else if (leastBy > amountPrecisionValue)

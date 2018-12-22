@@ -358,14 +358,14 @@ namespace DogPlatform
             else if (quoteCurrency == "btc")
             {
                 var res = btcCoins.Values.ToList();
-                var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "gxc", "ht", "iota", "lsk", "link", "ltc", "neo", "nano", "omg", "ont", "qtum", "steem", "trx", "vet", "waves", "xem", "xlm", "xmr", "xrp", "zec", "zrx", "xtz" };
+                var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "gxc", "ht", "iota", "lsk", "link", "ltc", "neo", "nano", "omg", "ont", "qtum", "steem", "trx", "vet", "waves", "xem", "xvg", "xlm", "xmr", "xrp", "zec", "zrx", "zil", "xtz" };
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;
             }
             else if (quoteCurrency == "eth")
             {
                 var res = ethCoins.Values.ToList();
-                var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "gxc", "hc", "hit", "ht", "icx", "iota", "lsk", "link", "nano", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx", "waves", "xtz" };
+                var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "gxc", "hc", "hit", "ht", "icx", "iota", "lsk", "link", "nano", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xvg", "xmr", "zrx", "zil", "waves", "xtz" };
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;
             }

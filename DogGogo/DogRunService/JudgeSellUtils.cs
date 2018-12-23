@@ -221,6 +221,10 @@ namespace DogRunService
             {
                 return decimal.Round(buyQuantity, symbol.AmountPrecision);
             }
+            if (symbol.BaseCurrency == "bat")
+            {
+                return decimal.Round(buyQuantity, symbol.AmountPrecision);
+            }
 
             throw new Exception($"计算sellquantity不合理, buyQuantity:{buyQuantity},newSellQuantity:{newSellQuantity}， 没有赚头");
         }

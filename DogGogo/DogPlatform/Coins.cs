@@ -183,19 +183,19 @@ namespace DogPlatform
             var amountPrecisionValue = GetPrecisionValue(symbol.AmountPrecision);
             if (leastBy == amountPrecisionValue)
             {
-                if (quantity > leastBy * 8)
+                if (quantity > leastBy * 9)
                 {
                     return quantity;
                 }
 
-                if (leastBy * 8 > quantity * 2)
+                if (leastBy * 10 > quantity * 2)
                 {
                     Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                     throw new ApplicationException("----");
                 }
                 else
                 {
-                    return leastBy * 8;
+                    return leastBy * 10;
                 }
             }
             else if (leastBy > amountPrecisionValue)
@@ -358,14 +358,14 @@ namespace DogPlatform
             else if (quoteCurrency == "btc")
             {
                 var res = btcCoins.Values.ToList();
-                var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "gxc", "ht", "iota", "lsk", "link", "ltc", "neo", "nano", "omg", "ont", "qtum", "steem", "trx", "vet", "waves", "xem", "xlm", "xmr", "xrp", "zec", "zrx", "xtz" };
+                var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "gxc", "ht", "iota", "lsk", "link", "ltc", "neo", "nano", "omg", "ont", "qtum", "steem", "trx", "vet", "waves", "xem", "xvg", "xlm", "xmr", "xrp", "zec", "zrx", "zil", "xtz" };
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;
             }
             else if (quoteCurrency == "eth")
             {
                 var res = ethCoins.Values.ToList();
-                var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "gxc", "hc", "hit", "ht", "icx", "iota", "lsk", "link", "nano", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xmr", "zrx", "waves", "xtz" };
+                var addCoins = new List<string> { "ada", "ae", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "gxc", "hc", "hit", "ht", "icx", "iota", "lsk", "link", "nano", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xvg", "xmr", "zrx", "zil", "waves", "xtz" };
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;
             }

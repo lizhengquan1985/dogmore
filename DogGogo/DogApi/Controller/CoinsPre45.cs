@@ -21,23 +21,23 @@ namespace DogApi.Controller
 
                    "okb","zrx","xuc","dcr",//waves
                     "qtum","bat","lsk","omg","xrb",
-                    "bts",//fct  dgb zil  zb
+                    "bts",//fct  dgb   zb start
                     "ae",//xvg    icx atp  link
-                    "aoa","maid","bcx","bcn","mkr","bcd",
+                    "bcx","bcd",
                 });
 
             historyCoins.Add(new List<string>
                 {
-                    "btc","xrp","eth","bchabc","bch",
-                    "eos","xlm","usdt","ltc","bsv",
-                    "xmr","ada","trx","bcx","iota",
-                    "dash","xem","bnb","ont","neo",
-                    "etc", "xtz","btg","zec",
+                    "btc","xrp","eth","usdt","eos",
+                    "xlm","bch","ltc","bsv","trx",
+                    "ada","xmr","bnb","xem","dash","iota",
+                     "etc","neo","waves","ont","doge",
+                    "xtz","ht","zec","vet","btg",
 
-                    "doge","ht","vet","mkr","okb",
-                    "zrx","qtum","dcr","xuc",
-                    "bcd","omg","lsk","bcn","bat",
-                    "xrb","aoa","ae","bts", "dgb",
+                    "okb","qtum","zrx","dcr","lsk",
+                    "xuc","omg","bat","zil",// start
+                    "bts","ae","bcd", // xvg
+                    "nano", "dgb","bcx",
                 });
 
             var set = new HashSet<string>();

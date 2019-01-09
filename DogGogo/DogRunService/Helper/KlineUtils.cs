@@ -199,7 +199,7 @@ namespace DogRunService.Helper
                     }
                     var maxId = lastKlines.Max(it => it.Id);
                     var lastKline = lastKlines.Find(it => it.Id == maxId);
-                    if (smallBuy != null && (lastKline.Close / buyTradePrice > (decimal)1.05 || buyTradePrice / lastKline.Close > (decimal)1.06))
+                    if (smallBuy != null && (lastKline.Close / buyTradePrice > (decimal)1.06 || buyTradePrice / lastKline.Close > (decimal)1.065))
                     {
                         Console.WriteLine($"---> 这个币快要收割或者需要做多 {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} Close：{lastKlines[0].Close},BuyTradePrice：{smallBuy.BuyTradePrice}");
                         nearSellOrBuy = true;
@@ -207,7 +207,7 @@ namespace DogRunService.Helper
                     if (!nearSellOrBuy)
                     {
                         var bigSell = dogEmptySellDao.GetBiggestDogEmptySell(symbol.QuoteCurrency, symbol.BaseCurrency);
-                        if (bigSell != null && (lastKline.Close / bigSell.SellTradePrice > (decimal)1.08 || bigSell.SellTradePrice / lastKline.Close > (decimal)1.04))
+                        if (bigSell != null && (lastKline.Close / bigSell.SellTradePrice > (decimal)1.08 || bigSell.SellTradePrice / lastKline.Close > (decimal)1.045))
                         {
                             nearSellOrBuy = true;
                         }

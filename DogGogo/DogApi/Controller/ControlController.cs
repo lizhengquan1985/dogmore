@@ -3,6 +3,7 @@ using DogPlatform;
 using DogPlatform.Model;
 using DogRunService;
 using DogRunService.Helper;
+using DogService;
 using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
@@ -180,6 +181,49 @@ namespace DogApi.Controller
             }
         }
 
+        [HttpGet]
+        [ActionName("refreshEmpty")]
+        public async Task RefreshEmpty(string quoteCurrency)
+        {
+            try
+            {
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
+                Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+                foreach (var item in nowPriceList)
+                {
+                    if (item.QuoteCurrency != quoteCurrency)
+                    {
+                        continue;
+                    }
+                    if (item.NowTime < Utils.GetIdByDate(DateTime.Now.AddHours(-1)))
+                    {
+                        continue;
+                    }
+                    closeDic.Add(item.SymbolName, item.NowPrice);
+                }
+
+                var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
+                foreach (var item in commonSymbols)
+                {
+                    var inDB = new DogControlDao().GetDogControl(item.BaseCurrency, quoteCurrency);
+                    if (inDB == null)
+                    {
+                        continue;
+                    }
+                    else if (closeDic.ContainsKey(item.BaseCurrency))
+                    {
+                        inDB.EmptyPrice = closeDic[item.BaseCurrency] * 2;
+                        await new DogControlDao().CreateDogControl(inDB);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+        }
+
         private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines, out decimal outFlexPercent)
         {
             Dictionary<decimal, int> result = new Dictionary<decimal, int>();
@@ -214,6 +258,10 @@ namespace DogApi.Controller
 
                 foreach (var balanceItem in accountInfo.Data.list)
                 {
+                    if (balanceItem.currency == "mana")
+                    {
+                        continue;
+                    }
                     try
                     {
                         if (balanceItem.balance < (decimal)0.00001 || balanceItem.type == "frozen")
@@ -309,6 +357,91 @@ namespace DogApi.Controller
             }
         }
 
+        private async Task<Dictionary<string, decimal>> GetUsdtPrice()
+        {
+            // 获取btc价格
+            var btcPrice = new decimal(1000);
+            PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
+            var period = "1min";
+            var count = 3;
+            var klines = api.GetHistoryKline("btcusdt", period, count);
+            btcPrice = klines[0].Close;
+
+            Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+            closeDic.Add("usdt", (decimal)1);
+
+            {
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice("usdt");
+                foreach (var item in nowPriceList)
+                {
+                    if (item.QuoteCurrency != "usdt")
+                    {
+                        continue;
+                    }
+
+                    closeDic.Add(item.SymbolName, item.NowPrice);
+                }
+            }
+
+            {
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice("btc");
+                foreach (var item in nowPriceList)
+                {
+                    if (item.QuoteCurrency != "btc")
+                    {
+                        continue;
+                    }
+
+                    if (closeDic.ContainsKey(item.SymbolName))
+                    {
+                        continue;
+                    }
+
+                    closeDic.Add(item.SymbolName, item.NowPrice * btcPrice);
+                }
+            }
+
+
+            {
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice("eth");
+                foreach (var item in nowPriceList)
+                {
+                    if (item.QuoteCurrency != "eth")
+                    {
+                        continue;
+                    }
+
+                    if (closeDic.ContainsKey(item.SymbolName))
+                    {
+                        continue;
+                    }
+
+                    closeDic.Add(item.SymbolName, item.NowPrice * closeDic["eth"]);
+                }
+            }
+
+
+            {
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice("ht");
+                foreach (var item in nowPriceList)
+                {
+                    if (item.QuoteCurrency != "ht")
+                    {
+                        continue;
+                    }
+
+                    if (closeDic.ContainsKey(item.SymbolName))
+                    {
+                        continue;
+                    }
+
+                    closeDic.Add(item.SymbolName, item.NowPrice * closeDic["ht"]);
+                }
+            }
+
+            return closeDic;
+        }
+
         [HttpGet]
         [ActionName("deleteData")]
         public async Task DeleteData(string quoteCurrency)
@@ -327,10 +460,14 @@ namespace DogApi.Controller
             }
         }
 
+        static int aaa = 0;
+
         [HttpGet]
         [ActionName("listDogStatCurrency")]
         public async Task<object> ListDogStatCurrency(string userName, int intervalDay = 1)
         {
+            aaa++;
+
             var dateList = new List<string>();
 
             if (intervalDay < 1)
@@ -363,6 +500,11 @@ namespace DogApi.Controller
             List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
             foreach (var symbol in symbolList)
             {
+                if (symbol == "mana")
+                {
+                    continue;
+                }
+
                 Dictionary<string, string> item = new Dictionary<string, string>();
                 item.Add("symbolName", symbol);
                 for (int i = 0; i <= 30; i++)
@@ -372,7 +514,57 @@ namespace DogApi.Controller
                 }
                 data.Add(item);
             }
-            return new { data, dateList };
+
+            var closeDic = await GetUsdtPrice();
+
+            if (aaa % 2 == 0)
+            {
+                try
+                {
+
+                    var date = DateTime.Now.ToString("yyyy-MM-dd");
+                    data.Sort((a, b) =>
+                    {
+                        if (a["symbolName"] == "usdt" || a["symbolName"] == "btc" || a["symbolName"] == "eth" || a["symbolName"] == "ht")
+                        {
+                            return -1;
+                        }
+                        if (b["symbolName"] == "usdt" || b["symbolName"] == "btc" || b["symbolName"] == "eth" || b["symbolName"] == "ht")
+                        {
+                            return 1;
+                        }
+
+                        if (!closeDic.ContainsKey(a["symbolName"]) || !closeDic.ContainsKey(a["symbolName"]))
+                        {
+                            return 0;
+                        }
+
+                        try
+                        {
+                            if (decimal.Parse(a[date]) * closeDic[a["symbolName"]] > decimal.Parse(b[date]) * closeDic[b["symbolName"]])
+                            {
+                                return 1;
+                            }
+                            return -1;
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.Error("-----> " + ex.Message, ex);
+                            Console.WriteLine(closeDic[a["symbolName"]]);
+                            Console.WriteLine(closeDic[b["symbolName"]]);
+                            Console.WriteLine(a[date]);
+                            Console.WriteLine(b[date]);
+                            return 0;
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    logger.Error(ex.Message, ex);
+                }
+            }
+
+            return new { data, dateList, closeDic };
         }
     }
 }

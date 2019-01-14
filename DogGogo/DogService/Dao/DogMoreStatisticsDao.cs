@@ -37,20 +37,20 @@ namespace DogService.Dao
             return (await Database.QueryAsync<DogMoreSell>(sql, new { SmallDate = smallDate })).ToList();
         }
 
-        public async Task<List<DogMoreBuy>> ListBuy(string userName, string symbolName, DateTime begin, DateTime end)
+        public async Task<List<DogMoreBuy>> ListBuy(string userName, string symbolName, string quoteCurrency, DateTime begin, DateTime end)
         {
             var smallDate = Utils.GetSmallestOfTheDate(DateTime.Now);
             var bigDate = Utils.GetBiggestOfTheDate(DateTime.Now);
-            var sql = $"select * from t_dog_more_buy where UserName=@UserName and SymbolName=@SymbolName and BuyDate>=@BeginDate and BuyDate<=@EndDate";
-            return (await Database.QueryAsync<DogMoreBuy>(sql, new { UserName = userName, SymbolName = symbolName, BeginDate = begin, EndDate = end })).ToList();
+            var sql = $"select * from t_dog_more_buy where UserName=@UserName and SymbolName=@SymbolName and QuoteCurrency=@QuoteCurrency and BuyDate>=@BeginDate and BuyDate<=@EndDate";
+            return (await Database.QueryAsync<DogMoreBuy>(sql, new { UserName = userName, SymbolName = symbolName, QuoteCurrency = quoteCurrency, BeginDate = begin, EndDate = end })).ToList();
         }
 
-        public async Task<List<DogMoreSell>> ListSell(string userName, string symbolName, DateTime begin, DateTime end)
+        public async Task<List<DogMoreSell>> ListSell(string userName, string symbolName, string quoteCurrency, DateTime begin, DateTime end)
         {
             var smallDate = Utils.GetSmallestOfTheDate(DateTime.Now);
             var bigDate = Utils.GetBiggestOfTheDate(DateTime.Now);
-            var sql = $"select * from t_dog_more_sell where UserName=@UserName and SellState='{StateConst.Filled}' and SymbolName=@SymbolName and SellDate>=@BeginDate and SellDate<=@EndDate";
-            return (await Database.QueryAsync<DogMoreSell>(sql, new { UserName = userName, SymbolName = symbolName, BeginDate = begin, EndDate = end })).ToList();
+            var sql = $"select * from t_dog_more_sell where UserName=@UserName and SellState='{StateConst.Filled}' and SymbolName=@SymbolName and QuoteCurrency=@QuoteCurrency and SellDate>=@BeginDate and SellDate<=@EndDate";
+            return (await Database.QueryAsync<DogMoreSell>(sql, new { UserName = userName, SymbolName = symbolName, QuoteCurrency = quoteCurrency, BeginDate = begin, EndDate = end })).ToList();
         }
     }
 }

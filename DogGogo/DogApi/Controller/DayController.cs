@@ -102,22 +102,148 @@ namespace DogApi.Controller
 
         [HttpGet]
         [ActionName("kline")]
-        public async Task<object> kline(string userName, string name, DateTime date)
+        public async Task<object> kline(string userName, string symbolName, string quoteCurrency)
         {
             try
             {
-                var begin = date.AddMinutes(-60 * 24 * 7);
-                var end = date.AddMinutes(10);
+                var begin = DateTime.Now.AddMinutes(-60 * 24 * 7);
+                var end = DateTime.Now.AddMinutes(10);
 
-                var buyList = await new DogMoreStatisticsDao().ListBuy(userName, name, begin, end);
-                var sellList = await new DogMoreStatisticsDao().ListSell(userName, name, begin, end);
-                var klineList = new KlineDao().ListTodayKline(name, "", begin, end);
+                var buyList = await new DogMoreStatisticsDao().ListBuy(userName, symbolName, quoteCurrency, begin, end);
+                var sellList = await new DogMoreStatisticsDao().ListSell(userName, symbolName, quoteCurrency, begin, end);
+                var klineList = new KlineDao().ListTodayKline(symbolName, quoteCurrency, begin, end);
                 return new
                 {
                     buyList = buyList.Select(it => new { it.BuyDate, it.BuyTradePrice }),
                     sellList = sellList.Select(it => new { it.SellDate, it.SellTradePrice }),
                     klineList = klineList.Select(it => new { it.Close, it.Id, it.High })
                 };
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+        }
+
+        [HttpGet]
+        [ActionName("symbolKline")]
+        public async Task<object> symbolKline(string userName, string symbolName, string quoteCurrency, int day)
+        {
+            try
+            {
+                var begin = DateTime.Now.AddDays(-60 * 24 * day);
+                var end = DateTime.Now;
+
+                var buyList = await new DogMoreStatisticsDao().ListBuy(userName, symbolName, quoteCurrency, begin, end);
+                var sellList = await new DogMoreStatisticsDao().ListSell(userName, symbolName, quoteCurrency, begin, end);
+                var klineList = new KlineDao().ListTodayKline(symbolName, quoteCurrency, begin, end);
+                return new
+                {
+                    buyList = buyList.Select(it => new { it.BuyDate, it.BuyTradePrice }),
+                    sellList = sellList.Select(it => new { it.SellDate, it.SellTradePrice }),
+                    klineList = klineList.Select(it => new { it.Close, it.Id, it.High })
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+        }
+
+        [HttpGet]
+        [ActionName("getNeedEmpty")]
+        public async Task<object> getNeedEmpty(string quoteCurrency)
+        {
+            try
+            {
+                var list = new List<string>();
+
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
+
+                foreach (var nowPriceItem in nowPriceList)
+                {
+                    if (nowPriceItem.SymbolName == "gxs" || nowPriceItem.SymbolName == "btc")
+                    {
+                        continue;
+                    }
+                    if (nowPriceItem.QuoteCurrency == "btc")
+                    {
+                        if (nowPriceItem.SymbolName == "btm" || nowPriceItem.SymbolName == "iost" || nowPriceItem.SymbolName == "icx")
+                        {
+                            continue;
+                        }
+                    }
+                    if (nowPriceItem.QuoteCurrency == "eth")
+                    {
+                        if (nowPriceItem.SymbolName == "ela" || nowPriceItem.SymbolName == "smt" || nowPriceItem.SymbolName == "mana")
+                        {
+                            continue;
+                        }
+                    }
+
+                    var nowPrice = nowPriceList.Find(it => it.SymbolName == nowPriceItem.SymbolName).NowPrice;
+
+                    {
+                        // 一个月内最上面
+                        var maxPrice = new KlineDao().GetMaxPrice(quoteCurrency, nowPriceItem.SymbolName, DateTime.Now.AddDays(-30));
+                        var minPrice = new KlineDao().GetMinPrice(quoteCurrency, nowPriceItem.SymbolName, DateTime.Now.AddDays(-30));
+                        if (nowPrice >= maxPrice)
+                        {
+                            list.Add(nowPriceItem.SymbolName);
+                            continue;
+                        }
+                        if (nowPrice <= minPrice)
+                        {
+                            continue;
+                        }
+                        if ((nowPrice - minPrice) > (maxPrice - nowPrice) * 2)
+                        {
+                            list.Add(nowPriceItem.SymbolName);
+                        }
+                    }
+
+                    {
+                        // 一周内最上面
+                        var maxPrice = new KlineDao().GetMaxPrice(quoteCurrency, nowPriceItem.SymbolName, DateTime.Now.AddDays(-7));
+                        var minPrice = new KlineDao().GetMinPrice(quoteCurrency, nowPriceItem.SymbolName, DateTime.Now.AddDays(-7));
+                        if (nowPrice >= maxPrice)
+                        {
+                            list.Add(nowPriceItem.SymbolName);
+                            continue;
+                        }
+                        if (nowPrice <= minPrice)
+                        {
+                            continue;
+                        }
+                        if ((nowPrice - minPrice) > (maxPrice - nowPrice) * 3)
+                        {
+                            list.Add(nowPriceItem.SymbolName);
+                        }
+                    }
+
+                    {
+                        // 一天内最上面
+                        var maxPrice = new KlineDao().GetMaxPrice(quoteCurrency, nowPriceItem.SymbolName, DateTime.Now.AddDays(-1));
+                        var minPrice = new KlineDao().GetMinPrice(quoteCurrency, nowPriceItem.SymbolName, DateTime.Now.AddDays(-1));
+                        if (nowPrice >= maxPrice)
+                        {
+                            list.Add(nowPriceItem.SymbolName);
+                            continue;
+                        }
+                        if (nowPrice <= minPrice)
+                        {
+                            continue;
+                        }
+                        if ((nowPrice - minPrice) > (maxPrice - nowPrice) * 4)
+                        {
+                            list.Add(nowPriceItem.SymbolName);
+                        }
+                    }
+                }
+
+                return list;
             }
             catch (Exception ex)
             {

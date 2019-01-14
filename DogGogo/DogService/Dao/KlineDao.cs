@@ -143,5 +143,17 @@ namespace DogService.Dao
                 tx.Commit();
             }
         }
+
+        public decimal GetMaxPrice(string quoteCurrency, string baseCurrency, DateTime date)
+        {
+            var sql = $"select max(close) from t_{quoteCurrency}_{baseCurrency} where Id>={Utils.GetIdByDate(date)}";
+            return Database.Query<decimal>(sql).FirstOrDefault();
+        }
+
+        public decimal GetMinPrice(string quoteCurrency, string baseCurrency, DateTime date)
+        {
+            var sql = $"select min(close) from t_{quoteCurrency}_{baseCurrency} where Id>={Utils.GetIdByDate(date)}";
+            return Database.Query<decimal>(sql).FirstOrDefault();
+        }
     }
 }

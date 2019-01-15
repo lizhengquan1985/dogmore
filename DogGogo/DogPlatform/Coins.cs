@@ -358,7 +358,7 @@ namespace DogPlatform
             else if (quoteCurrency == "btc")
             {
                 var res = btcCoins.Values.ToList();
-                var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "eos", "etc", "eth", "gxc", "ht", "iota", "lsk", "link", "ltc", "neo", "nano", "omg", "ont", "qtum", "steem", "trx", "vet", "waves", "xem", "xvg", "xlm", "xmr", "xrp", "zec", "zrx", "zil", "xtz" };
+                var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dgb", "dcr", "eos", "etc", "eth", "gxc", "ht", "iota", "lsk", "link", "ltc", "neo", "nano", "omg", "ont", "qtum", "steem", "trx", "vet", "waves", "xem", "xvg", "xlm", "xmr", "xrp", "zec", "zrx", "zil", "xtz" };
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;
             }

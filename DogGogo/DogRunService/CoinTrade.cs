@@ -172,7 +172,7 @@ namespace DogRunService
             {
                 logger.Error($"1开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
-                logger.Error($"2下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"2下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
 
                 if (order.Status == "ok")
                 {

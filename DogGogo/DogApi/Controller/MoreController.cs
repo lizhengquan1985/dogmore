@@ -201,7 +201,10 @@ namespace DogApi.Controller
                     ladderBuyDic.Add(item.SymbolName, DogControlUtils.GetLadderBuy(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
                 }
 
-                return new { list, closeDic, ladderDic, ladderBuyDic, todayDic };
+                var noBuy = symbols.Select(it => it.BaseCurrency).ToList();
+                noBuy.RemoveAll(it => list.Find(item => item.SymbolName == it) != null);
+
+                return new { list, closeDic, ladderDic, ladderBuyDic, todayDic, noBuy };
             }
             catch (Exception ex)
             {

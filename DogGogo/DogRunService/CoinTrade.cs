@@ -512,9 +512,9 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
-                logger.Error($"1开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"1:开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
-                logger.Error($"2下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
+                logger.Error($"2:下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
 
                 // 下单出错, 报了异常, 也需要查询是否下单成功. 查询最近的订单.
                 if (order.Status == "ok")
@@ -542,11 +542,11 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
                 }
-                logger.Error($"3入库结束 ----------------------------- 多单收割 --> {JsonConvert.SerializeObject(dogMoreBuy)}");
+                logger.Error($"3:入库结束 ----------------------------- 多单收割 --> {JsonConvert.SerializeObject(dogMoreBuy)}");
             }
             catch (Exception ex)
             {
-                logger.Error($"严重严重 -----------------------------  多单收割出错");
+                logger.Error($"严重严重111111 -----------------------------  多单收割出错");
                 Thread.Sleep(1000 * 60 * 5);
                 throw ex;
             }

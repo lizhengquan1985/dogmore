@@ -47,9 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalyzeHelper.cs" />
-    <Compile Include="CoinAnalyze.cs" />
     <Compile Include="CoinTrade.cs" />
-    <Compile Include="DataTypes\FlexPoint.cs" />
     <Compile Include="Helper\BuyLimitUtils.cs" />
     <Compile Include="Helper\BuyOrSellUtils.cs" />
     <Compile Include="Helper\Helper.cs" />

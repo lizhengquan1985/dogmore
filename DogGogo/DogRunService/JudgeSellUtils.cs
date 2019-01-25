@@ -1,6 +1,5 @@
 ﻿using DogPlatform;
 using DogPlatform.Model;
-using DogRunService.DataTypes;
 using DogService;
 using DogService.DateTypes;
 using log4net;

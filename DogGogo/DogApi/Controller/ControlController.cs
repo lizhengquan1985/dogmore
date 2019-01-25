@@ -224,25 +224,6 @@ namespace DogApi.Controller
             }
         }
 
-        private Dictionary<decimal, int> GetFlexpointCount(List<HistoryKline> historyKlines, out decimal outFlexPercent)
-        {
-            Dictionary<decimal, int> result = new Dictionary<decimal, int>();
-            decimal flexPercent = (decimal)1.02;
-            outFlexPercent = flexPercent;
-            for (int i = 0; i < 30; i++)
-            {
-                var flexPointList = CoinAnalyze.Analyze(historyKlines, flexPercent);
-                if (flexPointList.Count != 0)
-                {
-                    outFlexPercent = flexPercent;
-                }
-                result.Add(flexPercent, flexPointList.Count);
-
-                flexPercent += (decimal)0.005;
-            }
-            return result;
-        }
-
         [HttpGet]
         [ActionName("initAccountInfo")]
         public async Task<object> InitAccountInfo(string userName, string quoteCurrency, string sort, bool stat)

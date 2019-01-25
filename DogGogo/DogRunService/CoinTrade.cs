@@ -1,7 +1,6 @@
 ﻿using DogAccount;
 using DogPlatform;
 using DogPlatform.Model;
-using DogRunService.DataTypes;
 using DogRunService.Helper;
 using DogService;
 using DogService.Dao;

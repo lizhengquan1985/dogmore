@@ -150,37 +150,31 @@ namespace DogRunService
             return higher;
         }
 
+        /// <summary>
+        /// 计算多单收割的数量
+        /// </summary>
+        /// <param name="buyQuantity"></param>
+        /// <param name="buyTradePrice"></param>
+        /// <param name="nowPrice"></param>
+        /// <param name="symbol"></param>
+        /// <returns></returns>
         public static decimal CalcSellQuantityForMoreShouge(decimal buyQuantity, decimal buyTradePrice, decimal nowPrice, CommonSymbol symbol)
         {
-            if (nowPrice <= buyTradePrice * (decimal)1.01)
+            if (nowPrice <= buyTradePrice * (decimal)1.03)
             {
                 throw new Exception("收割多价格不合理");
             }
+
+            // 作用是,价格越高,则收割的量越多
             var position = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
             position += (decimal)0.15;
-            if (position <= (decimal)0.45)
-            {
-                position = (decimal)0.45;
-            }
-            if (position >= (decimal)0.85)
-            {
-                position = (decimal)0.85;
-            }
-            // 计算啥
+            position = Math.Max(position, (decimal)0.45);
+            position = Math.Min(position, (decimal)0.85);
+
+            // 作用是,价格越高,则收割的量越多
             decimal sellQuantity = buyQuantity * buyTradePrice / nowPrice;
             sellQuantity = sellQuantity + (buyQuantity - sellQuantity) * position;
             sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
-            Console.WriteLine($" ------------ {buyQuantity}, {sellQuantity}, {symbol.AmountPrecision}");
-
-            //if (buyQuantity > sellQuantity && buyQuantity * buyTradePrice < sellQuantity * nowPrice)
-            //{
-            //    return sellQuantity;
-            //}
-
-            if (sellQuantity == buyQuantity && symbol.BaseCurrency == "bsv" && symbol.QuoteCurrency == "usdt")
-            {
-                return sellQuantity;
-            }
 
             var newSellQuantity = sellQuantity;
             if (newSellQuantity == buyQuantity)
@@ -207,6 +201,7 @@ namespace DogRunService
                 }
             }
 
+            // 是否满足最小出售数量
             if (!CoinUtils.IsBiggerThenLeast(symbol.BaseCurrency, symbol.QuoteCurrency, sellQuantity))
             {
                 newSellQuantity = CoinUtils.GetLeast(symbol.BaseCurrency, symbol.QuoteCurrency);
@@ -215,15 +210,6 @@ namespace DogRunService
             if (buyQuantity > newSellQuantity && buyQuantity * buyTradePrice < newSellQuantity * nowPrice)
             {
                 return newSellQuantity;
-            }
-
-            if (symbol.BaseCurrency == "xrp")
-            {
-                return decimal.Round(buyQuantity, symbol.AmountPrecision);
-            }
-            if (symbol.BaseCurrency == "bat")
-            {
-                return decimal.Round(buyQuantity, symbol.AmountPrecision);
             }
 
             throw new Exception($"计算sellquantity不合理, buyQuantity:{buyQuantity},newSellQuantity:{newSellQuantity}， 没有赚头");

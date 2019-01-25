@@ -464,7 +464,7 @@ namespace DogRunService
 
         public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol, decimal sellPercent)
         {
-            sellPercent = Math.Max(sellPercent, (decimal)1.03);
+            sellPercent = Math.Max(sellPercent, (decimal)1.04);
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
@@ -476,10 +476,6 @@ namespace DogRunService
             // 没有大于预期, 也不能收割
             if (nowPrice < dogMoreBuy.BuyTradePrice * sellPercent)
             {
-                if (sellPercent < (decimal)1.04)
-                {
-                    logger.Error($"------------{dogMoreBuy.SymbolName}------------> 没有大于预期, 也不能收割");
-                }
                 return;
             }
 
@@ -490,20 +486,21 @@ namespace DogRunService
                 return;
             }
 
+            // 计算要出的数量
             decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
-
-            if (sellQuantity >= dogMoreBuy.BuyQuantity || sellQuantity * nowPrice * (decimal)0.98 <= dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice)
+            // 计算要出的价格
+            decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
+            if (sellQuantity >= dogMoreBuy.BuyQuantity)
             {
-                if (symbol.BaseCurrency != "xrp" && symbol.BaseCurrency != "bat")
-                {
-                    // 一定要赚才能出售
-                    logger.Error($"{dogMoreBuy.SymbolName}{dogMoreBuy.QuoteCurrency} 未实现双向收益 sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}，sellQuantity * nowPrice：{sellQuantity * nowPrice}，dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice：{dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice}");
-                    return;
-                }
+                Console.WriteLine("出售的量过多");
+                return;
+            }
+            if (sellQuantity * sellPrice <= dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice)
+            {
+                logger.Error($"{dogMoreBuy.SymbolName}{dogMoreBuy.QuoteCurrency} 未实现双向收益 sellQuantity:{sellQuantity}, BuyQuantity:{dogMoreBuy.BuyQuantity}，sellQuantity * nowPrice：{sellQuantity * nowPrice}，dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice：{dogMoreBuy.BuyQuantity * dogMoreBuy.BuyTradePrice}");
+                return;
             }
 
-            // 出售
-            decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
             OrderPlaceRequest req = new OrderPlaceRequest();
             req.account_id = dogMoreBuy.AccountId;
             req.amount = sellQuantity.ToString();

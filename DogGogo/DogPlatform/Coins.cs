@@ -84,6 +84,7 @@ namespace DogPlatform
         /*检查*/ { "bat",(decimal)1},
         /*检查*/ {"ada",(decimal)0.1 },
             { "ardr",1},
+        /*检查*/ { "xrp",(decimal)1},
             {"eth",(decimal)0.001 },
         };
         private static Dictionary<string, decimal> ethLeastBuy = new Dictionary<string, decimal>

@@ -47,9 +47,9 @@ namespace DogService.Dao
                 throw new ApplicationException("管控数据出错");
             }
 
-            if (dogControl.LadderBuyPercent <= (decimal)1.055)
+            if (dogControl.LadderBuyPercent <= (decimal)1.065)
             {
-                dogControl.LadderBuyPercent = (decimal)1.055;
+                dogControl.LadderBuyPercent = (decimal)1.065;
             }
             if (dogControl.LadderSellPercent >= (decimal)1.12)
             {

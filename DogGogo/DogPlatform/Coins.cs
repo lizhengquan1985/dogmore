@@ -361,7 +361,7 @@ namespace DogPlatform
                 var res = btcCoins.Values.ToList();
                 var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "bcd", "bch", "bcx", "bsv", "btg", "bts", "dash", "dcr", "dgb", "eos", "etc", "eth", "gxc", "ht", "icx", "iota", "lsk", "link", "ltc", "neo", "nano", "omg", "ont", "qtum", "steem", "trx", "vet", "waves", "xem", "xvg", "xlm", "xmr", "xrp", "zec", "zrx", "zil", "xtz" };
 
-                // addCoins.AddRange(new List<string> { });  //  加 2级别的
+                addCoins.AddRange(new List<string> { "mana" });  //  加 2级别的
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;
             }
@@ -370,7 +370,7 @@ namespace DogPlatform
                 var res = ethCoins.Values.ToList();
                 var addCoins = new List<string> { "ada", "ae", "ardr", "bat", "btm", "bts", "dcr", "dgb", "eos", "gnt", "gxc", "hc", "hit", "ht", "icx", "iota", "lsk", "link", "nano", "omg", "ont", "pai", "qtum", "steem", "trx", "vet", "xlm", "xvg", "xmr", "zrx", "zil", "waves", "xtz" };
 
-                // addCoins.AddRange(new List<string> { });  //  加 2级别的
+                addCoins.AddRange(new List<string> { "mana" });  //  加 2级别的
 
                 var addSymbols = res.Where(it => addCoins.Contains(it.BaseCurrency)).ToList();
                 return addSymbols;

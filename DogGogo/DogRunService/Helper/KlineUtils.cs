@@ -183,9 +183,16 @@ namespace DogRunService.Helper
                 // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
                 var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
                 var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
-                var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-7)).Count;
+                var dogControl =  new DogControlDao().GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
+                if(dogControl == null)
+                {
+                    return;
+                }
+                int minutes = Math.Max(7, dogControl.SymbolLevel);
+                var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-minutes)).Count;
                 if (minutesAfterCount > 0)
                 {
+                    // 如果7分钟内有数据,则要考虑一下.
                     var smallBuy = dogMoreBuyDao.GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);
                     var nearSellOrBuy = false;
                     var buyTradePrice = (decimal)0;
@@ -199,7 +206,7 @@ namespace DogRunService.Helper
                     }
                     var maxId = lastKlines.Max(it => it.Id);
                     var lastKline = lastKlines.Find(it => it.Id == maxId);
-                    if (smallBuy != null && (lastKline.Close / buyTradePrice > (decimal)1.065 || buyTradePrice / lastKline.Close > (decimal)1.065))
+                    if (smallBuy != null && (lastKline.Close / buyTradePrice > (decimal)1.07 || buyTradePrice / lastKline.Close > (decimal)1.065))
                     {
                         Console.WriteLine($"---> 这个币快要收割或者需要做多 {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} Close：{lastKlines[0].Close},BuyTradePrice：{smallBuy.BuyTradePrice}");
                         nearSellOrBuy = true;
@@ -207,7 +214,7 @@ namespace DogRunService.Helper
                     if (!nearSellOrBuy)
                     {
                         var bigSell = dogEmptySellDao.GetBiggestDogEmptySell(symbol.QuoteCurrency, symbol.BaseCurrency);
-                        if (bigSell != null && (lastKline.Close / bigSell.SellTradePrice > (decimal)1.08 || bigSell.SellTradePrice / lastKline.Close > (decimal)1.045))
+                        if (bigSell != null && (lastKline.Close / bigSell.SellTradePrice > (decimal)1.09 || bigSell.SellTradePrice / lastKline.Close > (decimal)1.065))
                         {
                             nearSellOrBuy = true;
                         }
@@ -224,7 +231,7 @@ namespace DogRunService.Helper
 
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
-                var count = 9;
+                var count = minutes + 2;
                 if (last24Klines.Count > 0 && (DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes >= count)
                 {
                     count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes);
@@ -233,6 +240,10 @@ namespace DogRunService.Helper
                         count = 1000;
                     }
                     Console.WriteLine($" 拉取数量{count}");
+                }
+                if(last24Klines.Count == 0)
+                {
+                    count = 1000;
                 }
                 var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, count);
                 if(klines == null || klines.Count == 0)

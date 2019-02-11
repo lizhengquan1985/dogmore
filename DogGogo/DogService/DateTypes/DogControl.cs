@@ -43,6 +43,9 @@ namespace DogService.DateTypes
         public decimal HistoryMin { get; set; }
         public int UpIndex { get; set; }
         public int DownIndex { get; set; }
+        /// <summary>
+        /// 层级,认可度, 0最大, 20 最小, 每降低一级别,是历史的5%
+        /// </summary>
         public int SymbolLevel { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using DogPlatform.Model;
 using DogService.Dao;
+using DogService.DateTypes;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,9 @@ namespace DogService
         static Dictionary<string, int> coinCount = new Dictionary<string, int> {
             { "usdt", 59 }, { "btc", 41 }, { "eth", 33 }, { "ht", 10 }
         };
+
+        static List<DogControl> dogControls = new List<DogControl>();
+        static long dogControlTime = 0;
 
         public static void InitAsync()
         {
@@ -403,6 +407,17 @@ namespace DogService
                 logger.Error(ex.Message, ex);
                 return defaultPosition;
             }
+        }
+
+        public static DogControl GetDogControl(string symbolName, string quoteCurrency)
+        {
+            if(dogControlTime < Utils.GetIdByDate(DateTime.Now) - 60 * 60)
+            {
+                dogControls = new DogControlDao().ListAllDogControl();
+                dogControlTime = Utils.GetIdByDate(DateTime.Now);
+            }
+
+            return dogControls.Find(it => it.SymbolName == symbolName && it.QuoteCurrency == quoteCurrency);
         }
     }
 }

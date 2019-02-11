@@ -71,6 +71,11 @@ namespace DogService.Dao
             return (await Database.QueryAsync<DogControl>(new { IsValid = true, QuoteCurrency = quoteCurrency })).ToList();
         }
 
+        public List<DogControl> ListAllDogControl()
+        {
+            return (Database.Query<DogControl>(new { IsValid = true })).ToList();
+        }
+
         public async Task SetUnvalid(string symbolName, string quoteCurrency)
         {
             using (var tx = Database.BeginTransaction())

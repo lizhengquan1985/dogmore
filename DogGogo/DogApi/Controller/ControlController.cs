@@ -29,10 +29,10 @@ namespace DogApi.Controller
             {
                 // 默认 1.05, 
                 dogControl.SymbolLevel = Math.Max(0, dogControl.SymbolLevel);
-                dogControl.SymbolLevel = Math.Min(10, dogControl.SymbolLevel);
-                if (dogControl.LadderBuyPercent < (decimal)(1.05 + 0.005 * dogControl.SymbolLevel))
+                dogControl.SymbolLevel = Math.Min(20, dogControl.SymbolLevel);
+                if (dogControl.LadderBuyPercent < (decimal)(1.05 + 0.003 * dogControl.SymbolLevel))
                 {
-                    dogControl.LadderBuyPercent = (decimal)(1.05 + 0.005 * dogControl.SymbolLevel);
+                    dogControl.LadderBuyPercent = (decimal)(1.05 + 0.003 * dogControl.SymbolLevel);
                 }
 
                 dogControl.UpIndex = Math.Max(0, dogControl.UpIndex);
@@ -54,6 +54,7 @@ namespace DogApi.Controller
                 {
                     dogControl.LadderSellPercent = Math.Max((decimal)dogControl.LadderSellPercent, (decimal)(1.05 + dogControl.UpIndex * 0.01));
                 }
+                dogControl.MaxInputPrice = Math.Min(dogControl.MaxInputPrice, dogControl.HistoryMax - (dogControl.HistoryMax - dogControl.HistoryMin) * dogControl.SymbolLevel / 20);
 
                 await new DogControlDao().CreateDogControl(dogControl);
             }

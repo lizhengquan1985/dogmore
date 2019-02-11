@@ -482,10 +482,6 @@ namespace DogApi.Controller
             List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
             foreach (var symbol in symbolList)
             {
-                if (symbol == "mana")
-                {
-                    continue;
-                }
 
                 Dictionary<string, string> item = new Dictionary<string, string>();
                 item.Add("symbolName", symbol);

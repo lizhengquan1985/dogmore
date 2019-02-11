@@ -8,36 +8,74 @@ namespace DogApi.Controller
 {
     class CoinsPre45
     {
-        public static List<string> GetPreCoins()
+        public static List<string> GetPre40Coins()
         {
             List<List<string>> historyCoins = new List<List<string>>();
             historyCoins.Add(new List<string>
                 {
-                    "btc","xrp","eth","usdt","xlm",
-                    "bch","bsv","eos","ltc","trx",
-                    "ada","xmr", "xem","iota","bnb",
-                   "dash","neo","etc","ont", "doge",
-                    "ht","zec","vet","btg","xtz",
+                    "btc","eth","xrp","ltc","eos",
+                    "usdt","bch","trx","xlm","bnb",
+                    "bsv","ada", "xmr","iota","dash",
+                   "neo","etc","xem","ont", "ht",
 
-                   "okb","zrx","xuc","dcr",//waves
-                    "qtum","bat","lsk","omg","xrb",
-                    "bts",//fct  dgb   zb start
-                    "ae",//xvg    icx atp  link
-                    "bcx","bcd",
+                    "waves","xtz","vet","zec","okb",
+                    "btg","qtum","link","dcr","rep",
+                    "xuc","zrx","lsk","zil","bat",
+                    "omg","nano","bts","dgb","ae",
                 });
 
+            var set = new HashSet<string>();
+            foreach (var item in historyCoins)
+            {
+                foreach (var str in item)
+                {
+                    set.Add(str);
+                }
+            }
+            return set.ToList();
+        }
+
+        public static List<string> GetPre80Coins()
+        {
+            List<List<string>> historyCoins = new List<List<string>>();
             historyCoins.Add(new List<string>
                 {
-                    "btc","xrp","eth","usdt","eos",
-                    "xlm","bch","ltc","bsv","trx",
-                    "ada","xmr","bnb","xem","dash","iota",
-                     "etc","neo","waves","ont","doge",
-                    "xtz","ht","zec","vet","btg",
+                    "xvg","icx","btm","strat","steem",
+                    "iost","atp","snt","theta","ark",
+                    "ardr","etn", "pax","r","ppt",
+                   "pivx","lrc","mana","mco", "dgd",
 
-                    "okb","qtum","zrx","dcr","lsk",
-                    "xuc","omg","bat","zil",// start
-                    "bts","ae","bcd", // xvg
-                    "nano", "dgb","bcx",
+                    "kcs","powr","wtc","wan","bnt",
+                    "san","xzc","elf","pay","qash",
+                    "poly","qkc","nas","loom","agi",
+                    "eng","mgo","zen","gas","gbyte",
+                });
+
+            var set = new HashSet<string>();
+            foreach (var item in historyCoins)
+            {
+                foreach (var str in item)
+                {
+                    set.Add(str);
+                }
+            }
+            return set.ToList();
+        }
+
+        public static List<string> GetPre120Coins()
+        {
+            List<List<string>> historyCoins = new List<List<string>>();
+            historyCoins.Add(new List<string>
+                {
+                    "fun","storj","edr","cvc","safe",
+                    "cmt","pai","dent","nxs","nuls",
+                    "gvt","salt", "req","mda","rvn",
+                   "cwv","bu","inb","kmd", "ft",
+
+                    "dai","gnt","fct","hsr","gxc",
+                    "rdd","wax","bhp","enj","tomo",
+                    "inve","usdc","nxt","wicc","edo",
+                    "dac","rlc","part","knc","edg",
                 });
 
             var set = new HashSet<string>();

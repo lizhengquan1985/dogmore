@@ -83,22 +83,50 @@ namespace DogApi.Controller
                     }
                     closeDic.Add(item.SymbolName, item.NowPrice);
                 }
-                var pre50 = CoinsPre45.GetPreCoins();
+                var pre50 = CoinsPre45.GetPre40Coins();
+                var pre80 = CoinsPre45.GetPre80Coins();
+                var pre120 = CoinsPre45.GetPre120Coins();
 
                 var notInPre50 = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);
+                var notInPre80 = res.FindAll(it => pre80.IndexOf(it.SymbolName) < 0);
+                var notInPre120 = res.FindAll(it => pre120.IndexOf(it.SymbolName) < 0);
+
+                var notInControl50 = pre50.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
+                var notInControl80 = pre80.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
+                var notInControl120 = pre120.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
+
+                var notInPre = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0 && pre80.IndexOf(it.SymbolName) < 0 && pre120.IndexOf(it.SymbolName) < 0);
+
                 var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
                 var notControlButRun = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList();
 
                 var commonSymbols22 = CoinUtils.GetAllCommonSymbols22(quoteCurrency);
                 pre50.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
                 pre50.RemoveAll(it => commonSymbols22.Find(item => item.BaseCurrency == it) == null);
+
+                pre80.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
+                pre80.RemoveAll(it => commonSymbols22.Find(item => item.BaseCurrency == it) == null);
+
+                pre120.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
+                pre120.RemoveAll(it => commonSymbols22.Find(item => item.BaseCurrency == it) == null);
+
+
+                notInControl50.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
+                notInControl80.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
+                notInControl120.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
+
                 return new
                 {
                     list = res,
                     closeDic,
                     noRunPre50 = pre50,
+                    noRunPre80 = pre80,
+                    noRunPre120 = pre120,
+                    notInControl50,
+                    notInControl80,
+                    notInControl120,
                     notInControl = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList(),
-                    hasControlButNotInPre50 = notInPre50.Select(it => it.SymbolName).ToList(),
+                    hasControlButNotInPre = notInPre.Select(it => it.SymbolName).ToList(),
                     allItems = res.Select(it => it.SymbolName).ToList()
                 };
             }
@@ -172,7 +200,7 @@ namespace DogApi.Controller
                 {
                     inDB.HistoryMax = max;
                     inDB.HistoryMin = min;
-                    
+
                     inDB.MaxInputPrice = Math.Min(inDB.MaxInputPrice, inDB.HistoryMax - (inDB.HistoryMax - inDB.HistoryMin) * inDB.SymbolLevel / 20);
                     await new DogControlDao().CreateDogControl(inDB);
                 }
@@ -208,17 +236,25 @@ namespace DogApi.Controller
                 var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
                 foreach (var item in commonSymbols)
                 {
-                    var inDB = new DogControlDao().GetDogControl(item.BaseCurrency, quoteCurrency);
-                    if (inDB == null)
+                    try
                     {
-                        continue;
+                        var inDB = new DogControlDao().GetDogControl(item.BaseCurrency, quoteCurrency);
+                        if (inDB == null)
+                        {
+                            continue;
+                        }
+                        else if (closeDic.ContainsKey(item.BaseCurrency))
+                        {
+                            inDB.EmptyPrice = closeDic[item.BaseCurrency] * 2;
+                            inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax);
+                            inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.065);
+                            inDB.LadderSellPercent = Math.Min(inDB.LadderSellPercent, (decimal)1.15);
+                            await new DogControlDao().CreateDogControl(inDB);
+                        }
                     }
-                    else if (closeDic.ContainsKey(item.BaseCurrency))
+                    catch (Exception ex)
                     {
-                        inDB.EmptyPrice = closeDic[item.BaseCurrency] * 2;
-                        inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.065);
-                        inDB.LadderSellPercent = Math.Min(inDB.LadderSellPercent, (decimal)1.15);
-                        await new DogControlDao().CreateDogControl(inDB);
+                        logger.Error(ex.Message, ex);
                     }
                 }
             }

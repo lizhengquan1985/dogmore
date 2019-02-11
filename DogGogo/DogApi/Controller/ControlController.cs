@@ -244,10 +244,6 @@ namespace DogApi.Controller
 
                 foreach (var balanceItem in accountInfo.Data.list)
                 {
-                    if (balanceItem.currency == "mana")
-                    {
-                        continue;
-                    }
                     try
                     {
                         if (balanceItem.balance < (decimal)0.00001 || balanceItem.type == "frozen")

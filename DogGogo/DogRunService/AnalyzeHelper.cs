@@ -37,6 +37,10 @@ namespace DogRunService
         public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol, bool refresh = false)
         {
             var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+            if (historyKlines == null || historyKlines.Count == 0)
+            {
+                return null;
+            }
             var idDate = Utils.GetDateById(historyKlines[0].Id);
             // 判断最小购买的价格是否接近， 如果接近，再去获取一次
             if (refresh && idDate > DateTime.Now.AddSeconds(-120))
@@ -147,7 +151,7 @@ namespace DogRunService
                 return false;
             }
 
-            var max = HistoryKlines.Max(it => it.Close); 
+            var max = HistoryKlines.Max(it => it.Close);
 
             var minHuidiao = (decimal)1.008;
             var maxHuidiao = (decimal)1.125;

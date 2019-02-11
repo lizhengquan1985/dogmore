@@ -171,6 +171,8 @@ namespace DogApi.Controller
                 {
                     inDB.HistoryMax = max;
                     inDB.HistoryMin = min;
+                    
+                    inDB.MaxInputPrice = Math.Min(inDB.MaxInputPrice, inDB.HistoryMax - (inDB.HistoryMax - inDB.HistoryMin) * inDB.SymbolLevel / 20);
                     await new DogControlDao().CreateDogControl(inDB);
                 }
             }

@@ -17,7 +17,7 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
         static Dictionary<string, int> coinCount = new Dictionary<string, int> {
-            { "usdt", 59 }, { "btc", 41 }, { "eth", 33 }, { "ht", 10 }
+            { "usdt", 60 }, { "btc", 51 }, { "eth", 46 }, { "ht", 10 }
         };
 
         static List<DogControl> dogControls = new List<DogControl>();
@@ -411,10 +411,11 @@ namespace DogService
 
         public static DogControl GetDogControl(string symbolName, string quoteCurrency)
         {
-            if(dogControlTime < Utils.GetIdByDate(DateTime.Now) - 60 * 60)
+            if (dogControlTime < Utils.GetIdByDate(DateTime.Now) - 60 * 60)
             {
                 dogControls = new DogControlDao().ListAllDogControl();
                 dogControlTime = Utils.GetIdByDate(DateTime.Now);
+                Console.WriteLine("----------从数据库里面读取dogControl-------");
             }
 
             return dogControls.Find(it => it.SymbolName == symbolName && it.QuoteCurrency == quoteCurrency);

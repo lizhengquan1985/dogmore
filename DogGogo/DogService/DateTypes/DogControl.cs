@@ -47,7 +47,11 @@ namespace DogService.DateTypes
         /// 层级,认可度, 0最大, 20 最小, 每降低一级别,是历史的5%
         /// </summary>
         public int SymbolLevel { get; set; }
+    }
 
+    [Table("t_dog_control")]
+    public class DogControlMemo : DogControl
+    {
         public string Memo { get; set; }
     }
 }

@@ -86,6 +86,25 @@ namespace DogApi.Controller
                 var pre50 = CoinsPre45.GetPre40Coins();
                 var pre80 = CoinsPre45.GetPre80Coins();
                 var pre120 = CoinsPre45.GetPre120Coins();
+                foreach (var item in res)
+                {
+                    if (pre50.Contains(item.SymbolName))
+                    {
+                        item.Memo = "前40";
+                    }
+                    else if (pre80.Contains(item.SymbolName))
+                    {
+                        item.Memo = "前80";
+                    }
+                    else if (pre120.Contains(item.SymbolName))
+                    {
+                        item.Memo = "前120";
+                    }
+                    else
+                    {
+                        item.Memo = "120开外";
+                    }
+                }
 
                 var notInPre50 = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);
                 var notInPre80 = res.FindAll(it => pre80.IndexOf(it.SymbolName) < 0);

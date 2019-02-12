@@ -72,7 +72,7 @@ namespace DogApi.Controller
                     "gvt","salt", "req","mda","rvn",
                    "cwv","bu","inb","kmd", "ft",
 
-                    "dai","gnt","fct","hsr","gxc",
+                    "dai","gnt","fct","hc","gxc",
                     "rdd","wax","bhp","enj","tomo",
                     "inve","usdc","nxt","wicc","edo",
                     "dac","rlc","part","knc","edg",

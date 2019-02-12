@@ -50,7 +50,7 @@ namespace DogApi.Controller
                 CommonSymbol symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName);
 
                 KlineUtils.InitMarketInDB(0, symbol, true);
-                CoinTrade.ShouGeDogMore(dogMoreBuy, symbol, (decimal)1.035);
+                CoinTrade.ShouGeDogMore(dogMoreBuy, symbol, (decimal)1.045);
 
                 return "操作结束";
             }
@@ -409,11 +409,12 @@ namespace DogApi.Controller
             {
                 var symbol = CoinUtils.GetCommonSymbol(symbolName, quoteCurrency);
 
-                var ladder = (decimal)1.055;
-                if (symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch" || symbolName == "etc" || symbolName == "eos" || symbolName == "ht"
+                var ladder = (decimal)1.06;
+                if (symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch"
+                    || symbolName == "etc" || symbolName == "eos" || symbolName == "ht"
                     || symbolName == "dash" || symbolName == "zec" || symbolName == "omg" || symbolName == "ada" || symbolName == "iota")
                 {
-                    ladder = (decimal)1.045;
+                    ladder = (decimal)1.05;
                 }
                 KlineUtils.InitMarketInDB(0, symbol, true);
                 return CoinTrade.BuyWhenDoMoreAnalyze(symbol, AccountConfigUtils.GetAccountConfig(userName), ladder);

@@ -247,6 +247,7 @@ namespace DogApi.Controller
                         {
                             inDB.EmptyPrice = closeDic[item.BaseCurrency] * 2;
                             inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax);
+                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, 2 * inDB.HistoryMin);
                             inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.065);
                             inDB.LadderSellPercent = Math.Min(inDB.LadderSellPercent, (decimal)1.15);
                             await new DogControlDao().CreateDogControl(inDB);

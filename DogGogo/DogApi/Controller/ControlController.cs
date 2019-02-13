@@ -274,7 +274,10 @@ namespace DogApi.Controller
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex.Message, ex);
+                        if (ex.Message.IndexOf("管控数据出错") < 0)
+                        {
+                            logger.Error(ex.Message, ex);
+                        }
                     }
                 }
             }

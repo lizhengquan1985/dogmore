@@ -22,7 +22,7 @@ namespace DogService.Dao
                 dogControl.LadderSellPercent <= 1 ||
                 dogControl.HistoryMin <= 0)
             {
-                throw new ApplicationException($"管控数据出错{symbolName}{quoteCurrency}");
+                return null;
             }
             return dogControl;
         }

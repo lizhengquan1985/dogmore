@@ -90,19 +90,19 @@ namespace DogApi.Controller
                 {
                     if (pre50.Contains(item.SymbolName))
                     {
-                        item.Memo = pre50.IndexOf(item.SymbolName) < 20 ? "前20" : "前40";
+                        item.Memo = pre50.IndexOf(item.SymbolName) < 20 ? "前20 -- 推荐 6level" : "前40 -- 推荐 8level";
                     }
                     else if (pre80.Contains(item.SymbolName))
                     {
-                        item.Memo = pre80.IndexOf(item.SymbolName) < 20 ? "前60" : "前80";
+                        item.Memo = pre80.IndexOf(item.SymbolName) < 20 ? "前60 -- 推荐 10level" : "前80 -- 推荐 12level";
                     }
                     else if (pre120.Contains(item.SymbolName))
                     {
-                        item.Memo = pre120.IndexOf(item.SymbolName) < 20 ? "前100" : "前120";
+                        item.Memo = pre120.IndexOf(item.SymbolName) < 20 ? "前100 -- 推荐 14level" : "前120 -- 推荐 16level";
                     }
                     else
                     {
-                        item.Memo = "120开外";
+                        item.Memo = "120开外 -- 推荐 18level";
                     }
                 }
 

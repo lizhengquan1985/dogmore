@@ -50,7 +50,7 @@ namespace DogApi.Controller
                 {
                     return "分析结果未null";
                 }
-                return CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.025);
+                return CoinTrade.ShouGeDogEmpty(dogEmptySell, symbol, analyzeResult, (decimal)1.045);
             }
             catch (Exception ex)
             {

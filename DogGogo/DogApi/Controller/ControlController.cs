@@ -30,9 +30,9 @@ namespace DogApi.Controller
                 // 默认 1.05, 
                 dogControl.SymbolLevel = Math.Max(0, dogControl.SymbolLevel);
                 dogControl.SymbolLevel = Math.Min(20, dogControl.SymbolLevel);
-                if (dogControl.LadderBuyPercent < (decimal)(1.05 + 0.003 * dogControl.SymbolLevel))
+                if (dogControl.LadderBuyPercent < (decimal)(1.05 + 0.001 * dogControl.SymbolLevel))
                 {
-                    dogControl.LadderBuyPercent = (decimal)(1.05 + 0.003 * dogControl.SymbolLevel);
+                    dogControl.LadderBuyPercent = (decimal)(1.05 + 0.001 * dogControl.SymbolLevel);
                 }
 
                 dogControl.UpIndex = Math.Max(0, dogControl.UpIndex);
@@ -90,15 +90,15 @@ namespace DogApi.Controller
                 {
                     if (pre50.Contains(item.SymbolName))
                     {
-                        item.Memo = "前40";
+                        item.Memo = pre50.IndexOf(item.SymbolName) < 20 ? "前20" : "前40";
                     }
                     else if (pre80.Contains(item.SymbolName))
                     {
-                        item.Memo = "前80";
+                        item.Memo = pre80.IndexOf(item.SymbolName) < 20 ? "前60" : "前80";
                     }
                     else if (pre120.Contains(item.SymbolName))
                     {
-                        item.Memo = "前120";
+                        item.Memo = pre120.IndexOf(item.SymbolName) < 20 ? "前100" : "前120";
                     }
                     else
                     {

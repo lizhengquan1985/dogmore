@@ -248,8 +248,8 @@ namespace DogService.Dao
         {
             var sql = $"select * from t_dog_more_buy where BuyOrderId in(" +
                 $" select BuyOrderId from ( " +
-                $"  select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where quoteCurrency=@quoteCurrency and {(string.IsNullOrEmpty(userName) ? "" : $" UserName = @userName and ")} IsFinished=0 group by SymbolName) t)  ";
-            return Database.Query<DogMoreBuyDTO>(sql, new { userName, quoteCurrency }).ToList();
+                $"  select max(BuyOrderId+0) BuyOrderId,SymbolName from t_dog_more_buy where quoteCurrency=@quoteCurrency and {(string.IsNullOrEmpty(userName) ? "" : $" UserName = @userName and ")} IsFinished=0 and BuyState!=@CancelState group by SymbolName) t)  ";
+            return Database.Query<DogMoreBuyDTO>(sql, new { userName, quoteCurrency, CancelState = StateConst.Canceled }).ToList();
         }
 
         public List<DogMoreBuyDTO> CountSymbol(string userName, string quoteCurrency)

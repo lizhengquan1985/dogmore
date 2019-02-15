@@ -368,13 +368,29 @@ namespace DogApi.Controller
                 }
                 if (sort == "maxmin")
                 {
+                    Console.WriteLine(res.Find(it => it.MinPrice <= 0 || it.MaxPrice <= 0) == null);
+                    logger.Error(JsonConvert.SerializeObject(res));
+
+                    var rate = 1;
+                    if (quoteCurrency == "btc")
+                    {
+                        rate = 1000000;
+                    }
+                    if (quoteCurrency == "eth")
+                    {
+                        rate = 100000;
+                    }
                     res.Sort((b, a) =>
                     {
                         if (a.MinPrice == 0 || b.MinPrice == 0)
                         {
                             return 0;
                         }
-                        if (a.MaxPrice / a.MinPrice > b.MaxPrice / b.MinPrice)
+                        var aMaxPrice = a.MaxPrice * rate;
+                        var bMaxPrice = b.MaxPrice * rate;
+                        var aMinPrice = a.MinPrice * rate;
+                        var bMinPrice = b.MinPrice * rate;
+                        if ((aMaxPrice * bMinPrice) > (bMaxPrice * aMinPrice))
                         {
                             return 1;
                         }

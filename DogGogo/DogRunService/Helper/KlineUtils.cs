@@ -330,8 +330,7 @@ namespace DogRunService.Helper
                 var dogEmptySellDao = new DogEmptySellDao();
 
                 // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
-                var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-                var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
+                var lastKlines = dao.ListKlines(symbol.QuoteCurrency, symbol.BaseCurrency, 20);
 
                 var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
 
@@ -341,6 +340,7 @@ namespace DogRunService.Helper
                     var finds = findList.FindAll(it => it.Id == kline.Id);
                     if (finds.Count > 1)
                     {
+                        Console.WriteLine("新增数据 finds.Count > 1");
                         // 删除，新增
                         dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
                     }
@@ -355,6 +355,7 @@ namespace DogRunService.Helper
                     else
                     {
                         // 新增
+                        Console.WriteLine($"新增数据 {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                         dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
                     }
                 }

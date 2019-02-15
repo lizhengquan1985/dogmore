@@ -617,8 +617,6 @@ namespace DogApi.Controller
         {
             try
             {
-                Console.WriteLine(JsonConvert.SerializeObject(form));
-
                 KlineUtils.InitMarketInDBFromOut(new CommonSymbol { BaseCurrency = form.BaseCurrency, QuoteCurrency = form.QuoteCurrency }, form.HistoryKlines);
             }
             catch (Exception ex)

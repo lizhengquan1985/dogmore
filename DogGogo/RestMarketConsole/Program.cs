@@ -35,8 +35,8 @@ namespace RestMarketConsole
             all120Coins.AddRange(pre120);
 
             var runCoins = new List<CommonSymbol>();
-            //runCoins.AddRange(InitUsdtData());
-            //runCoins.AddRange(InitBtcData(all120Coins));
+            runCoins.AddRange(InitUsdtData());
+            runCoins.AddRange(InitBtcData(all120Coins));
             runCoins.AddRange(InitEthData(all120Coins));
             runCoins.AddRange(InitHtData());
 
@@ -80,6 +80,7 @@ namespace RestMarketConsole
         {
             Task.Run(() =>
             {
+                var count = 0;
                 while (true)
                 {
                     var begin = DateTime.Now;
@@ -87,14 +88,11 @@ namespace RestMarketConsole
                     for (var i = 0; i < symbols.Count; i++)
                     {
                         var symbol = symbols[i];
-                        if (DateTime.Now.Millisecond % 3 == 0)
-                        {
-                            continue;
-                        }
 
                         try
                         {
                             InitMarketInDB(i, symbol);
+                            Console.WriteLine(count++);
                         }
                         catch (Exception ex)
                         {
@@ -102,7 +100,7 @@ namespace RestMarketConsole
                         }
 
                         // 暂停500毫秒
-                        Thread.Sleep(500);
+                        Thread.Sleep(1000);
                     }
                 }
             });
@@ -121,10 +119,6 @@ namespace RestMarketConsole
                     return;
                 }
 
-                Console.WriteLine("-------------------" + JsonConvert.SerializeObject(symbol));
-                Console.WriteLine(JsonConvert.SerializeObject(klines));
-                // 调用api
-
                 var client = new RestClient("http://118.31.44.235/api/Control/newSymbolData");
                 RestRequest req = new RestRequest(Method.POST);
                 req.AddHeader("content-type", "application/json");
@@ -136,8 +130,6 @@ namespace RestMarketConsole
                     HistoryKlines = klines
                 });
                 var response = client.ExecuteTaskAsync(req).Result;
-                Console.WriteLine("-------------------" + JsonConvert.SerializeObject(response));
-
             }
             catch (Exception ex)
             {

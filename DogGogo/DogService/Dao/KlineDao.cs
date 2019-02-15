@@ -87,6 +87,12 @@ namespace DogService.Dao
             return Database.Query<HistoryKline>(sql, new { date }).ToList();
         }
 
+        public List<HistoryKline> ListKlines(string quoteCurrency, string baseCurrency, int count)
+        {
+            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} order by Id desc limit {count}";
+            return Database.Query<HistoryKline>(sql).ToList();
+        }
+
         public decimal? GetMaxClosePrice(string quoteCurrency, string baseCurrency)
         {
             var date = DateTime.Now.AddMinutes(-60);

@@ -321,6 +321,7 @@ namespace DogRunService.Helper
                 var dogControl = DogControlUtils.GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
                 if (dogControl == null)
                 {
+                    Console.WriteLine("InitMarketInDBFromOut dogControl is null");
                     return;
                 }
 
@@ -331,7 +332,7 @@ namespace DogRunService.Helper
                 // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
                 var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
                 var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
-     
+
                 var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
 
                 klines.Sort((a, b) => (int)(a.Id - b.Id));

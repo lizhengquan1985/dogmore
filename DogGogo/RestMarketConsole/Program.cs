@@ -3,6 +3,7 @@ using DogPlatform.Model;
 using log4net;
 using log4net.Config;
 using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,8 +35,8 @@ namespace RestMarketConsole
             all120Coins.AddRange(pre120);
 
             var runCoins = new List<CommonSymbol>();
-            runCoins.AddRange(InitUsdtData());
-            runCoins.AddRange(InitBtcData(all120Coins));
+            //runCoins.AddRange(InitUsdtData());
+            //runCoins.AddRange(InitBtcData(all120Coins));
             runCoins.AddRange(InitEthData(all120Coins));
             runCoins.AddRange(InitHtData());
 
@@ -86,7 +87,7 @@ namespace RestMarketConsole
                     for (var i = 0; i < symbols.Count; i++)
                     {
                         var symbol = symbols[i];
-                        if(DateTime.Now.Millisecond % 3 == 0)
+                        if (DateTime.Now.Millisecond % 3 == 0)
                         {
                             continue;
                         }
@@ -120,9 +121,23 @@ namespace RestMarketConsole
                     return;
                 }
 
-                Console.WriteLine("-------------------"+JsonConvert.SerializeObject(symbol));
+                Console.WriteLine("-------------------" + JsonConvert.SerializeObject(symbol));
                 Console.WriteLine(JsonConvert.SerializeObject(klines));
                 // 调用api
+
+                var client = new RestClient("http://118.31.44.235/api/Control/newSymbolData");
+                RestRequest req = new RestRequest(Method.POST);
+                req.AddHeader("content-type", "application/json");
+                req.AddHeader("cache-type", "no-cache");
+                req.AddJsonBody(new
+                {
+                    BaseCurrency = symbol.BaseCurrency,
+                    QuoteCurrency = symbol.QuoteCurrency,
+                    HistoryKlines = klines
+                });
+                var response = client.ExecuteTaskAsync(req).Result;
+                Console.WriteLine("-------------------" + JsonConvert.SerializeObject(response));
+
             }
             catch (Exception ex)
             {

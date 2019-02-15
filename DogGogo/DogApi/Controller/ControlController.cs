@@ -607,7 +607,8 @@ namespace DogApi.Controller
         public class NewSymbolForm
         {
             public List<HistoryKline> HistoryKlines { get; set; }
-            public CommonSymbol Symbol { get; set; }
+            public string BaseCurrency { get; set; }
+            public string QuoteCurrency { get; set; }
         }
 
         [HttpPost]
@@ -618,7 +619,7 @@ namespace DogApi.Controller
             {
                 Console.WriteLine(JsonConvert.SerializeObject(form));
 
-                KlineUtils.InitMarketInDBFromOut(form.Symbol, form.HistoryKlines);
+                KlineUtils.InitMarketInDBFromOut(new CommonSymbol { BaseCurrency = form.BaseCurrency, QuoteCurrency = form.QuoteCurrency }, form.HistoryKlines);
             }
             catch (Exception ex)
             {

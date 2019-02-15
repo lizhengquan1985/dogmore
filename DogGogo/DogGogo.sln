@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DogAccount", "DogAccount\DogAccount.csproj", "{B656C0CB-B352-4F52-AD9B-D426423FECFB}"
 EndProject
@@ -22,6 +22,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestMarket", "RestMarket\RestMarket.csproj", "{7C9BD93C-C061-4BAE-A1B6-E8FF369AE065}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoTrade", "AutoTrade\AutoTrade.csproj", "{7D03B524-A1A3-410D-89FA-6CF09B956C3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestMarketConsole", "RestMarketConsole\RestMarketConsole.csproj", "{F8AD3607-1B72-4AE2-8DFD-03EF5F287A38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{7D03B524-A1A3-410D-89FA-6CF09B956C3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D03B524-A1A3-410D-89FA-6CF09B956C3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D03B524-A1A3-410D-89FA-6CF09B956C3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8AD3607-1B72-4AE2-8DFD-03EF5F287A38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8AD3607-1B72-4AE2-8DFD-03EF5F287A38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8AD3607-1B72-4AE2-8DFD-03EF5F287A38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8AD3607-1B72-4AE2-8DFD-03EF5F287A38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

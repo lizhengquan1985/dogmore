@@ -187,8 +187,9 @@ namespace DogRunService.Helper
                 var dogEmptySellDao = new DogEmptySellDao();
 
                 // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
-                var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-                var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
+                var lastKlines = dao.ListKlines(symbol.QuoteCurrency, symbol.BaseCurrency, 20);
+                //var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+                //var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
 
                 int minutes = Math.Max(8, dogControl.SymbolLevel);
                 var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-minutes)).Count;
@@ -229,6 +230,7 @@ namespace DogRunService.Helper
                 }
                 Console.WriteLine($"--->InitMarketInDB {index + 1}   {symbol.BaseCurrency}{symbol.QuoteCurrency}");
 
+                var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
                 var begin = DateTime.Now;
 
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx

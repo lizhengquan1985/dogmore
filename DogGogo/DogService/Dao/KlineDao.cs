@@ -31,10 +31,22 @@ namespace DogService.Dao
                     $" PRIMARY KEY(`RecordId`))" +
                     $" ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; ";
                 Database.Execute(createTableSql);
+
+
             }
             catch (Exception ex)
             {
 
+            }
+
+            try
+            {
+                var createIndex = $"CREATE INDEX `index_{quoteCurrency}_{baseCurrency}_id` ON `t_{quoteCurrency}_{baseCurrency}` (`Id`)";
+                Database.Execute(createIndex);
+            }
+            catch (Exception ex)
+            {
+                
             }
         }
 

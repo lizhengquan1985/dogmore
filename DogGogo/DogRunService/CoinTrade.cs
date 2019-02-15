@@ -138,14 +138,10 @@ namespace DogRunService
             decimal buyQuantity = recommendAmount / nowPrice;
             buyQuantity = CoinUtils.CalcTradeQuantity(symbol, buyQuantity);
 
+            // 判断是否满足最小购买数量
             if (!CoinUtils.IsBiggerThenLeastBuyForDoMore(symbol.BaseCurrency, symbol.QuoteCurrency, buyQuantity))
             {
                 Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做多数量太少，不符合最小交易额度");
-                return;
-            }
-
-            if (symbol.BaseCurrency == "bsv" && symbol.QuoteCurrency == "usdt" && buyQuantity < (decimal)0.08)
-            {
                 return;
             }
 

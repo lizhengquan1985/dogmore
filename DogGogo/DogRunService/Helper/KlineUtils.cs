@@ -313,5 +313,55 @@ namespace DogRunService.Helper
                 logger.Error("InitMarketInDB --> " + ex.Message, ex);
             }
         }
+
+        public static void InitMarketInDBFromOut(CommonSymbol symbol, List<HistoryKline> klines)
+        {
+            try
+            {
+                var dogControl = DogControlUtils.GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
+                if (dogControl == null)
+                {
+                    return;
+                }
+
+                var dao = new KlineDao();
+                var dogMoreBuyDao = new DogMoreBuyDao();
+                var dogEmptySellDao = new DogEmptySellDao();
+
+                // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
+                var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+                var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
+     
+                var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
+
+                klines.Sort((a, b) => (int)(a.Id - b.Id));
+                foreach (var kline in klines)
+                {
+                    var finds = findList.FindAll(it => it.Id == kline.Id);
+                    if (finds.Count > 1)
+                    {
+                        // 删除，新增
+                        dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
+                    }
+                    else if (finds.Count == 1)
+                    {
+                        if (finds[0].Low != kline.Low || finds[0].High != kline.High || finds[0].Open != kline.Open || finds[0].Close != kline.Close)
+                        {
+                            // 删除新增  从外面来的数据， 如果不一致， 不插入
+                            //dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
+                        }
+                    }
+                    else
+                    {
+                        // 新增
+                        dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("InitMarketInDB --> " + ex.Message, ex);
+            }
+        }
     }
 }

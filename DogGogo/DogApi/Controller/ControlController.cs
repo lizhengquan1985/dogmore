@@ -603,5 +603,28 @@ namespace DogApi.Controller
 
             return new { data, dateList, closeDic };
         }
+
+        public class NewSymbolForm
+        {
+            public List<HistoryKline> HistoryKlines { get; set; }
+            public CommonSymbol Symbol { get; set; }
+        }
+
+        [HttpPost]
+        [ActionName("newSymbolData")]
+        public async Task NewSymbolData([FromBody] NewSymbolForm form)
+        {
+            try
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(form));
+
+                KlineUtils.InitMarketInDBFromOut(form.Symbol, form.HistoryKlines);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+        }
     }
 }

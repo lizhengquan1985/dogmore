@@ -341,64 +341,72 @@ namespace DogApi.Controller
         [ActionName("listDogMoreBuyNotFinishedStatistics")]
         public async Task<object> ListDogMoreBuyNotFinishedStatistics(string userName, string quoteCurrency, string sort)
         {
-            var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName, quoteCurrency);
+            try
+            {
+                var res = new DogMoreBuyDao().ListDogMoreBuyNotFinishedStatistics(userName, quoteCurrency);
 
-            var symbols = CoinUtils.GetAllCommonSymbols("usdt");
-            symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
-            var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
-            Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
-            foreach (var item in nowPriceList)
-            {
-                if (item.QuoteCurrency != quoteCurrency)
+                var symbols = CoinUtils.GetAllCommonSymbols("usdt");
+                symbols = symbols.Where(it => it.BaseCurrency != "btc").ToList();
+                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
+                Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
+                foreach (var item in nowPriceList)
                 {
-                    continue;
+                    if (item.QuoteCurrency != quoteCurrency)
+                    {
+                        continue;
+                    }
+                    closeDic.Add(item.SymbolName, item.NowPrice);
                 }
-                closeDic.Add(item.SymbolName, item.NowPrice);
-            }
 
-            foreach (var item in res)
-            {
-                if (closeDic.ContainsKey(item.SymbolName))
+                foreach (var item in res)
                 {
-                    item.NowPrice = closeDic[item.SymbolName];
-                    item.NowTotalAmount = closeDic[item.SymbolName] * item.TotalQuantity;
+                    if (closeDic.ContainsKey(item.SymbolName))
+                    {
+                        item.NowPrice = closeDic[item.SymbolName];
+                        item.NowTotalAmount = closeDic[item.SymbolName] * item.TotalQuantity;
+                    }
                 }
-            }
-            if (sort == "maxmin")
-            {
-                res.Sort((b, a) =>
+                if (sort == "maxmin")
                 {
-                    if (a.MinPrice == 0 || b.MinPrice == 0)
+                    res.Sort((b, a) =>
                     {
-                        return 0;
-                    }
-                    if (a.MaxPrice / a.MinPrice > b.MaxPrice / b.MinPrice)
-                    {
-                        return 1;
-                    }
-                    else
-                    {
-                        return -1;
-                    }
-                });
+                        if (a.MinPrice == 0 || b.MinPrice == 0)
+                        {
+                            return 0;
+                        }
+                        if (a.MaxPrice / a.MinPrice > b.MaxPrice / b.MinPrice)
+                        {
+                            return 1;
+                        }
+                        else
+                        {
+                            return -1;
+                        }
+                    });
+                }
+                if (sort == "amount")
+                {
+                    res.Sort((b, a) => (int)(a.TotalAmount - b.TotalAmount));
+                }
+                if (sort == "nowamount")
+                {
+                    res.Sort((b, a) => (int)(a.NowTotalAmount - b.NowTotalAmount));
+                }
+                if (sort == "diffamount")
+                {
+                    res.Sort((b, a) => (int)(a.TotalAmount - a.NowTotalAmount - (b.TotalAmount - b.NowTotalAmount)));
+                }
+                if (sort == "count")
+                {
+                    res.Sort((b, a) => a.Count - b.Count);
+                }
+                return res;
             }
-            if (sort == "amount")
+            catch (Exception ex)
             {
-                res.Sort((b, a) => (int)(a.TotalAmount - b.TotalAmount));
+                logger.Error(ex.Message, ex);
+                throw ex;
             }
-            if (sort == "nowamount")
-            {
-                res.Sort((b, a) => (int)(a.NowTotalAmount - b.NowTotalAmount));
-            }
-            if (sort == "diffamount")
-            {
-                res.Sort((b, a) => (int)(a.TotalAmount - a.NowTotalAmount - (b.TotalAmount - b.NowTotalAmount)));
-            }
-            if (sort == "count")
-            {
-                res.Sort((b, a) => a.Count - b.Count);
-            }
-            return res;
         }
 
         [HttpPost]

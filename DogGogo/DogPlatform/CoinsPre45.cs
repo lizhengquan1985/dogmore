@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DogApi.Controller
+namespace DogPlatform
 {
-    class CoinsPre45
+    public class CoinsPre45
     {
         public static List<string> GetPre40Coins()
         {

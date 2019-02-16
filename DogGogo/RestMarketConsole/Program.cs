@@ -1,5 +1,6 @@
 ﻿using DogPlatform;
 using DogPlatform.Model;
+using DogService.DateTypes;
 using log4net;
 using log4net.Config;
 using Newtonsoft.Json;
@@ -32,22 +33,20 @@ namespace RestMarketConsole
             req.AddHeader("cache-type", "no-cache");
             var response = client.ExecuteTaskAsync(req).Result;
 
-            var pre50 = CoinsPre45.GetPre40Coins();
-            var pre80 = CoinsPre45.GetPre80Coins();
-            var pre120 = CoinsPre45.GetPre120Coins();
-            var all120Coins = new List<string>();
-            all120Coins.AddRange(pre50);
-            all120Coins.AddRange(pre80);
-            all120Coins.AddRange(pre120);
+            var controlList = JsonConvert.DeserializeObject<List<DogControl>>(response.Content);
 
-            var runCoins = new List<CommonSymbol>();
-            runCoins.AddRange(InitUsdtData());
-            runCoins.AddRange(InitBtcData(all120Coins));
-            runCoins.AddRange(InitEthData(all120Coins));
-            runCoins.AddRange(InitHtData());
+            var commonSymbols = new List<CommonSymbol>();
+            foreach (var control in controlList)
+            {
+                commonSymbols.Add(new CommonSymbol
+                {
+                    BaseCurrency = control.SymbolName,
+                    QuoteCurrency = control.QuoteCurrency
+                });
+            }
 
             // 开始
-            RunCoin(runCoins);
+            RunCoin(commonSymbols);
 
             Console.ReadLine();
         }

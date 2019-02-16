@@ -18,5 +18,11 @@ namespace DogService.Dao
                 Database.Insert(new DogCoin { SymbolName = symbolName, Level = level });
             }
         }
+
+        public List<DogCoin> ListDogCoin()
+        {
+            var sql = $"select * from t_dog_coin";
+            return Database.Query<DogCoin>(sql).ToList();
+        }
     }
 }

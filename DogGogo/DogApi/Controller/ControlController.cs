@@ -86,8 +86,17 @@ namespace DogApi.Controller
                 var pre50 = CoinsPre45.GetPre40Coins();
                 var pre80 = CoinsPre45.GetPre80Coins();
                 var pre120 = CoinsPre45.GetPre120Coins();
+
+                var dogCoinList = new DogCoinDao().ListDogCoin();
+
                 foreach (var item in res)
                 {
+                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item.SymbolName);
+                    var levelData = 10000;
+                    if (dogCoin != null)
+                    {
+                        levelData = dogCoin.Level;
+                    }
                     if (pre50.Contains(item.SymbolName))
                     {
                         item.Memo = pre50.IndexOf(item.SymbolName) < 20 ? "前20 -- 推荐 6level" : "前40 -- 推荐 8level";
@@ -104,6 +113,8 @@ namespace DogApi.Controller
                     {
                         item.Memo = "120开外 -- 推荐 18level";
                     }
+
+                    item.Memo += $" --------------- {levelData}";
                 }
 
                 var notInPre50 = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);

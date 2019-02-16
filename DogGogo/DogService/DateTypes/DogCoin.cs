@@ -10,6 +10,7 @@ namespace DogService.DateTypes
     [Table("t_dog_coin")]
     public class DogCoin
     {
+        [Key]
         public string SymbolName { get; set; }
         public int Level { get; set; }
     }

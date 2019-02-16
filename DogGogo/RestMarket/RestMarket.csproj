@@ -64,6 +64,10 @@
       <Project>{1C37E930-B3E1-461D-9C88-1796F2C727D6}</Project>
       <Name>DogRunService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DogService\DogService.csproj">
+      <Project>{0EB3BBA3-9734-4AD9-B9F0-19927773B082}</Project>
+      <Name>DogService</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

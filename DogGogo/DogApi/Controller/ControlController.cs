@@ -156,6 +156,36 @@ namespace DogApi.Controller
             }
         }
 
+        [HttpGet]
+        [ActionName("listAll")]
+        public async Task<object> ListAll()
+        {
+            try
+            {
+                var res = new List<DogControlMemo>();
+
+                var usdt = await new DogControlDao().ListDogControl("usdt");
+                usdt = usdt.OrderBy(it => it.SymbolName).ToList();
+                var btc = await new DogControlDao().ListDogControl("btc");
+                btc = btc.OrderBy(it => it.SymbolName).ToList();
+                var eth = await new DogControlDao().ListDogControl("eth");
+                eth = eth.OrderBy(it => it.SymbolName).ToList();
+                var ht = await new DogControlDao().ListDogControl("ht");
+                ht = ht.OrderBy(it => it.SymbolName).ToList();
+
+                res.AddRange(usdt);
+                res.AddRange(btc);
+                res.AddRange(eth);
+                res.AddRange(ht);
+                return res;
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+        }
+
         [HttpPut]
         [ActionName("setUnvalid")]
         public async Task<string> SetUnvalid(string symbolName, string quoteCurrency)

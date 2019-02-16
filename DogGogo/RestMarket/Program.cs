@@ -2,6 +2,7 @@
 using DogPlatform.Model;
 using DogRunService;
 using DogRunService.Helper;
+using DogService.Dao;
 using log4net;
 using log4net.Config;
 using System;
@@ -31,6 +32,11 @@ namespace RestMarket
             runCoins.AddRange(InitBtcData());
             runCoins.AddRange(InitEthData());
             runCoins.AddRange(InitHtData());
+
+            foreach (var symbol in runCoins)
+            {
+                new DogCoinDao().CreateNewDogCoin(symbol.BaseCurrency, 100000);
+            }
 
             // 开始
             RunCoin(runCoins);

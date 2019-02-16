@@ -26,6 +26,12 @@ namespace RestMarketConsole
 
             CoinUtils.Init();
 
+            var client = new RestClient("http://118.31.44.235/api/Control/listAll");
+            RestRequest req = new RestRequest(Method.GET);
+            req.AddHeader("content-type", "application/json");
+            req.AddHeader("cache-type", "no-cache");
+            var response = client.ExecuteTaskAsync(req).Result;
+
             var pre50 = CoinsPre45.GetPre40Coins();
             var pre80 = CoinsPre45.GetPre80Coins();
             var pre120 = CoinsPre45.GetPre120Coins();

@@ -61,10 +61,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dao\BaseDao.cs" />
+    <Compile Include="Dao\DogCoinDao.cs" />
     <Compile Include="Dao\DogControlDao.cs" />
     <Compile Include="Dao\DogNowPriceDao.cs" />
     <Compile Include="Dao\DogStatSymbolDao.cs" />
     <Compile Include="Dao\OrderReapDao.cs" />
+    <Compile Include="DateTypes\DogCoin.cs" />
     <Compile Include="DateTypes\DogControl.cs" />
     <Compile Include="DateTypes\DogEmpty.cs" />
     <Compile Include="DateTypes\DogMore.cs" />

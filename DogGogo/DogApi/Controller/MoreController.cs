@@ -390,14 +390,12 @@ namespace DogApi.Controller
                         var bMaxPrice = b.MaxPrice * rate;
                         var aMinPrice = a.MinPrice * rate;
                         var bMinPrice = b.MinPrice * rate;
-                        if ((aMaxPrice * bMinPrice) > (bMaxPrice * aMinPrice))
+                        var bb = ((aMaxPrice * bMinPrice) - (bMaxPrice * aMinPrice));
+                        if (bb == 0)
                         {
-                            return 1;
+                            return 0;
                         }
-                        else
-                        {
-                            return -1;
-                        }
+                        return bb > 0 ? 1 : -1;
                     });
                 }
                 if (sort == "amount")

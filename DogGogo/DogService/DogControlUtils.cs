@@ -312,6 +312,12 @@ namespace DogService
                 {
                     divide = min;
                 }
+
+                if (DateTime.Now.Second % 5 < 2)
+                {
+                    logger.Error($"分隔数据：{symbolName} {quoteCurrency} --- divide: {divide} ---- nowPrice: {nowPrice}");
+                }
+
                 return divide;
             }
             catch (Exception ex)

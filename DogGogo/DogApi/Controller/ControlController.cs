@@ -87,7 +87,7 @@ namespace DogApi.Controller
                 var pre80 = CoinsPre45.GetPre80Coins();
                 var pre120 = CoinsPre45.GetPre120Coins();
 
-                var dogCoinList = new DogCoinDao().ListDogCoin();
+                var dogCoinList = await new DogCoinDao().ListDogCoin();
 
                 foreach (var item in res)
                 {

@@ -351,7 +351,7 @@ namespace DogRunService.Helper
                         if (finds[0].Low != kline.Low || finds[0].High != kline.High || finds[0].Open != kline.Open || finds[0].Close != kline.Close)
                         {
                             // 删除新增  从外面来的数据， 如果不一致， 不插入
-                            //dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
+                            dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
                         }
                     }
                     else
@@ -360,6 +360,35 @@ namespace DogRunService.Helper
                         Console.WriteLine($"新增数据 {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                         dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
                     }
+                }
+
+                {
+                    var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+                    var todayKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date).ToList();
+                    var minutesKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.Date.AddMinutes(-30)).ToList();
+                    var nearMaxPrice = (decimal)0;
+                    var todayMinPrice = (decimal)0;
+                    var todayMaxPrice = (decimal)0;
+                    if (todayKlines.Count > 0)
+                    {
+                        todayMaxPrice = todayKlines.Max(it => it.Close);
+                        todayMinPrice = todayKlines.Min(it => it.Close);
+                    }
+                    if (minutesKlines.Count > 0)
+                    {
+                        nearMaxPrice = minutesKlines.Max(it => it.Close);
+                    }
+                    var lastKline = klines[klines.Count - 1];
+                    new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice
+                    {
+                        NowPrice = lastKline.Close,
+                        NowTime = lastKline.Id,
+                        QuoteCurrency = symbol.QuoteCurrency,
+                        SymbolName = symbol.BaseCurrency,
+                        TodayMaxPrice = todayMaxPrice,
+                        TodayMinPrice = todayMinPrice,
+                        NearMaxPrice = nearMaxPrice
+                    });
                 }
             }
             catch (Exception ex)

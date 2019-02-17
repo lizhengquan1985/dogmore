@@ -11,6 +11,7 @@ namespace DogService.DateTypes
     public class DogCoin
     {
         [Key]
+        public long Id { get; set; }
         public string SymbolName { get; set; }
         public int Level { get; set; }
     }

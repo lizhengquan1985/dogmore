@@ -19,10 +19,10 @@ namespace DogService.Dao
             }
         }
 
-        public List<DogCoin> ListDogCoin()
+        public async Task<List<DogCoin>> ListDogCoin()
         {
             var sql = $"select * from t_dog_coin";
-            return Database.Query<DogCoin>(sql).ToList();
+            return (await Database.QueryAsync<DogCoin>(new { })).ToList();
         }
     }
 }

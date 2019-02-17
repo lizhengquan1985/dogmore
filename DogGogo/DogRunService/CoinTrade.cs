@@ -44,7 +44,7 @@ namespace DogRunService
             }
             catch (Exception ex)
             {
-                logger.Error($"---> 购买异常: {JsonConvert.SerializeObject(symbol)}" + ex.Message, ex);
+                logger.Error($"---> 出售异常: {JsonConvert.SerializeObject(symbol)}" + ex.Message, ex);
             }
         }
 
@@ -314,7 +314,7 @@ namespace DogRunService
             }
 
             // 不符合管控的，则不考虑做空
-            if (!JudgeBuyUtils.ControlCanSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice))
+            if (!JudgeBuyUtils.ControlCanSell(symbol.BaseCurrency, symbol.QuoteCurrency, historyKlines, nowPrice))
             {
                 return;
             }

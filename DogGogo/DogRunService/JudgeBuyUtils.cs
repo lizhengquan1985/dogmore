@@ -24,7 +24,7 @@ namespace DogRunService
             return true;
         }
 
-        public static bool ControlCanSell(string symbolName, string quoteCurrency, decimal nowPrice)
+        public static bool ControlCanSell(string symbolName, string quoteCurrency, List<HistoryKline> historyKlines, decimal nowPrice)
         {
             var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
             if (control == null || control.HistoryMin <= 0)
@@ -33,7 +33,21 @@ namespace DogRunService
                 return false;
             }
 
-            if (nowPrice <= control.EmptyPrice || nowPrice < control.HistoryMin * 2 || nowPrice <= (control.HistoryMax - control.HistoryMin) * (decimal)0.6 + control.HistoryMin)
+            if (nowPrice <= control.EmptyPrice || nowPrice < control.HistoryMin * 2)
+            {
+                return false;
+            }
+
+            var maxPrice = historyKlines.Max(it => it.Close);
+            var minPrice = historyKlines.Min(it => it.Close);
+
+            if (nowPrice > minPrice * 2 && nowPrice > (control.HistoryMax - control.HistoryMin) * (decimal)0.3 + control.HistoryMin)
+            {
+                // 涨了1倍的，也可以空
+                return true;
+            }
+
+            if(nowPrice <= (control.HistoryMax - control.HistoryMin) * (decimal)0.6 + control.HistoryMin)
             {
                 return false;
             }

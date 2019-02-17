@@ -105,7 +105,6 @@ namespace DogPlatform
             {"icx",(decimal)0.01 },
             {"qtum",(decimal)0.01 },
             {"lsk",(decimal)0.001 },
-            {"bat",(decimal)1 },
             {"gnt",(decimal)0.1 },
             {"dcr",(decimal)0.001 },
             {"pai",(decimal)0.1 },
@@ -114,6 +113,11 @@ namespace DogPlatform
             {"hit",(decimal)1 },
             {"vet",(decimal)1 },
             {"ae",(decimal)0.01 },
+            {"powr",(decimal)1 },
+            {"mana",(decimal)1 },
+            {"cvc",(decimal)1 },
+            {"elf",(decimal)1 },
+            {"bat",(decimal)1 },
         };
         private static Dictionary<string, decimal> htLeastBuy = new Dictionary<string, decimal>
         {

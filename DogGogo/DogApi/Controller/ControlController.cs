@@ -174,8 +174,8 @@ namespace DogApi.Controller
                     notInControl50,
                     notInControl80,
                     notInControl120,
-                    notInControl = notInControlDic,
-                    notInControlButUsdt = notInControlButUsdtDic,
+                    notInControl = notInControlDic.OrderBy(it => it.Value),
+                    notInControlButUsdt = notInControlButUsdtDic.OrderBy(it=>it.Value),
                     hasControlButNotInPre = notInPre.Select(it => it.SymbolName).ToList(),
                     allItems = res.Select(it => it.SymbolName).ToList()
                 };

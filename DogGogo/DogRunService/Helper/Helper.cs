@@ -80,7 +80,7 @@ namespace DogRunService.Helper
         {
             if (quoteCurrency == "eth")
             {
-                notShougeEmptySellAmount = notShougeEmptySellAmount / 8;
+                notShougeEmptySellAmount = notShougeEmptySellAmount / 10;
             }
 
             if (notShougeEmptySellAmount >= balance)

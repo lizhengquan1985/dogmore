@@ -436,7 +436,7 @@ namespace DogApi.Controller
                     || symbolName == "etc" || symbolName == "eos" || symbolName == "ht"
                     || symbolName == "dash" || symbolName == "zec" || symbolName == "omg" || symbolName == "ada" || symbolName == "iota")
                 {
-                    ladder = (decimal)1.05;
+                    ladder = (decimal)1.053;
                 }
                 KlineUtils.InitMarketInDB(0, symbol, true);
                 return CoinTrade.BuyWhenDoMoreAnalyze(symbol, AccountConfigUtils.GetAccountConfig(userName), ladder);

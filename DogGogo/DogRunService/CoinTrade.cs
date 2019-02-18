@@ -133,12 +133,12 @@ namespace DogRunService
             if (!CommonHelper.CheckBalanceForDoMore(symbol.QuoteCurrency, quoteCurrency.balance, notShougeEmptySellAmount))
             {
                 Console.WriteLine($"{symbol.BaseCurrency}{symbol.QuoteCurrency}余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
-                throw new ApplicationException("余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
+                throw new ApplicationException($"余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
             }
 
             if (symbol.QuoteCurrency == "eth")
             {
-                notShougeEmptySellAmount = notShougeEmptySellAmount / 5;
+                notShougeEmptySellAmount = notShougeEmptySellAmount / 8;
             }
 
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);

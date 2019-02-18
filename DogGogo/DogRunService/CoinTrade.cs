@@ -138,7 +138,7 @@ namespace DogRunService
 
             if (symbol.QuoteCurrency == "eth")
             {
-                notShougeEmptySellAmount = notShougeEmptySellAmount / 2;
+                notShougeEmptySellAmount = notShougeEmptySellAmount / 3;
             }
 
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);

@@ -86,6 +86,10 @@ namespace DogRunService
             // 自动波动做多
             foreach (var userName in userNames)
             {
+                if (userName == "xx" && (symbol.QuoteCurrency == "btc" || symbol.QuoteCurrency == "eth"))
+                {
+                    continue;
+                }
                 try
                 {
                     BuyWhenDoMore(symbol, AccountConfigUtils.GetAccountConfig(userName), analyzeResult, ladderBuyPercent);
@@ -131,6 +135,12 @@ namespace DogRunService
                 Console.WriteLine($"{symbol.BaseCurrency}{symbol.QuoteCurrency}余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
                 throw new ApplicationException("余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
             }
+
+            if (symbol.QuoteCurrency == "eth")
+            {
+                notShougeEmptySellAmount = notShougeEmptySellAmount / 2;
+            }
+
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
             recommendAmount = DogControlUtils.GetRecommendBuyAmount(symbol, recommendAmount, nowPrice);
 

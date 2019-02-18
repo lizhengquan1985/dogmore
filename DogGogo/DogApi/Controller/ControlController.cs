@@ -145,6 +145,25 @@ namespace DogApi.Controller
                 notInControl80.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
                 notInControl120.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
 
+                var notInControlList = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList();
+                var notInControlDic = new Dictionary<string, int>();
+                foreach (var item in notInControlList)
+                {
+                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
+                    notInControlDic.Add(item, dogCoin.Level);
+                }
+
+                var usdtCommonSymbols = CoinUtils.GetAllCommonSymbols("usdt");
+                var notInControlButUsdtDic = new Dictionary<string, int>();
+                foreach (var item in notInControlList)
+                {
+                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
+                    var find = usdtCommonSymbols.Find(it => it.BaseCurrency == item);
+                    if (find != null)
+                    {
+                        notInControlButUsdtDic.Add(item, dogCoin.Level);
+                    }
+                }
                 return new
                 {
                     list = res,
@@ -155,7 +174,8 @@ namespace DogApi.Controller
                     notInControl50,
                     notInControl80,
                     notInControl120,
-                    notInControl = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList(),
+                    notInControl = notInControlDic,
+                    notInControlButUsdt = notInControlButUsdtDic,
                     hasControlButNotInPre = notInPre.Select(it => it.SymbolName).ToList(),
                     allItems = res.Select(it => it.SymbolName).ToList()
                 };

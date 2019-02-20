@@ -82,7 +82,12 @@ namespace DogPlatform
         };
         private static Dictionary<string, decimal> btcLeastBuy = new Dictionary<string, decimal> {
         /*检查*/ { "bat",(decimal)1},
+        /*检查*/ { "mana",(decimal)1},
         /*检查*/ {"ada",(decimal)0.1 },
+        /*检查*/ {"wan",(decimal)0.1 },
+        /*检查*/ {"ht",(decimal)0.1 },
+        /*检查*/ { "knc",(decimal)1},
+        /*检查*/ { "elf",(decimal)1},
             { "ardr",1},
         /*检查*/ { "xrp",(decimal)1},
             {"eth",(decimal)0.001 },
@@ -188,12 +193,12 @@ namespace DogPlatform
             var amountPrecisionValue = GetPrecisionValue(symbol.AmountPrecision);
             if (leastBy == amountPrecisionValue)
             {
-                if (quantity >= leastBy * 10)
+                if (quantity >= leastBy * 12)
                 {
                     return quantity;
                 }
 
-                if (leastBy * 10 > quantity * 2)
+                if (leastBy * 4 > quantity)
                 {
                     Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                     throw new ApplicationException("----");
@@ -205,19 +210,13 @@ namespace DogPlatform
             }
             else if (leastBy > amountPrecisionValue)
             {
-                if (leastBy > quantity * 2)
-                {
-                    Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
-                    throw new ApplicationException("----");
-                }
-
-                if (quantity > leastBy * (decimal)1.2)
+                if (quantity > leastBy * (decimal)1.3)
                 {
                     return quantity;
                 }
-                else if (quantity * 2 > leastBy)
+                else if (quantity * 3 >= leastBy)
                 {
-                    return leastBy * (decimal)1.2;
+                    return leastBy * (decimal)1.3;
                 }
                 else
                 {

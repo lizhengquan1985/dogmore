@@ -149,8 +149,17 @@ namespace DogApi.Controller
                 var notInControlDic = new Dictionary<string, int>();
                 foreach (var item in notInControlList)
                 {
-                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
-                    notInControlDic.Add(item, dogCoin.Level);
+                    try
+                    {
+                        var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
+                        notInControlDic.Add(item, dogCoin.Level);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex.Message, ex);
+                        logger.Error(JsonConvert.SerializeObject(item));
+                        continue;
+                    }
                 }
 
                 var usdtCommonSymbols = CoinUtils.GetAllCommonSymbols("usdt");
@@ -175,7 +184,7 @@ namespace DogApi.Controller
                     notInControl80,
                     notInControl120,
                     notInControl = notInControlDic.OrderBy(it => it.Value),
-                    notInControlButUsdt = notInControlButUsdtDic.OrderBy(it=>it.Value),
+                    notInControlButUsdt = notInControlButUsdtDic.OrderBy(it => it.Value),
                     hasControlButNotInPre = notInPre.Select(it => it.SymbolName).ToList(),
                     allItems = res.Select(it => it.SymbolName).ToList()
                 };

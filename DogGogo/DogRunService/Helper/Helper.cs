@@ -78,11 +78,6 @@ namespace DogRunService.Helper
         /// <returns></returns>
         public static bool CheckBalanceForDoMore(string quoteCurrency, decimal balance, decimal notShougeEmptySellAmount)
         {
-            if (quoteCurrency == "eth")
-            {
-                notShougeEmptySellAmount = 0;
-            }
-
             if (notShougeEmptySellAmount >= balance)
             {
                 return false;

@@ -136,11 +136,6 @@ namespace DogRunService
                 throw new ApplicationException($"余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
             }
 
-            if (symbol.QuoteCurrency == "eth")
-            {
-                notShougeEmptySellAmount = 0;
-            }
-
             decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
             recommendAmount = DogControlUtils.GetRecommendBuyAmount(symbol, recommendAmount, nowPrice);
 

@@ -91,6 +91,7 @@ namespace DogPlatform
             { "ardr",1},
         /*检查*/ { "xrp",(decimal)1},
             {"eth",(decimal)0.001 },
+            {"rdn",(decimal)1 },
         };
         private static Dictionary<string, decimal> ethLeastBuy = new Dictionary<string, decimal>
         {
@@ -123,6 +124,7 @@ namespace DogPlatform
             {"cvc",(decimal)1 },
             {"elf",(decimal)1 },
             {"bat",(decimal)1 },
+            {"rdn",(decimal)1 },
         };
         private static Dictionary<string, decimal> htLeastBuy = new Dictionary<string, decimal>
         {

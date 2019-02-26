@@ -193,7 +193,7 @@ namespace DogPlatform
             var amountPrecisionValue = GetPrecisionValue(symbol.AmountPrecision);
             if (leastBy == amountPrecisionValue)
             {
-                if (quantity >= leastBy * 12)
+                if (quantity >= leastBy * 14)
                 {
                     return quantity;
                 }
@@ -205,18 +205,18 @@ namespace DogPlatform
                 }
                 else
                 {
-                    return leastBy * 12;
+                    return leastBy * 14;
                 }
             }
             else if (leastBy > amountPrecisionValue)
             {
-                if (quantity > leastBy * (decimal)1.3)
+                if (quantity > leastBy * (decimal)1.4)
                 {
                     return quantity;
                 }
-                else if (quantity * 3 >= leastBy)
+                else if (quantity * 4 >= leastBy)
                 {
-                    return leastBy * (decimal)1.3;
+                    return leastBy * (decimal)1.4;
                 }
                 else
                 {

@@ -50,7 +50,7 @@ namespace DogApi.Controller
                 CommonSymbol symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName);
 
                 KlineUtils.InitMarketInDB(0, symbol, true);
-                CoinTrade.ShouGeDogMore(dogMoreBuy, symbol, (decimal)1.06);
+                CoinTrade.ShouGeDogMore(dogMoreBuy, symbol, (decimal)1.05);
 
                 return "操作结束";
             }

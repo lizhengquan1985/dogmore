@@ -212,7 +212,8 @@ namespace DogRunService
 
         public static string ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, decimal ladderBuyPercent)
         {
-            ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.03);
+            ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.05);
+            ladderBuyPercent = Math.Min(ladderBuyPercent, (decimal)1.12);
             var nowPrice = analyzeResult.NowPrice;
             if (nowPrice * ladderBuyPercent > dogEmptySell.SellTradePrice)
             {
@@ -810,7 +811,7 @@ namespace DogRunService
             try
             {
                 var needChangeBuyStateDogEmptyBuyList = new DogEmptyBuyDao().ListNeedChangeBuyStateDogEmptyBuy();
-                Console.WriteLine($"needChangeBuyStateDogEmptyBuyList: {needChangeBuyStateDogEmptyBuyList.Count}");
+                //Console.WriteLine($"needChangeBuyStateDogEmptyBuyList: {needChangeBuyStateDogEmptyBuyList.Count}");
                 foreach (var item in needChangeBuyStateDogEmptyBuyList)
                 {
                     // 如果长时间没有出售成功， 则取消订单。

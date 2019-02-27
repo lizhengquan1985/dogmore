@@ -342,7 +342,7 @@ namespace DogRunService.Helper
                     var finds = findList.FindAll(it => it.Id == kline.Id);
                     if (finds.Count > 1)
                     {
-                        Console.WriteLine("新增数据 finds.Count > 1");
+                        //Console.WriteLine("新增数据 finds.Count > 1");
                         // 删除，新增
                         dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
                     }
@@ -357,7 +357,7 @@ namespace DogRunService.Helper
                     else
                     {
                         // 新增
-                        Console.WriteLine($"新增数据 {symbol.BaseCurrency} {symbol.QuoteCurrency}");
+                        //Console.WriteLine($"新增数据 {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                         dao.DeleteAndRecordKlines(symbol.QuoteCurrency, symbol.BaseCurrency, kline);
                     }
                 }

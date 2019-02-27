@@ -173,6 +173,31 @@ namespace DogApi.Controller
                         notInControlButUsdtDic.Add(item, dogCoin.Level);
                     }
                 }
+
+                var btcCommonSymbols = await new DogControlDao().ListDogControl("btc");
+                var notInControlButBtcDic = new Dictionary<string, int>();
+                foreach (var item in notInControlList)
+                {
+                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
+                    var find = btcCommonSymbols.Find(it => it.SymbolName == item);
+                    if (find != null)
+                    {
+                        notInControlButBtcDic.Add(item, dogCoin.Level);
+                    }
+                }
+
+                var ethCommonSymbols = await new DogControlDao().ListDogControl("eth");
+                var notInControlButEthDic = new Dictionary<string, int>();
+                foreach (var item in notInControlList)
+                {
+                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
+                    var find = ethCommonSymbols.Find(it => it.SymbolName == item);
+                    if (find != null)
+                    {
+                        notInControlButEthDic.Add(item, dogCoin.Level);
+                    }
+                }
+
                 return new
                 {
                     list = res,
@@ -185,6 +210,8 @@ namespace DogApi.Controller
                     notInControl120,
                     notInControl = notInControlDic.OrderBy(it => it.Value),
                     notInControlButUsdt = notInControlButUsdtDic.OrderBy(it => it.Value),
+                    notInControlButEth = notInControlButEthDic.OrderBy(it => it.Value),
+                    notInControlButBtc = notInControlButBtcDic.OrderBy(it => it.Value),
                     hasControlButNotInPre = notInPre.Select(it => it.SymbolName).ToList(),
                     allItems = res.Select(it => it.SymbolName).ToList()
                 };

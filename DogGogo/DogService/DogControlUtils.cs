@@ -251,7 +251,7 @@ namespace DogService
 
                 if (control.HistoryMax > control.HistoryMin)
                 {
-                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                    var percent = (control.HistoryMax * (decimal)1.2 - nowPrice) / (control.HistoryMax * (decimal)1.2 - control.HistoryMin * (decimal)1.2);
                     defaultEmptyLadderSellPercent = (max - min) * percent + min;
                 }
 

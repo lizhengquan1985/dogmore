@@ -328,8 +328,8 @@ namespace DogService
         {
             try
             {
-                var max = 70;
-                var min = 20;
+                var max = 80;
+                var min = 25;
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null || control.HistoryMax <= control.HistoryMin || control.HistoryMin <= 0 || control.HistoryMax <= 0)
                 {
@@ -357,7 +357,7 @@ namespace DogService
                     return min;
                 }
 
-                var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
+                var percent = (control.HistoryMax * (decimal)1.2 - nowPrice) / (control.HistoryMax * (decimal)1.2 - control.HistoryMin * (decimal)1.2);
                 divide = min + Convert.ToInt32(percent * (max - min));
                 if (divide > max)
                 {

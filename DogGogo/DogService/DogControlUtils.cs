@@ -106,7 +106,7 @@ namespace DogService
             return recommendAmount;
         }
 
-        public static decimal GetLadderBuy(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.1)
+        public static decimal GetLadderBuy(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.08)
         {
             try
             {

@@ -111,7 +111,7 @@ namespace DogApi.Controller
                     }
                     else
                     {
-                        item.Memo = "120开外 -- 推荐 18level";
+                        item.Memo = "120开外 -- 推荐 16level";
                     }
 
                     item.Memo += $" --------------- {levelData}";

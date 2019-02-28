@@ -99,15 +99,15 @@ namespace DogApi.Controller
                     }
                     if (pre50.Contains(item.SymbolName))
                     {
-                        item.Memo = pre50.IndexOf(item.SymbolName) < 20 ? "前20 -- 推荐 6level" : "前40 -- 推荐 8level";
+                        item.Memo = pre50.IndexOf(item.SymbolName) < 20 ? "前20 -- 推荐 4level" : "前40 -- 推荐 6level";
                     }
                     else if (pre80.Contains(item.SymbolName))
                     {
-                        item.Memo = pre80.IndexOf(item.SymbolName) < 20 ? "前60 -- 推荐 10level" : "前80 -- 推荐 12level";
+                        item.Memo = pre80.IndexOf(item.SymbolName) < 20 ? "前60 -- 推荐 8level" : "前80 -- 推荐 10level";
                     }
                     else if (pre120.Contains(item.SymbolName))
                     {
-                        item.Memo = pre120.IndexOf(item.SymbolName) < 20 ? "前100 -- 推荐 14level" : "前120 -- 推荐 16level";
+                        item.Memo = pre120.IndexOf(item.SymbolName) < 20 ? "前100 -- 推荐 12level" : "前120 -- 推荐 14level";
                     }
                     else
                     {

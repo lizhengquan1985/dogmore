@@ -431,12 +431,12 @@ namespace DogApi.Controller
             {
                 var symbol = CoinUtils.GetCommonSymbol(symbolName, quoteCurrency);
 
-                var ladder = (decimal)1.06;
+                var ladder = (decimal)1.062;
                 if (symbolName == "hb10" || symbolName == "eth" || symbolName == "ltc" || symbolName == "xrp" || symbolName == "bch"
                     || symbolName == "etc" || symbolName == "eos" || symbolName == "ht"
                     || symbolName == "dash" || symbolName == "zec" || symbolName == "omg" || symbolName == "ada" || symbolName == "iota")
                 {
-                    ladder = (decimal)1.055;
+                    ladder = (decimal)1.058;
                 }
                 KlineUtils.InitMarketInDB(0, symbol, true);
                 return CoinTrade.BuyWhenDoMoreAnalyze(symbol, AccountConfigUtils.GetAccountConfig(userName), ladder);

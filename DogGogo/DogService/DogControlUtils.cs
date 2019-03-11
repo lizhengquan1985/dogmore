@@ -277,8 +277,8 @@ namespace DogService
                 {
                     return divide;
                 }
-                var max = coinCount[quoteCurrency] * 32;
-                var min = Math.Max(coinCount[quoteCurrency] * 6, 100);
+                var max = coinCount[quoteCurrency] * 35;
+                var min = Math.Max(coinCount[quoteCurrency] * 8, 100);
 
                 // 防止价格波动后的, 分隔过合理. 下
                 if (control.HistoryMax < control.HistoryMin * (decimal)2)
@@ -304,14 +304,8 @@ namespace DogService
 
                 var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
                 divide = max - Convert.ToInt32(percent * (max - min));
-                if (divide > max)
-                {
-                    divide = max;
-                }
-                if (divide < min)
-                {
-                    divide = min;
-                }
+                divide = Math.Min(divide, max);
+                divide = Math.Max(divide, min);
 
                 logger.Error($"分隔数据：{symbolName} {quoteCurrency} --- divide: {divide} ---- nowPrice: {nowPrice}");
 

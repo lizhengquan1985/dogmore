@@ -212,13 +212,13 @@ namespace DogPlatform
             }
             else if (leastBy > amountPrecisionValue)
             {
-                if (quantity > leastBy * (decimal)1.4)
+                if (quantity > leastBy * (decimal)1.6)
                 {
                     return quantity;
                 }
                 else if (quantity * 4 >= leastBy)
                 {
-                    return leastBy * (decimal)1.4;
+                    return leastBy * (decimal)1.6;
                 }
                 else
                 {

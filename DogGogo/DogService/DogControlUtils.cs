@@ -2,6 +2,7 @@
 using DogService.Dao;
 using DogService.DateTypes;
 using log4net;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
         static Dictionary<string, int> coinCount = new Dictionary<string, int> {
-            { "usdt", 61 }, { "btc", 77 }, { "eth", 61 }, { "ht", 10 }
+            { "usdt", 61 }, { "btc", 96 }, { "eth", 80 }, { "ht", 10 }
         };
 
         static List<DogControl> dogControls = new List<DogControl>();
@@ -29,35 +30,24 @@ namespace DogService
             {
                 {
                     long count = new DogControlDao().GetCount("usdt").Result;
-                    if (count >= coinCount["usdt"])
-                    {
-                        coinCount["usdt"] = (int)count;
-                    }
+                    coinCount["usdt"] = Math.Max(coinCount["usdt"], (int)count);
                 }
 
                 {
                     long count = new DogControlDao().GetCount("btc").Result;
-                    if (count >= coinCount["btc"])
-                    {
-                        coinCount["btc"] = (int)count;
-                    }
+                    coinCount["btc"] = Math.Max(coinCount["btc"], (int)count);
                 }
 
                 {
                     long count = new DogControlDao().GetCount("eth").Result;
-                    if (count >= coinCount["eth"])
-                    {
-                        coinCount["eth"] = (int)count;
-                    }
+                    coinCount["eth"] = Math.Max(coinCount["eth"], (int)count);
                 }
 
                 {
                     long count = new DogControlDao().GetCount("ht").Result;
-                    if (count >= coinCount["ht"])
-                    {
-                        coinCount["ht"] = (int)count;
-                    }
+                    coinCount["ht"] = Math.Max(coinCount["ht"], (int)count);
                 }
+                Console.WriteLine(JsonConvert.SerializeObject(coinCount));
             }
             catch (Exception ex)
             {

@@ -3,6 +3,7 @@ using DogPlatform.Model;
 using DogRunService;
 using DogRunService.Helper;
 using DogService;
+using DogService.Dao;
 using log4net;
 using log4net.Config;
 using System;
@@ -134,6 +135,14 @@ namespace AutoTrade
                     {
                         Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
                         Thread.Sleep(1000 * (30 - (int)useTime));
+                    }
+
+                    if(DateTime.Now.Hour == 0 || DateTime.Now.Hour == 6 || DateTime.Now.Hour == 12 || DateTime.Now.Hour == 18)
+                    {
+                        if(DateTime.Now.Minute < 3)
+                        {
+                            new DogOrderStatDao().AddStatRecord();
+                        }
                     }
                 }
             });

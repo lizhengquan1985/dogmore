@@ -64,6 +64,7 @@
     <Compile Include="Dao\DogCoinDao.cs" />
     <Compile Include="Dao\DogControlDao.cs" />
     <Compile Include="Dao\DogNowPriceDao.cs" />
+    <Compile Include="Dao\DogOrderStatDao.cs" />
     <Compile Include="Dao\DogStatSymbolDao.cs" />
     <Compile Include="Dao\OrderReapDao.cs" />
     <Compile Include="DateTypes\DogCoin.cs" />
@@ -72,6 +73,7 @@
     <Compile Include="DateTypes\DogMore.cs" />
     <Compile Include="DateTypes\DogMoreStatisticsDay.cs" />
     <Compile Include="DateTypes\DogNowPrice.cs" />
+    <Compile Include="DateTypes\DogOrderStat.cs" />
     <Compile Include="DateTypes\DogStatSymbol.cs" />
     <Compile Include="DateTypes\OrderReap.cs" />
     <Compile Include="Dao\DogEmptyBuyDao.cs" />

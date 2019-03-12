@@ -1,4 +1,5 @@
 ﻿using DogAccount;
+using log4net;
 using MySql.Data.MySqlClient;
 using SharpDapper;
 using System;
@@ -12,6 +13,8 @@ namespace DogService.Dao
 {
     public class BaseDao
     {
+        protected ILog logger = LogManager.GetLogger(typeof(BaseDao));
+
         public string LikeStr(string str)
         {
             StringBuilder sb = new StringBuilder(str);

@@ -640,7 +640,10 @@ namespace DogApi.Controller
             List<Dictionary<string, string>> data = new List<Dictionary<string, string>>();
             foreach (var symbol in symbolList)
             {
-
+                if (userName == "xx" && symbol == "gas")
+                {
+                    continue;
+                }
                 Dictionary<string, string> item = new Dictionary<string, string>();
                 item.Add("symbolName", symbol);
                 for (int i = 0; i <= 30; i++)

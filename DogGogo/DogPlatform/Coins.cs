@@ -125,6 +125,7 @@ namespace DogPlatform
             {"elf",(decimal)1 },
             {"bat",(decimal)1 },
             {"rdn",(decimal)1 },
+            {"itc",(decimal)1 },
         };
         private static Dictionary<string, decimal> htLeastBuy = new Dictionary<string, decimal>
         {

@@ -625,11 +625,11 @@ namespace DogApi.Controller
             var symbolList = result.Select(it => it.SymbolName).Distinct().ToList();
             symbolList.Sort((a, b) =>
             {
-                if (a == "usdt" || a == "btc" || a == "eth" || a == "ht")
+                if (a == "usdt" || a == "btc" || a == "eth" || a == "ht" || a == "hpt")
                 {
                     return -1;
                 }
-                if (b == "usdt" || b == "btc" || b == "eth" || b == "ht")
+                if (b == "usdt" || b == "btc" || b == "eth" || b == "ht" || b == "hpt")
                 {
                     return 1;
                 }
@@ -664,11 +664,11 @@ namespace DogApi.Controller
                     var date = DateTime.Now.ToString("yyyy-MM-dd");
                     data.Sort((a, b) =>
                     {
-                        if (a["symbolName"] == "usdt" || a["symbolName"] == "btc" || a["symbolName"] == "eth" || a["symbolName"] == "ht")
+                        if (a["symbolName"] == "usdt" || a["symbolName"] == "btc" || a["symbolName"] == "eth" || a["symbolName"] == "ht" || a["symbolName"] == "hpt")
                         {
                             return -1;
                         }
-                        if (b["symbolName"] == "usdt" || b["symbolName"] == "btc" || b["symbolName"] == "eth" || b["symbolName"] == "ht")
+                        if (b["symbolName"] == "usdt" || b["symbolName"] == "btc" || b["symbolName"] == "eth" || b["symbolName"] == "ht" || a["symbolName"] == "hpt")
                         {
                             return 1;
                         }

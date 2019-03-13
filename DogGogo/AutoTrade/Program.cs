@@ -137,9 +137,10 @@ namespace AutoTrade
                         Thread.Sleep(1000 * (30 - (int)useTime));
                     }
 
-                    if(DateTime.Now.Hour == 0 || DateTime.Now.Hour == 6 || DateTime.Now.Hour == 12 || DateTime.Now.Hour == 18)
+                    if (DateTime.Now.Hour == 0 || DateTime.Now.Hour == 4 || DateTime.Now.Hour == 8
+                        || DateTime.Now.Hour == 12 || DateTime.Now.Hour == 16 || DateTime.Now.Hour == 20)
                     {
-                        if(DateTime.Now.Minute < 3)
+                        if (DateTime.Now.Minute < 2)
                         {
                             new DogOrderStatDao().AddStatRecord();
                         }

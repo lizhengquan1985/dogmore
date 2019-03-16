@@ -86,10 +86,6 @@ namespace DogRunService
             // 自动波动做多
             foreach (var userName in userNames)
             {
-                if (userName == "xx" && (symbol.QuoteCurrency == "btc" || symbol.QuoteCurrency == "eth"))
-                {
-                    continue;
-                }
                 try
                 {
                     BuyWhenDoMore(symbol, AccountConfigUtils.GetAccountConfig(userName), analyzeResult, ladderBuyPercent);

@@ -13,7 +13,7 @@ namespace MarketApp
         private static WebSocket websocket;
         private static Dictionary<string, string> topicDic = new Dictionary<string, string>();
         private static bool isOpened = false;
-        private const string HUOBI_WEBSOCKET_API = "wss://api.huobi.pro/ws";
+        private const string HUOBI_WEBSOCKET_API = "wss://api.huobi.pro/ws"; // api.huobi.pro
         #endregion
         #region  市场信息常量
         public const string MARKET_KLINE = "market.{0}.kline.{1}";

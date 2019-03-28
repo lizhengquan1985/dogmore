@@ -20,7 +20,7 @@ namespace DogPlatform
         /// <summary>
         /// API域名名称
         /// </summary>
-        private readonly string HUOBI_HOST = "api.huobipro.com";
+        private readonly string HUOBI_HOST = "api.huobi.pro"; // api.huobipro.com
         /// <summary>
         /// APi域名地址
         /// </summary>

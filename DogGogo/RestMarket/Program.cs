@@ -116,16 +116,16 @@ namespace RestMarket
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime > 50)
+                    if (useTime > 80)
                     {
                         logger.Error($"一轮总共耗时：{useTime}秒");
                     }
                     else
                     {
-                        if (useTime > 30)
-                        {
-                            Console.WriteLine($"一轮总共耗时：{useTime}秒");
-                        }
+                        //if (useTime > 30)
+                        //{
+                        //    Console.WriteLine($"一轮总共耗时：{useTime}秒");
+                        //}
 
                         Thread.Sleep((50 - (int)useTime) * 1000);
                     }

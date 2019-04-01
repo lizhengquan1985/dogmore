@@ -297,7 +297,7 @@ namespace DogService
                 divide = Math.Min(divide, max);
                 divide = Math.Max(divide, min);
 
-                logger.Error($"分隔数据：{symbolName} {quoteCurrency} --- divide: {divide} ---- nowPrice: {nowPrice}");
+                //logger.Error($"分隔数据：{symbolName} {quoteCurrency} --- divide: {divide} ---- nowPrice: {nowPrice}");
 
                 return divide;
             }

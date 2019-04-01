@@ -166,9 +166,10 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
-                logger.Error($"1开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"");
+                logger.Error($"1: 开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
-                logger.Error($"2下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
+                logger.Error($"2: 下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
 
                 if (order.Status == "ok")
                 {
@@ -195,7 +196,8 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QueryBuyDetailAndUpdate(userName, order.Data);
                 }
-                logger.Error($"3入库结束 -----------------------------做多  下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, nowPrice：{nowPrice}, accountId：{accountId},");
+                logger.Error($"3: 入库结束 -----------------------------做多  下单购买结果 {JsonConvert.SerializeObject(req)}, notShougeEmptySellAmount:{notShougeEmptySellAmount}, order：{JsonConvert.SerializeObject(order)}, nowPrice：{nowPrice}, accountId：{accountId},");
+                logger.Error($"");
             }
             catch (Exception ex)
             {
@@ -249,9 +251,10 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
-                logger.Error($"1开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
+                logger.Error($"");
+                logger.Error($"1: 开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
-                logger.Error($"2下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
+                logger.Error($"2: 下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
 
                 if (order.Status == "ok")
                 {
@@ -277,7 +280,8 @@ namespace DogRunService
                     // 下单成功马上去查一次
                     QueryEmptyBuyDetailAndUpdate(dogEmptySell.UserName, order.Data);
                 }
-                logger.Error($"3入库结束 ----------------------------- 空单收割");
+                logger.Error($"3: 入库结束 ----------------------------- 空单收割");
+                logger.Error($"");
                 return "运行结束";
             }
             catch (Exception ex)
@@ -415,9 +419,10 @@ namespace DogRunService
                 HBResponse<long> order = null;
                 try
                 {
-                    logger.Error($"开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
+                    logger.Error($"");
+                    logger.Error($"1: 开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                     order = api.OrderPlace(req);
-                    logger.Error($"下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
+                    logger.Error($"2: 下单结束 -----------------------------{JsonConvert.SerializeObject(req)}");
 
                     if (order.Status == "ok")
                     {
@@ -444,7 +449,8 @@ namespace DogRunService
                         // 下单成功马上去查一次
                         QueryEmptySellDetailAndUpdate(userName, order.Data);
                     }
-                    logger.Error($"入库结束 -----------------------------做空 {JsonConvert.SerializeObject(req)}下单出售结果：" + JsonConvert.SerializeObject(order));
+                    logger.Error($"3: 入库结束 -----------------------------做空 {JsonConvert.SerializeObject(req)}下单出售结果：" + JsonConvert.SerializeObject(order));
+                    logger.Error($"");
                 }
                 catch (Exception ex)
                 {
@@ -509,6 +515,7 @@ namespace DogRunService
             HBResponse<long> order = null;
             try
             {
+                logger.Error($"");
                 logger.Error($"1:开始下单 -----------------------------{JsonConvert.SerializeObject(req)}");
                 order = api.OrderPlace(req);
                 logger.Error($"2:下单结束 -----------------------------{JsonConvert.SerializeObject(order)}");
@@ -540,6 +547,7 @@ namespace DogRunService
                     QuerySellDetailAndUpdate(dogMoreBuy.UserName, order.Data);
                 }
                 logger.Error($"3:入库结束 ----------------------------- 多单收割 --> {JsonConvert.SerializeObject(dogMoreBuy)}");
+                logger.Error($"");
             }
             catch (Exception ex)
             {

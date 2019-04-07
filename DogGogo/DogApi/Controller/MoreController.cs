@@ -369,7 +369,6 @@ namespace DogApi.Controller
                 if (sort == "maxmin")
                 {
                     Console.WriteLine(res.Find(it => it.MinPrice <= 0 || it.MaxPrice <= 0) == null);
-                    logger.Error(JsonConvert.SerializeObject(res));
 
                     var rate = 1;
                     if (quoteCurrency == "btc")

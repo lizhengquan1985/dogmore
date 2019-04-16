@@ -18,7 +18,7 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
         static Dictionary<string, int> coinCount = new Dictionary<string, int> {
-            { "usdt", 61 }, { "btc", 96 }, { "eth", 80 }, { "ht", 10 }
+            { "usdt", 65 }, { "btc", 105 }, { "eth", 90 }, { "ht", 15 }
         };
 
         static List<DogControl> dogControls = new List<DogControl>();
@@ -259,7 +259,7 @@ namespace DogService
 
         public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice)
         {
-            int divide = coinCount[quoteCurrency] * 22;
+            int divide = coinCount[quoteCurrency] * 25;
             try
             {
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
@@ -267,8 +267,8 @@ namespace DogService
                 {
                     return divide;
                 }
-                var max = coinCount[quoteCurrency] * 35;
-                var min = Math.Max(coinCount[quoteCurrency] * 8, 100);
+                var max = coinCount[quoteCurrency] * 38;
+                var min = Math.Max(coinCount[quoteCurrency] * 10, 100);
 
                 // 防止价格波动后的, 分隔过合理. 下
                 if (control.HistoryMax < control.HistoryMin * (decimal)2)

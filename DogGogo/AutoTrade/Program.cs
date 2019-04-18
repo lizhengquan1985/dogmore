@@ -126,7 +126,7 @@ namespace AutoTrade
                     var useTime = (DateTime.Now - begin).TotalSeconds;
                     if (useTime >= 30)
                     {
-                        if (useTime > 60)
+                        if (useTime > 70)
                         {
                             logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
                         }

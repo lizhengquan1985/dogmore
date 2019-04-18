@@ -676,6 +676,10 @@ namespace DogRunService
                 if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
+                    if(orderMatchResult == null || orderMatchResult.Data == null)
+                    {
+                        return;
+                    }
                     decimal maxPrice = 0;
                     foreach (var item in orderMatchResult.Data)
                     {

@@ -100,8 +100,8 @@ namespace DogService
         {
             try
             {
-                var max = (decimal)1.10;
-                var min = (decimal)1.06;
+                var max = (decimal)1.095;
+                var min = (decimal)1.065;
                 var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (control == null)
                 {

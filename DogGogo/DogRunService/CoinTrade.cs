@@ -108,7 +108,7 @@ namespace DogRunService
             var accountId = account.MainAccountId;
             var userName = account.UserName;
             var nowPrice = analyzeResult.NowPrice;
-            ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.04);
+            ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.05);
 
             if (!analyzeResult.CheckCanBuyForHuiDiao())
             {

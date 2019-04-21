@@ -30,9 +30,9 @@ namespace DogApi.Controller
                 // 默认 1.05, 
                 dogControl.SymbolLevel = Math.Max(0, dogControl.SymbolLevel);
                 dogControl.SymbolLevel = Math.Min(20, dogControl.SymbolLevel);
-                if (dogControl.LadderBuyPercent < (decimal)(1.05 + 0.001 * dogControl.SymbolLevel))
+                if (dogControl.LadderBuyPercent < (decimal)(1.06 + 0.001 * dogControl.SymbolLevel))
                 {
-                    dogControl.LadderBuyPercent = (decimal)(1.05 + 0.001 * dogControl.SymbolLevel);
+                    dogControl.LadderBuyPercent = (decimal)(1.06 + 0.001 * dogControl.SymbolLevel);
                 }
 
                 dogControl.UpIndex = Math.Max(0, dogControl.UpIndex);
@@ -361,11 +361,11 @@ namespace DogApi.Controller
                         }
                         else if (closeDic.ContainsKey(item.BaseCurrency))
                         {
-                            inDB.EmptyPrice = closeDic[item.BaseCurrency] * 2;
+                            inDB.EmptyPrice = closeDic[item.BaseCurrency] * 3;
                             inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax);
-                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, 2 * inDB.HistoryMin);
-                            inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.065);
-                            inDB.LadderBuyPercent = Math.Min(inDB.LadderBuyPercent, (decimal)1.095);
+                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, 3 * inDB.HistoryMin);
+                            inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.07);
+                            inDB.LadderBuyPercent = Math.Min(inDB.LadderBuyPercent, (decimal)1.09);
                             inDB.LadderSellPercent = Math.Min(inDB.LadderSellPercent, (decimal)1.25);
                             inDB.LadderSellPercent = Math.Max(inDB.LadderSellPercent, (decimal)1.15);
                             await new DogControlDao().CreateDogControl(inDB);

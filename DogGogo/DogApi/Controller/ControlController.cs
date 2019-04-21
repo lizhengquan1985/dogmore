@@ -362,7 +362,7 @@ namespace DogApi.Controller
                         else if (closeDic.ContainsKey(item.BaseCurrency))
                         {
                             inDB.EmptyPrice = closeDic[item.BaseCurrency] * 3;
-                            inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax);
+                            inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax * (decimal)1.2);
                             inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, 3 * inDB.HistoryMin);
                             inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.07);
                             inDB.LadderBuyPercent = Math.Min(inDB.LadderBuyPercent, (decimal)1.09);

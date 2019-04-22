@@ -390,7 +390,7 @@ namespace DogRunService
                     if (symbol.BaseCurrency == "hpt")
                     {
                         var count = new DogEmptySellDao().GetCountSell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                        sellQuantity = 100 + count * 8;
+                        sellQuantity = 200 + count * 10;
                     }
                     SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:{devide}");
                 }

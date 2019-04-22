@@ -387,6 +387,11 @@ namespace DogRunService
 
                     // 出售
                     decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
+                    if (symbol.BaseCurrency == "hpt")
+                    {
+                        var count = new DogEmptySellDao().GetCountSell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
+                        sellQuantity = 100 + count * 8;
+                    }
                     SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:{devide}");
                 }
                 catch (Exception ex)
@@ -676,7 +681,7 @@ namespace DogRunService
                 if (orderDetail.Status == "ok" && orderDetail.Data.state == "filled")
                 {
                     var orderMatchResult = api.QueryOrderMatchResult(orderId);
-                    if(orderMatchResult == null || orderMatchResult.Data == null)
+                    if (orderMatchResult == null || orderMatchResult.Data == null)
                     {
                         return;
                     }

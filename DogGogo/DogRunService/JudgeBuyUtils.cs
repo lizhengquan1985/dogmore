@@ -27,13 +27,17 @@ namespace DogRunService
         public static bool ControlCanSell(string symbolName, string quoteCurrency, List<HistoryKline> historyKlines, decimal nowPrice)
         {
             var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-            if (control == null || control.HistoryMin <= 0)
+            if (control == null || control.HistoryMin <= 0 || control.EmptyPrice <= 0)
             {
                 // 未管控的不能操作
                 return false;
             }
 
-            if (nowPrice <= control.EmptyPrice || nowPrice < control.HistoryMin * 2)
+            if (nowPrice <= control.EmptyPrice
+                || (quoteCurrency == "usdt" && nowPrice < control.HistoryMin * 2)
+                || (quoteCurrency == "btc" && nowPrice < control.HistoryMin * (decimal)1.5)
+                || (quoteCurrency == "eth" && nowPrice < control.HistoryMin * (decimal)1.5)
+                || (quoteCurrency == "ht" && nowPrice < control.HistoryMin * (decimal)1.5))
             {
                 return false;
             }
@@ -47,7 +51,7 @@ namespace DogRunService
                 return true;
             }
 
-            if(nowPrice <= (control.HistoryMax - control.HistoryMin) * (decimal)0.6 + control.HistoryMin)
+            if(nowPrice <= (control.HistoryMax - control.HistoryMin) * (decimal)0.2 + control.HistoryMin)
             {
                 return false;
             }

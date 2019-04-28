@@ -30,9 +30,9 @@ namespace DogApi.Controller
                 // 默认 1.05, 
                 dogControl.SymbolLevel = Math.Max(0, dogControl.SymbolLevel);
                 dogControl.SymbolLevel = Math.Min(20, dogControl.SymbolLevel);
-                if (dogControl.LadderBuyPercent < (decimal)(1.06 + 0.001 * dogControl.SymbolLevel))
+                if (dogControl.LadderBuyPercent < (decimal)(1.07 + 0.0003 * dogControl.SymbolLevel))
                 {
-                    dogControl.LadderBuyPercent = (decimal)(1.06 + 0.001 * dogControl.SymbolLevel);
+                    dogControl.LadderBuyPercent = (decimal)(1.07 + 0.0003 * dogControl.SymbolLevel);
                 }
 
                 dogControl.UpIndex = Math.Max(0, dogControl.UpIndex);

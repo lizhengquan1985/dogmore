@@ -86,7 +86,7 @@ namespace DogRunService.Helper
             {
                 return false;
             }
-            if (quoteCurrency == "btc" && balance - notShougeEmptySellAmount < (decimal)0.0006)
+            if (quoteCurrency == "btc" && balance - notShougeEmptySellAmount < (decimal)0.0004)
             {
                 return false;
             }

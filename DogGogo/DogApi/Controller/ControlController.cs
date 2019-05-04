@@ -364,6 +364,11 @@ namespace DogApi.Controller
                             inDB.EmptyPrice = closeDic[item.BaseCurrency] * 3;
                             inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax * (decimal)1.2);
                             inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, 3 * inDB.HistoryMin);
+                            if (item.QuoteCurrency == "btc" || item.QuoteCurrency == "eth")
+                            {
+                                var max = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(item.QuoteCurrency, item.BaseCurrency);
+                                inDB.MaxInputPrice = Math.Min(inDB.MaxInputPrice, max);
+                            }
                             inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.07);
                             inDB.LadderBuyPercent = Math.Min(inDB.LadderBuyPercent, (decimal)1.09);
                             inDB.LadderSellPercent = Math.Min(inDB.LadderSellPercent, (decimal)1.25);

@@ -43,7 +43,7 @@ namespace DogRunService
             }
             var idDate = Utils.GetDateById(historyKlines[0].Id);
             // 判断最小购买的价格是否接近， 如果接近，再去获取一次
-            if (refresh && idDate > DateTime.Now.AddSeconds(-120))
+            if (refresh && (idDate > DateTime.Now.AddSeconds(-120) || idDate < DateTime.Now.AddSeconds(-900)))
             {
                 KlineUtils.InitMarketInDB(0, symbol);
                 historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);

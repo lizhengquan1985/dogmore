@@ -211,7 +211,7 @@ namespace DogRunService.Helper
                     var lastKline = lastKlines.Find(it => it.Id == maxId);
                     if (smallBuy != null && (lastKline.Close / buyTradePrice > (decimal)1.07 || buyTradePrice / lastKline.Close > (decimal)1.07))
                     {
-                        Console.WriteLine($"---> 这个币快要收割或者需要做多 {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} Close：{lastKlines[0].Close},BuyTradePrice：{smallBuy.BuyTradePrice}");
+                        //Console.WriteLine($"---> 这个币快要收割或者需要做多 {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} Close：{lastKlines[0].Close},BuyTradePrice：{smallBuy.BuyTradePrice}");
                         nearSellOrBuy = true;
                     }
                     if (!nearSellOrBuy)

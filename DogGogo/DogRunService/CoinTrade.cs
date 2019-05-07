@@ -378,7 +378,7 @@ namespace DogRunService
                         (symbol.QuoteCurrency == "usdt" && sellQuantity * nowPrice < (decimal)1.0)
                         || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.001)
                         || (symbol.QuoteCurrency == "etc" && sellQuantity * nowPrice < (decimal)0.005)
-                        || (symbol.QuoteCurrency == "ht" && sellQuantity * nowPrice < (decimal)0.8)
+                        || (symbol.QuoteCurrency == "ht" && sellQuantity * nowPrice < (decimal)0.2)
                         )
                     {
                         Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做空不超过{sellQuantity * nowPrice},, sellQuantity: {sellQuantity},  nowPrice:{nowPrice}");

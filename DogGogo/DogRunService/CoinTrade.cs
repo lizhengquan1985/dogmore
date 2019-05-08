@@ -22,7 +22,7 @@ namespace DogRunService
 
         public static void Run(int index, CommonSymbol symbol)
         {
-            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol, true);
+            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
                 return;
@@ -336,8 +336,6 @@ namespace DogRunService
                     var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
                     if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * emptyLadder)
                     {
-                        // 上一次还没收割得，相差10%， 要等等
-                        Console.WriteLine($"---> doempty no emptyLadder   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                         continue;
                     }
 
@@ -355,31 +353,21 @@ namespace DogRunService
                     var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
                     // 要减去未收割得。
                     var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
-                    if (
-                        (symbol.QuoteCurrency == "usdt" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)6.5)
-                        || (symbol.QuoteCurrency == "btc" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.002)
-                        || (symbol.QuoteCurrency == "eth" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.02)
-                        || (symbol.QuoteCurrency == "ht" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)2.2)
-                        )
-                    {
-                        Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},余量{(balanceItem.balance - notShougeQuantity) * nowPrice}不多， 不适合做空, balance: {balanceItem.balance},  notShougeQuantity:{notShougeQuantity}, nowPrice：{nowPrice}");
-                        continue;
-                    }
 
-                    var devide = DogControlUtils.GetRecommendDivideForEmpty(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice, (balanceItem.balance - notShougeQuantity));
-                    decimal sellQuantity = (balanceItem.balance - notShougeQuantity) / devide;
+                    var baseSellQuantity = (balanceItem.balance - notShougeQuantity) / 60;
+
+                    // 出售
+                    decimal sellPrice = decimal.Round(nowPrice * (decimal)0.988, symbol.PricePrecision);
+
+                    // 阶梯有数量差别
+                    var count = new DogEmptySellDao().GetCountSell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
+                    decimal sellQuantity = baseSellQuantity * (1 + count / (decimal)40);
                     sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
 
-                    if (!CoinUtils.IsBiggerThenLeast(symbol.BaseCurrency, symbol.QuoteCurrency, sellQuantity))
-                    {
-                        Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做空数量太少，不符合最小交易额度");
-                        continue;
-                    }
-
                     if (
-                        (symbol.QuoteCurrency == "usdt" && sellQuantity * nowPrice < (decimal)1.0)
+                        (symbol.QuoteCurrency == "usdt" && sellQuantity * nowPrice < (decimal)0.8)
                         || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.0001)
-                        || (symbol.QuoteCurrency == "eth" && sellQuantity * nowPrice < (decimal)0.005)
+                        || (symbol.QuoteCurrency == "eth" && sellQuantity * nowPrice < (decimal)0.004)
                         || (symbol.QuoteCurrency == "ht" && sellQuantity * nowPrice < (decimal)0.5)
                         )
                     {
@@ -387,14 +375,7 @@ namespace DogRunService
                         continue;
                     }
 
-                    // 出售
-                    decimal sellPrice = decimal.Round(nowPrice * (decimal)0.988, symbol.PricePrecision);
-                    if (symbol.BaseCurrency == "hpt")
-                    {
-                        var count = new DogEmptySellDao().GetCountSell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                        sellQuantity = 200 + count * 10;
-                    }
-                    SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:{devide}");
+                    SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:");
                 }
                 catch (Exception ex)
                 {

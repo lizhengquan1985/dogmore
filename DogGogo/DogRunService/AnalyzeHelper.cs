@@ -34,21 +34,21 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="isBuy"></param>
         /// <returns></returns>
-        public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol, bool refresh = false)
+        public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol)
         {
-            var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-            if (historyKlines == null || historyKlines.Count == 0)
-            {
-                return null;
-            }
-            var idDate = Utils.GetDateById(historyKlines[0].Id);
+            //var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+            //if (historyKlines == null || historyKlines.Count == 0)
+            //{
+            //    return null;
+            //}
+            //var idDate = Utils.GetDateById(historyKlines[0].Id);
             // 判断最小购买的价格是否接近， 如果接近，再去获取一次
-            if (refresh && (idDate > DateTime.Now.AddSeconds(-120) || idDate < DateTime.Now.AddSeconds(-900)))
-            {
-                KlineUtils.InitMarketInDB(0, symbol);
-                historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-                idDate = Utils.GetDateById(historyKlines[0].Id);
-            }
+            //if (refresh && (idDate > DateTime.Now.AddSeconds(-120) || idDate < DateTime.Now.AddSeconds(-900)))
+            //{
+            KlineUtils.InitMarketInDB(0, symbol);
+            var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+            var idDate = Utils.GetDateById(historyKlines[0].Id);
+            //}
 
             var now = DateTime.Now;
             if (historyKlines == null

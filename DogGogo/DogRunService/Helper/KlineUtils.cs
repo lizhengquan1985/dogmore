@@ -187,7 +187,7 @@ namespace DogRunService.Helper
                 var dogEmptySellDao = new DogEmptySellDao();
 
                 // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
-                var lastKlines = dao.ListKlines(symbol.QuoteCurrency, symbol.BaseCurrency, 20);
+                //var lastKlines = dao.ListKlines(symbol.QuoteCurrency, symbol.BaseCurrency, 20);
 
                 //int minutes = Math.Max(8, dogControl.SymbolLevel);
                 //var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-minutes)).Count;
@@ -232,7 +232,15 @@ namespace DogRunService.Helper
 
                 PlatformApi api = PlatformApi.GetInstance("xx"); // 下面api和角色无关. 随便指定一个xx
                 var period = "1min";
-                var count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes) + 5;
+                var count = 0;
+                if (last24Klines.Count > 0)
+                {
+                    count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes) + 5;
+                }
+                else
+                {
+                    count = 1000;
+                }
                 //if (last24Klines.Count > 0 && (DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes >= count)
                 //{
                 //    count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes) + 1;
@@ -275,7 +283,7 @@ namespace DogRunService.Helper
                 }
                 begin = DateTime.Now;
 
-                var findList = lastKlines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
+                var findList = last24Klines.FindAll(it => klines.Find(item => item.Id == it.Id) != null).ToList();
 
                 klines.Sort((a, b) => (int)(a.Id - b.Id));
                 foreach (var kline in klines)

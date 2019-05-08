@@ -188,8 +188,6 @@ namespace DogRunService.Helper
 
                 // 去数据库中拉取数据， 判断是否超过5分钟，  或者是否离目标差4%，
                 var lastKlines = dao.ListKlines(symbol.QuoteCurrency, symbol.BaseCurrency, 20);
-                //var last24Klines = dao.List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-                //var lastKlines = last24Klines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-60)).Take(20).ToList();
 
                 int minutes = Math.Max(8, dogControl.SymbolLevel);
                 var minutesAfterCount = lastKlines.FindAll(it => Utils.GetDateById(it.Id) > DateTime.Now.AddMinutes(-minutes)).Count;
@@ -211,7 +209,6 @@ namespace DogRunService.Helper
                     var lastKline = lastKlines.Find(it => it.Id == maxId);
                     if (smallBuy != null && (lastKline.Close / buyTradePrice > (decimal)1.07 || buyTradePrice / lastKline.Close > (decimal)1.07))
                     {
-                        //Console.WriteLine($"---> 这个币快要收割或者需要做多 {index + 1}{symbol.BaseCurrency}{symbol.QuoteCurrency} Close：{lastKlines[0].Close},BuyTradePrice：{smallBuy.BuyTradePrice}");
                         nearSellOrBuy = true;
                     }
                     if (!nearSellOrBuy)
@@ -238,7 +235,7 @@ namespace DogRunService.Helper
                 var count = minutes + 2;
                 if (last24Klines.Count > 0 && (DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes >= count)
                 {
-                    count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes);
+                    count = (int)((DateTime.Now - Utils.GetDateById(last24Klines.Max(it => it.Id))).TotalMinutes) + 1;
                     if (count > 1000)
                     {
                         count = 1000;

@@ -330,11 +330,7 @@ namespace DogRunService
                 try
                 {
                     Console.WriteLine($"---> before doempty {userName}   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
-                    if (!analyzeResult.CheckCanSellForHuiDiao())
-                    {
-                        Console.WriteLine($"---> doempty no huidiao   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
-                        continue;
-                    }
+
                     // 和上次做空价格要相差8%
                     var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
                     var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
@@ -342,6 +338,12 @@ namespace DogRunService
                     {
                         // 上一次还没收割得，相差10%， 要等等
                         Console.WriteLine($"---> doempty no emptyLadder   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
+                        continue;
+                    }
+
+                    if (!(analyzeResult.CheckCanSellForHuiDiao() || (maxSellTradePrice != null && nowPrice > maxSellTradePrice * (decimal)1.15)))
+                    {
+                        Console.WriteLine($"---> doempty no huidiao   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                         continue;
                     }
 
@@ -356,7 +358,7 @@ namespace DogRunService
                     if (
                         (symbol.QuoteCurrency == "usdt" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)6.5)
                         || (symbol.QuoteCurrency == "btc" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.002)
-                        || (symbol.QuoteCurrency == "etc" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.02)
+                        || (symbol.QuoteCurrency == "eth" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)0.02)
                         || (symbol.QuoteCurrency == "ht" && (balanceItem.balance - notShougeQuantity) * nowPrice < (decimal)2.2)
                         )
                     {
@@ -376,9 +378,9 @@ namespace DogRunService
 
                     if (
                         (symbol.QuoteCurrency == "usdt" && sellQuantity * nowPrice < (decimal)1.0)
-                        || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.001)
-                        || (symbol.QuoteCurrency == "etc" && sellQuantity * nowPrice < (decimal)0.005)
-                        || (symbol.QuoteCurrency == "ht" && sellQuantity * nowPrice < (decimal)0.2)
+                        || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.0001)
+                        || (symbol.QuoteCurrency == "eth" && sellQuantity * nowPrice < (decimal)0.005)
+                        || (symbol.QuoteCurrency == "ht" && sellQuantity * nowPrice < (decimal)0.5)
                         )
                     {
                         Console.WriteLine($"    {symbol.BaseCurrency}{symbol.QuoteCurrency},做空不超过{sellQuantity * nowPrice},, sellQuantity: {sellQuantity},  nowPrice:{nowPrice}");
@@ -386,7 +388,7 @@ namespace DogRunService
                     }
 
                     // 出售
-                    decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
+                    decimal sellPrice = decimal.Round(nowPrice * (decimal)0.988, symbol.PricePrecision);
                     if (symbol.BaseCurrency == "hpt")
                     {
                         var count = new DogEmptySellDao().GetCountSell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);

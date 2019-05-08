@@ -361,9 +361,9 @@ namespace DogApi.Controller
                         }
                         else if (closeDic.ContainsKey(item.BaseCurrency))
                         {
-                            inDB.EmptyPrice = closeDic[item.BaseCurrency] * 3;
                             inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax * (decimal)1.2);
-                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, 3 * inDB.HistoryMin);
+                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, (decimal)1.5 * inDB.HistoryMin);
+                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, inDB.HistoryMin + (decimal)0.2 * (inDB.HistoryMax - inDB.HistoryMin));
                             if (item.QuoteCurrency == "btc" || item.QuoteCurrency == "eth")
                             {
                                 var max = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(item.QuoteCurrency, item.BaseCurrency);

@@ -269,9 +269,9 @@ namespace DogRunService.Helper
 
                 // 记录下， 获取api数据太长的数据
                 var totalMilliseconds = (DateTime.Now - begin).TotalMilliseconds;
-                if (totalMilliseconds > 5 * 1000)
+                if (totalMilliseconds > 3 * 1000)
                 {
-                    logger.Error($"一次请求时间太长,达到：{totalMilliseconds}ms");
+                    logger.Error($"一次请求时间太长,达到：{totalMilliseconds}ms， 请求数量：{count}, {symbol.BaseCurrency + symbol.QuoteCurrency}");
                 }
                 begin = DateTime.Now;
 

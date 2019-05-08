@@ -47,6 +47,10 @@ namespace DogRunService
             //{
             KlineUtils.InitMarketInDB(0, symbol);
             var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+            if(historyKlines == null || historyKlines.Count < 100)
+            {
+                return null;
+            }
             var idDate = Utils.GetDateById(historyKlines[0].Id);
             //}
 

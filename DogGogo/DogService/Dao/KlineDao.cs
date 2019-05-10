@@ -112,6 +112,12 @@ namespace DogService.Dao
             return Database.Query<decimal?>(sql, new { id = Utils.GetIdByDate(date) }).FirstOrDefault();
         }
 
+        public HistoryKline GetLastKline(string quoteCurrency, string baseCurrency)
+        {
+            var sql = $"select * from t_{quoteCurrency}_{baseCurrency} order by Id desc limit 0,1";
+            return Database.Query<HistoryKline>(sql).FirstOrDefault();
+        }
+
         public List<HistoryKline> List20Kline(string quoteCurrency, string baseCurrency)
         {
             var date = DateTime.Now.AddMinutes(-60);

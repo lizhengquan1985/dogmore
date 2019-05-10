@@ -97,7 +97,7 @@ namespace DogService.Dao
         public void UpdateDogMoreBuySuccess(long buyOrderId, decimal buyQuantity, HBResponse<OrderDetail> orderDetail, HBResponse<List<OrderMatchResult>> orderMatchResult, decimal buyTradePrice)
         {
             var results = JsonConvert.SerializeObject(orderMatchResult);
-            if(results.Length > 8000)
+            if (results.Length > 8000)
             {
                 logger.Error($"{results}");
                 results = results.Substring(0, 8000);

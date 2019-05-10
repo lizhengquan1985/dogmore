@@ -23,7 +23,16 @@ namespace DogRunService
         public static void Run(int index, CommonSymbol symbol)
         {
             // 先获取最近的数据， 看看是否靠近购入，卖出
-
+            var minDogMoreBuy = new DogMoreBuyDao().GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);
+            var maxDogEmptySell = new DogEmptySellDao().GetBiggestDogEmptySell(symbol.QuoteCurrency, symbol.BaseCurrency);
+            var lastKline = new KlineDao().GetLastKline(symbol.QuoteCurrency, symbol.BaseCurrency);
+            // 如果kline是3分钟内的，并且价格相差不到5%， 则不考虑
+            if (Utils.GetDateById(lastKline.Id) > DateTime.Now.AddMinutes(-3)
+                && minDogMoreBuy != null && minDogMoreBuy.BuyOrderPrice / lastKline.Close < (decimal)1.05  && lastKline.Close / minDogMoreBuy.BuyOrderPrice < (decimal)1.05
+                && maxDogEmptySell != null && maxDogEmptySell.SellOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / maxDogEmptySell.SellOrderPrice < (decimal)1.05)
+            {
+                return;
+            }
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)

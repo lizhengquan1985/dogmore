@@ -116,7 +116,7 @@ namespace AutoTrade
                         try
                         {
                             CoinTrade.Run(i, symbol);
-                            Thread.Sleep(300);
+                            Thread.Sleep(500);
                         }
                         catch (Exception ex)
                         {

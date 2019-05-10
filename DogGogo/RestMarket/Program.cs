@@ -111,23 +111,7 @@ namespace RestMarket
                             logger.Error("RunCoin:  " + ex.Message, ex);
                         }
 
-                        // 暂停100毫秒
-                        Thread.Sleep(50);
-                    }
-
-                    var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime > 80)
-                    {
-                        logger.Error($"一轮总共耗时：{useTime}秒");
-                    }
-                    else
-                    {
-                        //if (useTime > 30)
-                        //{
-                        //    Console.WriteLine($"一轮总共耗时：{useTime}秒");
-                        //}
-
-                        Thread.Sleep((50 - (int)useTime) * 1000);
+                        Thread.Sleep(500);
                     }
                 }
             });

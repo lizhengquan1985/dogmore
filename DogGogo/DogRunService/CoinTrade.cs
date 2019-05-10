@@ -22,6 +22,9 @@ namespace DogRunService
 
         public static void Run(int index, CommonSymbol symbol)
         {
+            // 先获取最近的数据， 看看是否靠近购入，卖出
+
+
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {

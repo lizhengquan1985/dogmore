@@ -125,23 +125,15 @@ namespace AutoTrade
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime >= 30)
+                    if (useTime >= 100)
                     {
-                        if (useTime > 70)
-                        {
-                            logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
-                        Thread.Sleep(1000 * (30 - (int)useTime));
+                        logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
                     }
 
                     if (DateTime.Now.Hour == 0 || DateTime.Now.Hour == 4 || DateTime.Now.Hour == 8
                         || DateTime.Now.Hour == 12 || DateTime.Now.Hour == 16 || DateTime.Now.Hour == 20)
                     {
-                        if (DateTime.Now.Minute < 2)
+                        if (DateTime.Now.Minute < 25)
                         {
                             new DogOrderStatDao().AddStatRecord();
                         }

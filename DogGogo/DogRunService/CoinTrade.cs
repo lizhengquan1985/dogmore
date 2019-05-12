@@ -27,10 +27,12 @@ namespace DogRunService
             var maxDogEmptySell = new DogEmptySellDao().GetBiggestDogEmptySell(symbol.QuoteCurrency, symbol.BaseCurrency);
             var lastKline = new KlineDao().GetLastKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             // 如果kline是3分钟内的，并且价格相差不到5%， 则不考虑
-            if (Utils.GetDateById(lastKline.Id) > DateTime.Now.AddMinutes(-3)
-                && minDogMoreBuy != null && minDogMoreBuy.BuyOrderPrice / lastKline.Close < (decimal)1.05  && lastKline.Close / minDogMoreBuy.BuyOrderPrice < (decimal)1.05
-                && maxDogEmptySell != null && maxDogEmptySell.SellOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / maxDogEmptySell.SellOrderPrice < (decimal)1.05)
+            if (lastKline != null && Utils.GetDateById(lastKline.Id) > DateTime.Now.AddMinutes(-3)
+                && !(minDogMoreBuy == null && maxDogEmptySell == null) 
+                && (minDogMoreBuy == null || minDogMoreBuy.BuyOrderPrice / lastKline.Close < (decimal)1.05  && lastKline.Close / minDogMoreBuy.BuyOrderPrice < (decimal)1.05)
+                && (maxDogEmptySell == null || maxDogEmptySell.SellOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / maxDogEmptySell.SellOrderPrice < (decimal)1.05))
             {
+                Console.WriteLine("3分钟内还没价格波动");
                 return;
             }
 

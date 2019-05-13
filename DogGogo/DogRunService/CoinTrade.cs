@@ -89,7 +89,7 @@ namespace DogRunService
                 {
                     try
                     {
-                        ShouGeDogEmpty(dogEmptySellItem, symbol, analyzeResult, ladderBuyPercent);
+                        ShouGeDogEmpty(dogEmptySellItem, symbol, analyzeResult);
                     }
                     catch (Exception ex)
                     {
@@ -221,12 +221,10 @@ namespace DogRunService
 
         }
 
-        public static string ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, decimal ladderBuyPercent)
+        public static string ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult)
         {
-            ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.04);
-            ladderBuyPercent = Math.Min(ladderBuyPercent, (decimal)1.12);
             var nowPrice = analyzeResult.NowPrice;
-            if (nowPrice * ladderBuyPercent > dogEmptySell.SellTradePrice)
+            if (nowPrice * ladderEmptyBuyPercent > dogEmptySell.SellTradePrice)
             {
                 Console.WriteLine("没有收益，不能收割");
                 return "没有收益，不能收割";
@@ -644,7 +642,7 @@ namespace DogRunService
 
             try
             {
-                BuyWhenDoMore(symbol, account, analyzeResult, ladderBuyPercent);
+                BuyWhenDoMore(symbol, account, analyzeResult);
             }
             catch (Exception ex)
             {

@@ -88,6 +88,7 @@ namespace DogPlatform
         #region 公共接口
         private const string API_COMMON_CURRENCYS = "/v1/common/currencys";
         private const string API_COMMON_SYMBOLS = "/v1/common/symbols";
+        private const string API_market_tickers = "/market/tickers";
 
         public List<string> GetCommonCurrencys()
         {
@@ -98,6 +99,12 @@ namespace DogPlatform
         public List<CommonSymbol> GetCommonSymbols()
         {
             var result = SendRequestNoSignature<List<CommonSymbol>>(API_COMMON_SYMBOLS);
+            return result.Data;
+        }
+
+        public List<Ticker> GetTickers()
+        {
+            var result = SendRequestNoSignature<List<Ticker>>(API_market_tickers);
             return result.Data;
         }
 

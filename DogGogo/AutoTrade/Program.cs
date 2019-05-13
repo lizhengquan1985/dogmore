@@ -110,12 +110,13 @@ namespace AutoTrade
                 while (true)
                 {
                     var begin = DateTime.Now;
+                    var tickers = PlatformApi.GetInstance("xx").GetTickers();
                     for (var i = 0; i < symbols.Count; i++)
                     {
                         var symbol = symbols[i];
                         try
                         {
-                            var bl = CoinTrade.Run(i, symbol);
+                            var bl = CoinTrade.Run(i, symbol, tickers);
                             if (bl)
                             {
                                 Thread.Sleep(550);

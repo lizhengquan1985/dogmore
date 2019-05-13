@@ -25,11 +25,38 @@ namespace DogRunService
 
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
 
-        public static bool Run(int index, CommonSymbol symbol)
+        public static bool Run(int index, CommonSymbol symbol, List<Ticker> tickers)
         {
             // 先获取最近的数据， 看看是否靠近购入，卖出
             var minDogMoreBuy = new DogMoreBuyDao().GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);
             var maxDogEmptySell = new DogEmptySellDao().GetBiggestDogEmptySell(symbol.QuoteCurrency, symbol.BaseCurrency);
+            var findTicker = tickers.Find(it => it.symbol == symbol.BaseCurrency + symbol.QuoteCurrency);
+            if (findTicker == null)
+            {
+                throw new ApplicationException("errrrr");
+            }
+            var control = new DogControlDao().GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
+            if (control == null)
+            {
+                return false;
+            }
+            var maySell = false;
+            var mayBuy = false;
+            if (maxDogEmptySell != null &&
+                (maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.072 || findTicker.close / maxDogEmptySell.SellOrderPrice > (decimal)1.072))
+            {
+                maySell = true;
+            }
+            if (minDogMoreBuy != null &&
+               (minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.072 || findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.072))
+            {
+                mayBuy = true;
+            }
+            if (!mayBuy && !maySell)
+            {
+                return false;
+            }
+
             var lastKline = new KlineDao().GetLastKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             // 如果kline是3分钟内的，并且价格相差不到5%， 则不考虑
             if (lastKline != null && Utils.GetDateById(lastKline.Id) > DateTime.Now.AddMinutes(-3)
@@ -309,7 +336,7 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             var userNames = UserPools.GetAllUserName();
-             
+
 
             // 多单的自动波动收割
             foreach (var userName in userNames)
@@ -458,7 +485,7 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol )
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol)
         {
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)

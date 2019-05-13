@@ -41,4 +41,20 @@ namespace DogPlatform.Model
         /// </summary>
         public decimal LeastBuyQuantity { get; set; }
     }
+
+    /// <summary>
+    /// {"open":0.396338,"close":0.408307,"low":0.395745,"high":0.414551,"amount":1250.7924232536443,"count":5198,
+    /// "vol":500.2103917836005,"symbol":"xmreth"}
+    /// </summary>
+    public class Ticker
+    {
+        public decimal open { get; set; }
+        public decimal close { get; set; }
+        public decimal low { get; set; }
+        public decimal high { get; set; }
+        public decimal amount { get; set; }
+        public decimal count { get; set; }
+        public decimal vol { get; set; }
+        public string symbol { get; set; }
+    }
 }

@@ -46,7 +46,7 @@ namespace DogRunService.Helper
                                 KlineUtils.InitKlineInToPool(symbol);
                             }
 
-                            CoinTrade.Run(i, symbol);
+                            //CoinTrade.Run(i, symbol);
 
                         }
                         catch (Exception ex)

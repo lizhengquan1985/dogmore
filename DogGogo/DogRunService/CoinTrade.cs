@@ -40,6 +40,18 @@ namespace DogRunService
             {
                 return false;
             }
+
+            new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice
+            {
+                NowPrice = findTicker.close,
+                NowTime = Utils.GetIdByDate(DateTime.Now),
+                QuoteCurrency = symbol.QuoteCurrency,
+                SymbolName = symbol.BaseCurrency,
+                TodayMaxPrice = 0,
+                TodayMinPrice = 0,
+                NearMaxPrice = 0
+            });
+
             var maySell = false;
             var mayBuy = false;
             if (maxDogEmptySell != null &&

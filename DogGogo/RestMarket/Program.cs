@@ -111,7 +111,7 @@ namespace RestMarket
                             logger.Error("RunCoin:  " + ex.Message, ex);
                         }
 
-                        Thread.Sleep(600);
+                        Thread.Sleep(1000);
                     }
                 }
             });

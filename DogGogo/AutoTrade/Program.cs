@@ -131,6 +131,9 @@ namespace AutoTrade
                     var useTime = (DateTime.Now - begin).TotalSeconds;
                     logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
 
+
+                    Thread.Sleep(2000);
+
                     if (DateTime.Now.Hour == 0 || DateTime.Now.Hour == 4 || DateTime.Now.Hour == 8
                         || DateTime.Now.Hour == 12 || DateTime.Now.Hour == 16 || DateTime.Now.Hour == 20)
                     {

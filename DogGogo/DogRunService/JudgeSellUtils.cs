@@ -165,10 +165,7 @@ namespace DogRunService
             }
 
             // 作用是,价格越高,则收割的量越多
-            var position = DogControlUtils.GetLadderPosition(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-            position += (decimal)0.15;
-            position = Math.Max(position, (decimal)0.45);
-            position = Math.Min(position, (decimal)0.85);
+            var position = (decimal)0.66;
 
             // 作用是,价格越高,则收割的量越多
             decimal sellQuantity = buyQuantity * buyTradePrice / nowPrice;

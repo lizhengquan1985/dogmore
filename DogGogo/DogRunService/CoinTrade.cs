@@ -18,6 +18,11 @@ namespace DogRunService
 {
     public class CoinTrade
     {
+        public static decimal ladderMoreBuyPercent = (decimal)1.078;
+        public static decimal ladderMoreSellPercent = (decimal)1.11;
+        private static decimal ladderEmptySellPercent = (decimal)1.088;
+        private static decimal ladderEmptyBuyPercent = (decimal)1.10;
+
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
 
         public static bool Run(int index, CommonSymbol symbol)
@@ -28,8 +33,8 @@ namespace DogRunService
             var lastKline = new KlineDao().GetLastKline(symbol.QuoteCurrency, symbol.BaseCurrency);
             // 如果kline是3分钟内的，并且价格相差不到5%， 则不考虑
             if (lastKline != null && Utils.GetDateById(lastKline.Id) > DateTime.Now.AddMinutes(-3)
-                && !(minDogMoreBuy == null && maxDogEmptySell == null) 
-                && (minDogMoreBuy == null || minDogMoreBuy.BuyOrderPrice / lastKline.Close < (decimal)1.05  && lastKline.Close / minDogMoreBuy.BuyOrderPrice < (decimal)1.05)
+                && !(minDogMoreBuy == null && maxDogEmptySell == null)
+                && (minDogMoreBuy == null || minDogMoreBuy.BuyOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / minDogMoreBuy.BuyOrderPrice < (decimal)1.05)
                 && (maxDogEmptySell == null || maxDogEmptySell.SellOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / maxDogEmptySell.SellOrderPrice < (decimal)1.05))
             {
                 Console.WriteLine("3分钟内还没价格波动");
@@ -69,7 +74,6 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             var userNames = UserPools.GetAllUserName();
-            var ladderBuyPercent = DogControlUtils.GetLadderBuy(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
 
             // 空单的自动波动收割
             foreach (var userName in userNames)
@@ -104,7 +108,7 @@ namespace DogRunService
             {
                 try
                 {
-                    BuyWhenDoMore(symbol, AccountConfigUtils.GetAccountConfig(userName), analyzeResult, ladderBuyPercent);
+                    BuyWhenDoMore(symbol, AccountConfigUtils.GetAccountConfig(userName), analyzeResult);
                 }
                 catch (Exception ex)
                 {
@@ -118,21 +122,14 @@ namespace DogRunService
         /// <param name="symbol"></param>
         /// <param name="userName"></param>
         /// <param name="accountId"></param>
-        public static void BuyWhenDoMore(CommonSymbol symbol, AccountConfig account, AnalyzeResult analyzeResult,
-            decimal ladderBuyPercent)
+        public static void BuyWhenDoMore(CommonSymbol symbol, AccountConfig account, AnalyzeResult analyzeResult)
         {
             var accountId = account.MainAccountId;
             var userName = account.UserName;
             var nowPrice = analyzeResult.NowPrice;
-            ladderBuyPercent = Math.Max(ladderBuyPercent, (decimal)1.05);
-
-            if (!analyzeResult.CheckCanBuyForHuiDiao())
-            {
-                throw new ApplicationException("没有正常回掉。");
-            }
 
             var dogMoreBuy = new DogMoreBuyDao().GetMinBuyPriceDataOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
-            if (dogMoreBuy != null && nowPrice * ladderBuyPercent > Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice))
+            if (dogMoreBuy != null && (nowPrice * ladderMoreBuyPercent > Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice)))
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
             }
@@ -314,7 +311,7 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             var userNames = UserPools.GetAllUserName();
-            decimal gaoyuPercentSell = DogControlUtils.GetLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice); //(decimal)1.035;
+             
 
             // 多单的自动波动收割
             foreach (var userName in userNames)
@@ -325,7 +322,7 @@ namespace DogRunService
                 {
                     try
                     {
-                        ShouGeDogMore(dogMoreBuyItem, symbol, gaoyuPercentSell);
+                        ShouGeDogMore(dogMoreBuyItem, symbol);
                     }
                     catch (Exception ex)
                     {
@@ -349,15 +346,9 @@ namespace DogRunService
 
                     // 和上次做空价格要相差8%
                     var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                    var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-                    if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * emptyLadder)
+                    //var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
+                    if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * ladderEmptySellPercent)
                     {
-                        continue;
-                    }
-
-                    if (!(analyzeResult.CheckCanSellForHuiDiao() || (maxSellTradePrice != null && nowPrice > maxSellTradePrice * (decimal)1.15)))
-                    {
-                        Console.WriteLine($"---> doempty no huidiao   {symbol.BaseCurrency},{symbol.QuoteCurrency}");
                         continue;
                     }
 
@@ -469,9 +460,8 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol, decimal sellPercent)
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol )
         {
-            sellPercent = Math.Max(sellPercent, (decimal)1.04);
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
@@ -481,7 +471,7 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             // 没有大于预期, 也不能收割
-            if (nowPrice < dogMoreBuy.BuyTradePrice * sellPercent)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * ladderMoreSellPercent)
             {
                 return;
             }
@@ -496,7 +486,7 @@ namespace DogRunService
             // 计算要出的数量
             decimal sellQuantity = JudgeSellUtils.CalcSellQuantityForMoreShouge(dogMoreBuy.BuyQuantity, dogMoreBuy.BuyTradePrice, nowPrice, symbol);
             // 计算要出的价格
-            decimal sellPrice = decimal.Round(nowPrice * (decimal)0.98, symbol.PricePrecision);
+            decimal sellPrice = decimal.Round(nowPrice * (decimal)0.988, symbol.PricePrecision);
             if (sellQuantity >= dogMoreBuy.BuyQuantity)
             {
                 Console.WriteLine("出售的量过多");

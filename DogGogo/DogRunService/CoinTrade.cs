@@ -20,7 +20,7 @@ namespace DogRunService
     {
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
 
-        public static void Run(int index, CommonSymbol symbol)
+        public static bool Run(int index, CommonSymbol symbol)
         {
             // 先获取最近的数据， 看看是否靠近购入，卖出
             var minDogMoreBuy = new DogMoreBuyDao().GetSmallestDogMoreBuy(symbol.QuoteCurrency, symbol.BaseCurrency);
@@ -33,13 +33,13 @@ namespace DogRunService
                 && (maxDogEmptySell == null || maxDogEmptySell.SellOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / maxDogEmptySell.SellOrderPrice < (decimal)1.05))
             {
                 Console.WriteLine("3分钟内还没价格波动");
-                return;
+                return false;
             }
 
             AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
             if (analyzeResult == null)
             {
-                return;
+                return false;
             }
             try
             {
@@ -60,6 +60,8 @@ namespace DogRunService
             {
                 logger.Error($"---> 出售异常: {JsonConvert.SerializeObject(symbol)}" + ex.Message, ex);
             }
+
+            return true;
         }
 
         private static void RunBuy(CommonSymbol symbol, AnalyzeResult analyzeResult)

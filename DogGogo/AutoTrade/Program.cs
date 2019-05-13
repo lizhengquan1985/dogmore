@@ -115,8 +115,11 @@ namespace AutoTrade
                         var symbol = symbols[i];
                         try
                         {
-                            CoinTrade.Run(i, symbol);
-                            Thread.Sleep(500);
+                            var bl = CoinTrade.Run(i, symbol);
+                            if (bl)
+                            {
+                                Thread.Sleep(550);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -125,10 +128,7 @@ namespace AutoTrade
                     }
 
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    if (useTime >= 100)
-                    {
-                        logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
-                    }
+                    logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
 
                     if (DateTime.Now.Hour == 0 || DateTime.Now.Hour == 4 || DateTime.Now.Hour == 8
                         || DateTime.Now.Hour == 12 || DateTime.Now.Hour == 16 || DateTime.Now.Hour == 20)

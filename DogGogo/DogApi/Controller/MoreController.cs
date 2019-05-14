@@ -198,7 +198,6 @@ namespace DogApi.Controller
                     {
                         continue;
                     }
-                    ladderBuyDic.Add(item.SymbolName, DogControlUtils.GetLadderBuy(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
                 }
 
                 var noBuy = symbols.Select(it => it.BaseCurrency).ToList();

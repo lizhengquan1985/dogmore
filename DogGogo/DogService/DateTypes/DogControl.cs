@@ -26,10 +26,6 @@ namespace DogService.DateTypes
         /// </summary>
         public decimal MaxInputPrice { get; set; }
         /// <summary>
-        /// 购买阶梯数， 2%~8%， 一般情况是3%
-        /// </summary>
-        public decimal LadderBuyPercent { get; set; }
-        /// <summary>
         /// 出售阶梯数， 2.5%~9%， 一般情况是3.5%
         /// </summary>
         public decimal LadderSellPercent { get; set; }
@@ -41,12 +37,6 @@ namespace DogService.DateTypes
 
         public decimal HistoryMax { get; set; }
         public decimal HistoryMin { get; set; }
-        public int UpIndex { get; set; }
-        public int DownIndex { get; set; }
-        /// <summary>
-        /// 层级,认可度, 0最大, 20 最小, 每降低一级别,是历史的5%
-        /// </summary>
-        public int SymbolLevel { get; set; }
     }
 
     [Table("t_dog_control")]

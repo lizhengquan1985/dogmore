@@ -27,35 +27,6 @@ namespace DogApi.Controller
         {
             try
             {
-                // 默认 1.05, 
-                dogControl.SymbolLevel = Math.Max(0, dogControl.SymbolLevel);
-                dogControl.SymbolLevel = Math.Min(20, dogControl.SymbolLevel);
-                if (dogControl.LadderBuyPercent < (decimal)(1.065 + 0.0003 * dogControl.SymbolLevel))
-                {
-                    dogControl.LadderBuyPercent = (decimal)(1.065 + 0.0003 * dogControl.SymbolLevel);
-                }
-
-                dogControl.UpIndex = Math.Max(0, dogControl.UpIndex);
-                dogControl.UpIndex = Math.Min(20, dogControl.UpIndex);
-
-                dogControl.DownIndex = Math.Max(0, dogControl.DownIndex);
-                dogControl.DownIndex = Math.Min(20, dogControl.DownIndex);
-
-                // 每点增加0.01
-                // usdt  1.08起售， 
-                // btc   1.05 
-                // eth   1.05 
-                // ht   1.05
-                if (dogControl.QuoteCurrency == "usdt")
-                {
-                    dogControl.LadderSellPercent = Math.Max((decimal)dogControl.LadderSellPercent, (decimal)(1.08 + dogControl.UpIndex * 0.01));
-                }
-                else
-                {
-                    dogControl.LadderSellPercent = Math.Max((decimal)dogControl.LadderSellPercent, (decimal)(1.05 + dogControl.UpIndex * 0.01));
-                }
-                dogControl.MaxInputPrice = Math.Min(dogControl.MaxInputPrice, dogControl.HistoryMax - (dogControl.HistoryMax - dogControl.HistoryMin) * dogControl.SymbolLevel / 20);
-
                 await new DogControlDao().CreateDogControl(dogControl);
             }
             catch (Exception ex)
@@ -317,7 +288,6 @@ namespace DogApi.Controller
                     inDB.HistoryMax = max;
                     inDB.HistoryMin = min;
 
-                    inDB.MaxInputPrice = Math.Min(inDB.MaxInputPrice, inDB.HistoryMax - (inDB.HistoryMax - inDB.HistoryMin) * inDB.SymbolLevel / 20);
                     await new DogControlDao().CreateDogControl(inDB);
                 }
             }
@@ -369,8 +339,6 @@ namespace DogApi.Controller
                                 var max = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(item.QuoteCurrency, item.BaseCurrency);
                                 inDB.MaxInputPrice = Math.Min(inDB.MaxInputPrice, max);
                             }
-                            inDB.LadderBuyPercent = Math.Max(inDB.LadderBuyPercent, (decimal)1.07);
-                            inDB.LadderBuyPercent = Math.Min(inDB.LadderBuyPercent, (decimal)1.09);
                             inDB.LadderSellPercent = Math.Min(inDB.LadderSellPercent, (decimal)1.25);
                             inDB.LadderSellPercent = Math.Max(inDB.LadderSellPercent, (decimal)1.15);
                             await new DogControlDao().CreateDogControl(inDB);

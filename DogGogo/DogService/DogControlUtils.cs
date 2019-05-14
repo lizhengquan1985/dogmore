@@ -90,62 +90,6 @@ namespace DogService
             return recommendAmount;
         }
 
-        public static decimal GetLadderBuy(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderBuyPercent = (decimal)1.08)
-        {
-            try
-            {
-                var max = (decimal)1.088;
-                var min = (decimal)1.068;
-                var control = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
-                if (control == null)
-                {
-                    return defaultLadderBuyPercent;
-                }
-
-                if (control.HistoryMin >= control.HistoryMax || control.HistoryMin <= 0 || control.HistoryMax <= 0)
-                {
-                    return defaultLadderBuyPercent;
-                }
-
-                // 防止价格波动后的, 分隔过合理. 下
-                if (control.HistoryMax <= control.HistoryMin * (decimal)2)
-                {
-                    control.HistoryMax = control.HistoryMax * (decimal)1.2;
-                    control.HistoryMin = control.HistoryMin * (decimal)0.4;
-                }
-                else if (control.HistoryMax <= control.HistoryMin * (decimal)3)
-                {
-                    control.HistoryMax = control.HistoryMax * (decimal)1;
-                    control.HistoryMin = control.HistoryMin * (decimal)0.8;
-                }
-
-                if (nowPrice >= control.HistoryMax)
-                {
-                    defaultLadderBuyPercent = max;
-                }
-                else if (nowPrice <= control.HistoryMin)
-                {
-                    defaultLadderBuyPercent = min;
-                }
-                else
-                {
-                    var percent = (control.HistoryMax - nowPrice) / (control.HistoryMax - control.HistoryMin);
-                    defaultLadderBuyPercent = max - percent * (max - min);
-                }
-
-                // 计算出来阶梯
-                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, min);
-                defaultLadderBuyPercent = Math.Min(defaultLadderBuyPercent, max);
-                defaultLadderBuyPercent = Math.Max(defaultLadderBuyPercent, control.LadderBuyPercent);
-                return defaultLadderBuyPercent;
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                return defaultLadderBuyPercent;
-            }
-        }
-
         public static decimal GetLadderSell(string symbolName, string quoteCurrency, decimal nowPrice, decimal defaultLadderSellPercent = (decimal)1.1)
         {
             try

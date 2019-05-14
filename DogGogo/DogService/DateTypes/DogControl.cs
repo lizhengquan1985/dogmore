@@ -26,10 +26,6 @@ namespace DogService.DateTypes
         /// </summary>
         public decimal MaxInputPrice { get; set; }
         /// <summary>
-        /// 出售阶梯数， 2.5%~9%， 一般情况是3.5%
-        /// </summary>
-        public decimal LadderSellPercent { get; set; }
-        /// <summary>
         /// 每点击一次保持，都会把过去的设置改成false
         /// </summary>
         public bool IsValid { get; set; }

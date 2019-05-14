@@ -181,29 +181,10 @@ namespace DogApi.Controller
                     }
                 }
 
-                Dictionary<string, decimal> ladderDic = new Dictionary<string, decimal>();
-                foreach (var item in list)
-                {
-                    if (ladderDic.ContainsKey(item.SymbolName) || !closeDic.ContainsKey(item.SymbolName))
-                    {
-                        continue;
-                    }
-                    ladderDic.Add(item.SymbolName, DogControlUtils.GetLadderSell(item.SymbolName, item.QuoteCurrency, closeDic[item.SymbolName]));
-                }
-
-                Dictionary<string, decimal> ladderBuyDic = new Dictionary<string, decimal>();
-                foreach (var item in list)
-                {
-                    if (ladderBuyDic.ContainsKey(item.SymbolName) || !closeDic.ContainsKey(item.SymbolName))
-                    {
-                        continue;
-                    }
-                }
-
                 var noBuy = symbols.Select(it => it.BaseCurrency).ToList();
                 noBuy.RemoveAll(it => list.Find(item => item.SymbolName == it) != null);
 
-                return new { list, closeDic, ladderDic, ladderBuyDic, todayDic, noBuy };
+                return new { list, closeDic, todayDic, noBuy };
             }
             catch (Exception ex)
             {

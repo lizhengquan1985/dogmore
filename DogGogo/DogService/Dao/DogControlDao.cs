@@ -18,7 +18,6 @@ namespace DogService.Dao
                 dogControl.HistoryMax < dogControl.HistoryMin ||
                 dogControl.MaxInputPrice <= 0 ||
                 dogControl.EmptyPrice <= 0 ||
-                dogControl.LadderSellPercent <= 1 ||
                 dogControl.HistoryMin <= 0)
             {
                 return null;
@@ -39,15 +38,9 @@ namespace DogService.Dao
             if (dogControl.HistoryMax < dogControl.HistoryMin
                    || dogControl.MaxInputPrice <= 0
                    || dogControl.EmptyPrice <= 0
-                   || dogControl.LadderSellPercent <= 1
                    || dogControl.HistoryMin <= 0)
             {
                 throw new ApplicationException("管控数据出错");
-            }
-
-            if (dogControl.LadderSellPercent >= (decimal)1.12)
-            {
-                dogControl.LadderSellPercent = (decimal)1.12;
             }
 
             using (var tx = Database.BeginTransaction())

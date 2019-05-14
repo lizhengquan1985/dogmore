@@ -339,8 +339,6 @@ namespace DogApi.Controller
                                 var max = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(item.QuoteCurrency, item.BaseCurrency);
                                 inDB.MaxInputPrice = Math.Min(inDB.MaxInputPrice, max);
                             }
-                            inDB.LadderSellPercent = Math.Min(inDB.LadderSellPercent, (decimal)1.25);
-                            inDB.LadderSellPercent = Math.Max(inDB.LadderSellPercent, (decimal)1.15);
                             await new DogControlDao().CreateDogControl(inDB);
                         }
                     }

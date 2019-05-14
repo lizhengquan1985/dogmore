@@ -110,29 +110,35 @@ namespace AutoTrade
                 while (true)
                 {
                     var begin = DateTime.Now;
-                    var tickers = PlatformApi.GetInstance("xx").GetTickers();
-                    for (var i = 0; i < symbols.Count; i++)
+                    try
                     {
-                        var symbol = symbols[i];
-                        try
+                        var tickers = PlatformApi.GetInstance("xx").GetTickers();
+                        for (var i = 0; i < symbols.Count; i++)
                         {
-                            var bl = CoinTrade.Run(i, symbol, tickers);
-                            if (bl)
+                            var symbol = symbols[i];
+                            try
                             {
-                                Thread.Sleep(550);
+                                var bl = CoinTrade.Run(i, symbol, tickers);
+                                if (bl)
+                                {
+                                    Thread.Sleep(550);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                logger.Error("RunCoin:  " + ex.Message, ex);
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            logger.Error("RunCoin:  " + ex.Message, ex);
-                        }
                     }
-
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex.Message, ex);
+                    }
                     var useTime = (DateTime.Now - begin).TotalSeconds;
                     logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
 
 
-                    Thread.Sleep(2000);
+                    Thread.Sleep(1000);
 
                     if (DateTime.Now.Hour == 0 || DateTime.Now.Hour == 4 || DateTime.Now.Hour == 8
                         || DateTime.Now.Hour == 12 || DateTime.Now.Hour == 16 || DateTime.Now.Hour == 20)

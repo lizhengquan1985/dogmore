@@ -33,6 +33,7 @@ namespace DogRunService
             var findTicker = tickers.Find(it => it.symbol == symbol.BaseCurrency + symbol.QuoteCurrency);
             if (findTicker == null)
             {
+                logger.Error($"{symbol.QuoteCurrency}, {symbol.BaseCurrency}");
                 throw new ApplicationException("errrrr");
             }
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
@@ -47,20 +48,24 @@ namespace DogRunService
                 NowTime = Utils.GetIdByDate(DateTime.Now),
                 QuoteCurrency = symbol.QuoteCurrency,
                 SymbolName = symbol.BaseCurrency,
-                TodayMaxPrice = 0,
-                TodayMinPrice = 0,
-                NearMaxPrice = 0
+                TodayMaxPrice = findTicker.high,
+                TodayMinPrice = findTicker.low,
+                NearMaxPrice = findTicker.high
             });
 
             var maySell = false;
             var mayBuy = false;
-            if (maxDogEmptySell != null &&
-                (maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.072 || findTicker.close / maxDogEmptySell.SellOrderPrice > (decimal)1.072))
+            if (control.EmptyPrice < findTicker.close && (
+                maxDogEmptySell == null ||
+                maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.072 ||
+                findTicker.close / maxDogEmptySell.SellOrderPrice > (decimal)1.072))
             {
                 maySell = true;
             }
-            if (minDogMoreBuy != null &&
-               (minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.072 || findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.072))
+            if (control.MaxInputPrice > findTicker.close && (
+                minDogMoreBuy == null
+                || minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.072
+                || findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.072))
             {
                 mayBuy = true;
             }

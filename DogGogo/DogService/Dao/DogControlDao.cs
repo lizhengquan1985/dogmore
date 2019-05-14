@@ -35,21 +35,25 @@ namespace DogService.Dao
                 throw new ApplicationException("管控数据QuoteCurrency出错");
             }
 
-            if (dogControl.HistoryMax < dogControl.HistoryMin
-                   || dogControl.MaxInputPrice <= 0
+            if (dogControl.MaxInputPrice <= 0
                    || dogControl.EmptyPrice <= 0
                    || dogControl.HistoryMin <= 0)
             {
                 throw new ApplicationException("管控数据出错");
             }
 
-            using (var tx = Database.BeginTransaction())
+            var indb = GetDogControl(dogControl.SymbolName, dogControl.QuoteCurrency);
+            if (indb != null)
             {
-                await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
+                var emptyPrice = Math.Max(dogControl.EmptyPrice, indb.HistoryMin * (decimal)1.5);
+                var maxInputPrice = Math.Min(dogControl.MaxInputPrice, indb.HistoryMax);
+                await Database.UpdateAsync<DogControl>(new { EmptyPrice = emptyPrice, MaxInputPrice = maxInputPrice, dogControl.AvgPrice }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
+            }
+            else
+            {
                 dogControl.IsValid = true;
                 dogControl.CreateTime = DateTime.Now;
                 await Database.InsertAsync(dogControl);
-                tx.Commit();
             }
         }
 

@@ -271,6 +271,13 @@ namespace DogApi.Controller
                     max = maxNotSell;
                 }
 
+                var avgPrice = (decimal)0;
+                foreach (var item in klines)
+                {
+                    avgPrice += (item.Open + item.Close) / 2;
+                }
+                avgPrice = avgPrice / klines.Count;
+
                 var inDB = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
                 if (inDB == null)
                 {
@@ -279,7 +286,8 @@ namespace DogApi.Controller
                         SymbolName = symbolName,
                         QuoteCurrency = quoteCurrency,
                         HistoryMax = max,
-                        HistoryMin = min
+                        HistoryMin = min,
+                        AvgPrice = avgPrice,
                     };
                     await new DogControlDao().CreateDogControl(inDB);
                 }
@@ -287,6 +295,7 @@ namespace DogApi.Controller
                 {
                     inDB.HistoryMax = max;
                     inDB.HistoryMin = min;
+                    inDB.AvgPrice = avgPrice;
 
                     await new DogControlDao().CreateDogControl(inDB);
                 }

@@ -19,7 +19,7 @@ namespace DogRunService
     public class CoinTrade
     {
         public static decimal ladderMoreBuyPercent = (decimal)1.078;
-        public static decimal ladderMoreSellPercent = (decimal)1.11;
+        public static decimal ladderMoreSellPercent = (decimal)1.095;
         private static decimal ladderEmptySellPercent = (decimal)1.088;
         private static decimal ladderEmptyBuyPercent = (decimal)1.10;
 

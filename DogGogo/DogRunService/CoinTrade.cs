@@ -33,8 +33,8 @@ namespace DogRunService
             var findTicker = tickers.Find(it => it.symbol == symbol.BaseCurrency + symbol.QuoteCurrency);
             if (findTicker == null)
             {
-                logger.Error($"{symbol.QuoteCurrency}, {symbol.BaseCurrency}");
-                throw new ApplicationException("errrrr");
+                //logger.Error($"{symbol.QuoteCurrency}, {symbol.BaseCurrency}");
+                return false;
             }
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
             if (control == null)
@@ -57,7 +57,7 @@ namespace DogRunService
             var mayBuy = false;
             if (control.EmptyPrice < findTicker.close && (
                 maxDogEmptySell == null ||
-                maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.072 ||
+                maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.08 ||
                 findTicker.close / maxDogEmptySell.SellOrderPrice > (decimal)1.072))
             {
                 maySell = true;
@@ -65,7 +65,7 @@ namespace DogRunService
             if (control.MaxInputPrice > findTicker.close && (
                 minDogMoreBuy == null
                 || minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.072
-                || findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.072))
+                || findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.08))
             {
                 mayBuy = true;
             }

@@ -39,6 +39,9 @@ namespace DogService.DateTypes
     [Table("t_dog_control")]
     public class DogControlMemo : DogControl
     {
-        public string Memo { get; set; }
+        public decimal Min8
+        {
+            get { return this.HistoryMin * (decimal)Math.Pow(1.08, 10); }
+        }
     }
 }

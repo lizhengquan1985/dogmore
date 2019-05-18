@@ -60,38 +60,6 @@ namespace DogApi.Controller
 
                 var dogCoinList = await new DogCoinDao().ListDogCoin();
 
-                foreach (var item in res)
-                {
-                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item.SymbolName);
-                    var levelData = 10000;
-                    if (dogCoin != null)
-                    {
-                        levelData = dogCoin.Level;
-                    }
-                    if (pre50.Contains(item.SymbolName))
-                    {
-                        item.Memo = pre50.IndexOf(item.SymbolName) < 20 ? "前20 -- 推荐 2level" : "前40 -- 推荐 4level";
-                    }
-                    else if (pre80.Contains(item.SymbolName))
-                    {
-                        item.Memo = pre80.IndexOf(item.SymbolName) < 20 ? "前60 -- 推荐 6level" : "前80 -- 推荐 8level";
-                    }
-                    else if (pre120.Contains(item.SymbolName))
-                    {
-                        item.Memo = pre120.IndexOf(item.SymbolName) < 20 ? "前100 -- 推荐 10level" : "前120 -- 推荐 12level";
-                    }
-                    else
-                    {
-                        item.Memo = "120开外 -- 推荐 14level";
-                    }
-
-                    item.Memo += $" --------------- {levelData}";
-                }
-
-                var notInPre50 = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0);
-                var notInPre80 = res.FindAll(it => pre80.IndexOf(it.SymbolName) < 0);
-                var notInPre120 = res.FindAll(it => pre120.IndexOf(it.SymbolName) < 0);
-
                 var notInControl50 = pre50.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
                 var notInControl80 = pre80.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
                 var notInControl120 = pre120.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
@@ -99,7 +67,6 @@ namespace DogApi.Controller
                 var notInPre = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0 && pre80.IndexOf(it.SymbolName) < 0 && pre120.IndexOf(it.SymbolName) < 0);
 
                 var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
-                var notControlButRun = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList();
 
                 var commonSymbols22 = CoinUtils.GetAllCommonSymbols22(quoteCurrency);
                 pre50.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
@@ -171,7 +138,17 @@ namespace DogApi.Controller
 
                 return new
                 {
-                    list = res,
+                    list = res.Select(it => new
+                    {
+                        it.HistoryMin,
+                        it.HistoryMax,
+                        it.EmptyPrice,
+                        it.MaxInputPrice,
+                        it.QuoteCurrency,
+                        it.SymbolName,
+                        AvgPrice = it.AvgPrice + " -- " + it.Min8 + "" + (it.MaxInputPrice > it.Min8 || it.MaxInputPrice > it.AvgPrice ? " 我哭啊 " : ""),
+
+                    }).ToList(),
                     closeDic,
                     noRunPre50 = pre50,
                     noRunPre80 = pre80,

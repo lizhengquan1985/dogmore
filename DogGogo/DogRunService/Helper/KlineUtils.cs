@@ -172,7 +172,7 @@ namespace DogRunService.Helper
         /// 获取行情数据， 防止频繁rest， 因为api调用次数太多。
         /// </summary>
         /// <param name="symbol"></param>
-        public static void InitMarketInDB(int index, CommonSymbol symbol, bool forceUpdate = false)
+        public static void InitMarketInDB(int index, CommonSymbol symbol)
         {
             try
             {

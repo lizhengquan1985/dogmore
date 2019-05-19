@@ -55,33 +55,27 @@ namespace DogRunService
 
             var maySell = false;
             var mayBuy = false;
-            if (control.EmptyPrice < findTicker.close && (
-                maxDogEmptySell == null ||
-                maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.08 ||
-                findTicker.close / maxDogEmptySell.SellOrderPrice > (decimal)1.072))
+            if ((
+                    control.EmptyPrice < findTicker.close && (
+                    maxDogEmptySell == null ||
+                    findTicker.close / maxDogEmptySell.SellOrderPrice > (decimal)1.082)
+                )
+
+                || (maxDogEmptySell != null && 
+                maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.085))
             {
                 maySell = true;
             }
-            if (control.MaxInputPrice > findTicker.close && (
+            if (
+                (control.MaxInputPrice > findTicker.close && (
                 minDogMoreBuy == null
-                || minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.072
-                || findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.08))
+                || minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.072))
+                || (minDogMoreBuy != null && findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.09))
             {
                 mayBuy = true;
             }
             if (!mayBuy && !maySell)
             {
-                return false;
-            }
-
-            var lastKline = new KlineDao().GetLastKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-            // 如果kline是3分钟内的，并且价格相差不到5%， 则不考虑
-            if (lastKline != null && Utils.GetDateById(lastKline.Id) > DateTime.Now.AddMinutes(-3)
-                && !(minDogMoreBuy == null && maxDogEmptySell == null)
-                && (minDogMoreBuy == null || minDogMoreBuy.BuyOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / minDogMoreBuy.BuyOrderPrice < (decimal)1.05)
-                && (maxDogEmptySell == null || maxDogEmptySell.SellOrderPrice / lastKline.Close < (decimal)1.05 && lastKline.Close / maxDogEmptySell.SellOrderPrice < (decimal)1.05))
-            {
-                Console.WriteLine("3分钟内还没价格波动");
                 return false;
             }
 

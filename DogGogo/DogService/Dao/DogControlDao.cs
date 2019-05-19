@@ -47,7 +47,7 @@ namespace DogService.Dao
                 throw new ApplicationException("管控数据出错");
             }
 
-            var indb = GetDogControl(dogControl.SymbolName, dogControl.QuoteCurrency);
+            var indb = GetDogControlBySet(dogControl.SymbolName, dogControl.QuoteCurrency);
             if (indb != null)
             {
                 var emptyPrice = Math.Max(dogControl.EmptyPrice, indb.HistoryMin * (decimal)1.5);

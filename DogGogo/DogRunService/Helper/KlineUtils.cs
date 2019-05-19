@@ -168,6 +168,21 @@ namespace DogRunService.Helper
             new KlineDao().CheckTableExistsAndCreate(symbol.QuoteCurrency, symbol.BaseCurrency);
         }
 
+        public static List<HistoryKline> ListKlines(CommonSymbol symbol)
+        {
+            var now = DateTime.Now;
+            PlatformApi api = PlatformApi.GetInstance("xx");
+            var period = "1min";
+            var count = 300;
+            var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, count);
+            if (klines == null || klines.Count == 0)
+            {
+                return null;
+            }
+            Console.WriteLine($"{(DateTime.Now - now).TotalMilliseconds}, {klines[0].Id} {klines[klines.Count - 1].Id}");
+            return klines;
+        }
+
         /// <summary>
         /// 获取行情数据， 防止频繁rest， 因为api调用次数太多。
         /// </summary>

@@ -660,7 +660,7 @@ namespace DogRunService
             if (analyzeResult == null)
             {
                 // 初始化数据, 再次拿去
-                KlineUtils.InitMarketInDB(0, symbol, true);
+                KlineUtils.InitMarketInDB(0, symbol);
                 analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 if (analyzeResult == null)
                 {

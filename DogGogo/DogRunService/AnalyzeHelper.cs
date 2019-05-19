@@ -36,25 +36,27 @@ namespace DogRunService
         /// <returns></returns>
         public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol)
         {
-            KlineUtils.InitMarketInDB(0, symbol);
-            var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-            if(historyKlines == null || historyKlines.Count < 100)
-            {
-                return null;
-            }
-            var idDate = Utils.GetDateById(historyKlines[0].Id);
+            //KlineUtils.InitMarketInDB(0, symbol);
+            //var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
 
-            var now = DateTime.Now;
-            if (historyKlines == null
-                || historyKlines.Count < 100
-                || idDate < now.AddSeconds(-60))
+            var historyKlines = KlineUtils.ListKlines(symbol);
+            if (historyKlines == null || historyKlines.Count < 100)
             {
-                if (idDate.Minute == now.Minute)
-                {
-                    logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  idDate.Minute == now.Minute, {idDate.Second}, {now.Second}");
-                }
                 return null;
             }
+            //var idDate = Utils.GetDateById(historyKlines[0].Id);
+
+            //var now = DateTime.Now;
+            //if (historyKlines == null
+            //    || historyKlines.Count < 100
+            //    || idDate < now.AddSeconds(-60))
+            //{
+            //    if (idDate.Minute == now.Minute)
+            //    {
+            //        logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  idDate.Minute == now.Minute, {idDate.Second}, {now.Second}");
+            //    }
+            //    return null;
+            //}
 
             var minute30Klines = historyKlines.FindAll(it => it.Id > Utils.GetIdByDate(DateTime.Now.AddMinutes(-30)));
 
@@ -117,24 +119,24 @@ namespace DogRunService
                 return false;
             }
 
+            var upPercent = NowPrice / dogMoreBuy.BuyTradePrice;
+            if (upPercent <= (decimal)1.05)
+            {
+                // 这个太差了吧.
+                return false;
+            }
+
             // 判断是否有最小值，且小于nowPrice
             var min = klines.Min(it => it.Close);
             var max = klines.Max(it => it.Close);
 
             var minHuidiao = (decimal)1.005;
             var maxHuidiao = (decimal)1.03;
-            var upPercent = NowPrice / dogMoreBuy.BuyTradePrice;
-            if (upPercent <= (decimal)1.02)
-            {
-                // 这个太差了吧.
-                return false;
-            }
-
-            var huidiao = 1 + ((NowPrice / dogMoreBuy.BuyTradePrice) - 1) / 10;
+            var huidiao = 1 + ((NowPrice / dogMoreBuy.BuyTradePrice) - 1) / 11;
             huidiao = Math.Max(huidiao, minHuidiao);
             huidiao = Math.Min(huidiao, maxHuidiao);
 
-            return NowPrice * huidiao < max && NowPrice * upPercent * 2 > max;
+            return NowPrice * huidiao < max && NowPrice * upPercent * 3 > max;
         }
 
         public bool CheckCanSellForHuiDiao()

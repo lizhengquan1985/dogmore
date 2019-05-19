@@ -417,7 +417,7 @@ namespace DogApi.Controller
                 {
                     ladder = (decimal)1.058;
                 }
-                KlineUtils.InitMarketInDB(0, symbol, true);
+                KlineUtils.InitMarketInDB(0, symbol);
                 return CoinTrade.BuyWhenDoMoreAnalyze(symbol, AccountConfigUtils.GetAccountConfig(userName), ladder);
             }
             catch (Exception ex)

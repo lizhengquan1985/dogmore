@@ -60,6 +60,8 @@ namespace DogApi.Controller
 
                 var dogCoinList = await new DogCoinDao().ListDogCoin();
 
+                var outList = new List<string> { "mtl", "ncash", "phx", "sbtc", "adx", "mtl", "mtl", "mtl", "mtl", "mtl" };
+
                 var notInControl50 = pre50.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
                 var notInControl80 = pre80.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
                 var notInControl120 = pre120.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);

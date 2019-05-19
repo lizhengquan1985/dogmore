@@ -382,7 +382,6 @@ namespace DogRunService
 
                     // 和上次做空价格要相差8%
                     var maxSellTradePrice = new DogEmptySellDao().GetMaxSellTradePrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                    //var emptyLadder = DogControlUtils.GetEmptyLadderSell(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
                     if (maxSellTradePrice != null && nowPrice < maxSellTradePrice * ladderEmptySellPercent)
                     {
                         continue;
@@ -418,6 +417,7 @@ namespace DogRunService
                         continue;
                     }
 
+                    Console.WriteLine($"准备做空 sellQuantity:{sellQuantity}, nowPrice:{nowPrice},baseSellQuantity:{baseSellQuantity}");
                     SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:");
                 }
                 catch (Exception ex)
@@ -432,7 +432,11 @@ namespace DogRunService
         {
             try
             {
-                if (sellQuantity < symbol.AmountPrecision)
+                if ((symbol.AmountPrecision == 0 && sellQuantity < (decimal)20)
+                    || (symbol.AmountPrecision == 1 && sellQuantity < (decimal)2)
+                    || (symbol.AmountPrecision == 2 && sellQuantity < (decimal)0.2)
+                    || (symbol.AmountPrecision == 3 && sellQuantity < (decimal)0.02)
+                    || (symbol.AmountPrecision == 4 && sellQuantity < (decimal)0.002))
                 {
                     LogNotBuy(symbol.BaseCurrency + "-empty-sell", $"sell userName:{userName} 出错,{symbol.BaseCurrency} 的精度为 {symbol.AmountPrecision}, 但是却要出售{sellQuantity}  ");
                     return;

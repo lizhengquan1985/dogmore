@@ -25,6 +25,12 @@ namespace DogService.Dao
             return dogControl;
         }
 
+        public DogControl GetDogControlBySet(string symbolName, string quoteCurrency)
+        {
+            var dogControl = Database.Get<DogControl>(new { SymbolName = symbolName, QuoteCurrency = quoteCurrency, IsValid = true });
+            return dogControl;
+        }
+
         public async Task CreateDogControl(DogControl dogControl)
         {
             if (dogControl.QuoteCurrency != "usdt"

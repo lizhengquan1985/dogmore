@@ -255,7 +255,7 @@ namespace DogApi.Controller
                 }
                 avgPrice = avgPrice / klines.Count;
 
-                var inDB = new DogControlDao().GetDogControl(symbolName, quoteCurrency);
+                var inDB = new DogControlDao().GetDogControlBySet(symbolName, quoteCurrency);
                 if (inDB == null)
                 {
                     inDB = new DogControl()

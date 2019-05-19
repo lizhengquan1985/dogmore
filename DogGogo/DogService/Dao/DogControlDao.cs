@@ -36,8 +36,7 @@ namespace DogService.Dao
             }
 
             if (dogControl.MaxInputPrice <= 0
-                   || dogControl.EmptyPrice <= 0
-                   || dogControl.HistoryMin <= 0)
+                   || dogControl.EmptyPrice <= 0)
             {
                 throw new ApplicationException("管控数据出错");
             }
@@ -47,7 +46,8 @@ namespace DogService.Dao
             {
                 var emptyPrice = Math.Max(dogControl.EmptyPrice, indb.HistoryMin * (decimal)1.5);
                 var maxInputPrice = Math.Min(dogControl.MaxInputPrice, indb.HistoryMax);
-                await Database.UpdateAsync<DogControl>(new { EmptyPrice = emptyPrice, MaxInputPrice = maxInputPrice, dogControl.AvgPrice, dogControl.HistoryMax, dogControl.HistoryMin }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
+                var avgPrice = dogControl.AvgPrice > 0 ? dogControl.AvgPrice : indb.AvgPrice;
+                await Database.UpdateAsync<DogControl>(new { EmptyPrice = emptyPrice, MaxInputPrice = maxInputPrice, AvgPrice = avgPrice, dogControl.HistoryMax, dogControl.HistoryMin }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
             }
             else
             {

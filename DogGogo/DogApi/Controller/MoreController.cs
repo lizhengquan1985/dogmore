@@ -74,17 +74,33 @@ namespace DogApi.Controller
             {
                 var list = new List<DogMoreBuyDTO>();
                 var symbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
-                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
+                var tickers = PlatformApi.GetInstance("xx").GetTickers();
                 Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
-                foreach (var item in nowPriceList)
+                Dictionary<string, decimal> todayDic = new Dictionary<string, decimal>();
+                var findTickers = tickers.FindAll(it => it.symbol.EndsWith(quoteCurrency));
+                foreach (var item in findTickers)
+                {
+                    var itemSymbolName = item.symbol.Replace(quoteCurrency, "");
+                    closeDic.Add(itemSymbolName, item.close);
+
+                    todayDic.Add(itemSymbolName + "+", item.high / item.close);
+                    todayDic.Add(itemSymbolName, item.high / item.low);
+                    todayDic.Add(itemSymbolName + "-", item.close / item.low);
+                }
+
+                var dogcontrol = new DogControlDao().ListAllDogControl();
+                var maxInputPrice = new Dictionary<string, decimal>();
+                var emptyPrice = new Dictionary<string, decimal>();
+                foreach (var item in dogcontrol)
                 {
                     if (item.QuoteCurrency != quoteCurrency)
                     {
                         continue;
                     }
-                    closeDic.Add(item.SymbolName, item.NowPrice);
+                    maxInputPrice.Add(item.SymbolName, item.MaxInputPrice);
+                    emptyPrice.Add(item.SymbolName, item.EmptyPrice);
                 }
-                Dictionary<string, decimal> todayDic = new Dictionary<string, decimal>();
+
                 if (string.IsNullOrEmpty(symbolName))
                 {
                     list = new DogMoreBuyDao().listEveryMinPriceMoreBuyIsNotFinished(userName, quoteCurrency);
@@ -94,34 +110,7 @@ namespace DogApi.Controller
                         item.Count = countSymbol.Find(it => it.SymbolName == item.SymbolName)?.Count ?? 0;
                     }
                     list = list.Where(it => it.SymbolName != "btc" && it.SymbolName != "ven" && it.SymbolName != "hsr").ToList();
-                    foreach (var symbol in symbols)
-                    {
-                        try
-                        {
-                            var item = list.Find(it => it.SymbolName == symbol.BaseCurrency);
-                            if (item == null)
-                            {
-                                continue;
-                            }
-                            var close = closeDic[symbol.BaseCurrency];
 
-                            // 这里有些慢, 50个
-                            var nowPriceItem = nowPriceList.Find(it => it.SymbolName == symbol.BaseCurrency);
-                            if (nowPriceItem != null)
-                            {
-                                if (nowPriceItem.TodayMinPrice != 0)
-                                {
-                                    todayDic.Add(symbol.BaseCurrency, nowPriceItem.TodayMaxPrice / nowPriceItem.TodayMinPrice);
-                                    todayDic.Add(symbol.BaseCurrency + "-", close / nowPriceItem.TodayMinPrice);
-                                }
-                                todayDic.Add(symbol.BaseCurrency + "+", nowPriceItem.NearMaxPrice / close);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.Error($"{userName} --> {symbolName}{quoteCurrency} --> {ex.Message}", ex);
-                        }
-                    }
                     if (sort != "lastbuy")
                     {
                         list.Sort((a, b) =>
@@ -160,31 +149,11 @@ namespace DogApi.Controller
                         });
                     }
                 }
-                else
-                {
-                    try
-                    {
-                        list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName, quoteCurrency);
-
-                        var close = closeDic[symbolName];
-                        var symbol = symbols.Find(it => it.BaseCurrency == symbolName);
-                        var item = list.Find(it => it.SymbolName == symbolName);
-
-                        var todayList = new KlineDao().ListTodayKline(symbol.BaseCurrency, symbol.QuoteCurrency, DateTime.Now.Date, DateTime.Now);
-                        todayDic.Add(symbolName, todayList.Max(it => it.Close) / todayList.Min(it => it.Close));
-                        todayDic.Add(symbolName + "-", close / todayList.Min(it => it.Close));
-                        todayDic.Add(symbolName + "+", todayList.Where(it => Utils.GetDateById(it.Id) >= item.BuyDate).Max(it => it.Close) / close);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error(ex.Message, ex);
-                    }
-                }
 
                 var noBuy = symbols.Select(it => it.BaseCurrency).ToList();
                 noBuy.RemoveAll(it => list.Find(item => item.SymbolName == it) != null);
 
-                return new { list, closeDic, todayDic, noBuy };
+                return new { list, closeDic, todayDic, noBuy, maxInputPrice, emptyPrice };
             }
             catch (Exception ex)
             {

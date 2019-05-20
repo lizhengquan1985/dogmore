@@ -34,6 +34,10 @@ namespace DogService.DateTypes
         public decimal HistoryMax { get; set; }
         public decimal HistoryMin { get; set; }
         public decimal AvgPrice { get; set; }
+        /// <summary>
+        /// 将要推出
+        /// </summary>
+        public bool WillDelist { get; set; }
     }
 
     [Table("t_dog_control")]

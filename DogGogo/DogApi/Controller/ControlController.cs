@@ -287,66 +287,6 @@ namespace DogApi.Controller
         }
 
         [HttpGet]
-        [ActionName("refreshEmpty")]
-        public async Task RefreshEmpty(string quoteCurrency)
-        {
-            try
-            {
-                var nowPriceList = new DogNowPriceDao().ListDogNowPrice(quoteCurrency);
-                Dictionary<string, decimal> closeDic = new Dictionary<string, decimal>();
-                foreach (var item in nowPriceList)
-                {
-                    if (item.QuoteCurrency != quoteCurrency)
-                    {
-                        continue;
-                    }
-                    if (item.NowTime < Utils.GetIdByDate(DateTime.Now.AddHours(-1)))
-                    {
-                        continue;
-                    }
-                    closeDic.Add(item.SymbolName, item.NowPrice);
-                }
-
-                var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
-                foreach (var item in commonSymbols)
-                {
-                    try
-                    {
-                        var inDB = new DogControlDao().GetDogControl(item.BaseCurrency, quoteCurrency);
-                        if (inDB == null)
-                        {
-                            continue;
-                        }
-                        else if (closeDic.ContainsKey(item.BaseCurrency))
-                        {
-                            inDB.EmptyPrice = Math.Min(inDB.EmptyPrice, inDB.HistoryMax * (decimal)1.2);
-                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, (decimal)1.5 * inDB.HistoryMin);
-                            inDB.EmptyPrice = Math.Max(inDB.EmptyPrice, inDB.HistoryMin + (decimal)0.2 * (inDB.HistoryMax - inDB.HistoryMin));
-                            if (item.QuoteCurrency == "btc" || item.QuoteCurrency == "eth")
-                            {
-                                var max = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(item.QuoteCurrency, item.BaseCurrency);
-                                inDB.MaxInputPrice = Math.Min(inDB.MaxInputPrice, max);
-                            }
-                            await new DogControlDao().CreateDogControl(inDB);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex.Message.IndexOf("管控数据出错") < 0)
-                        {
-                            logger.Error(ex.Message, ex);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                throw ex;
-            }
-        }
-
-        [HttpGet]
         [ActionName("initAccountInfo")]
         public async Task<object> InitAccountInfo(string userName, string quoteCurrency, string sort, bool stat)
         {
@@ -659,28 +599,6 @@ namespace DogApi.Controller
             }
 
             return new { data, dateList, closeDic };
-        }
-
-        public class NewSymbolForm
-        {
-            public List<HistoryKline> HistoryKlines { get; set; }
-            public string BaseCurrency { get; set; }
-            public string QuoteCurrency { get; set; }
-        }
-
-        [HttpPost]
-        [ActionName("newSymbolData")]
-        public async Task NewSymbolData([FromBody] NewSymbolForm form)
-        {
-            try
-            {
-                KlineUtils.InitMarketInDBFromOut(new CommonSymbol { BaseCurrency = form.BaseCurrency, QuoteCurrency = form.QuoteCurrency }, form.HistoryKlines);
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex.Message, ex);
-                throw ex;
-            }
         }
     }
 }

@@ -25,10 +25,6 @@ namespace DogService.DateTypes
         /// 最大投入价格
         /// </summary>
         public decimal MaxInputPrice { get; set; }
-        /// <summary>
-        /// 每点击一次保持，都会把过去的设置改成false
-        /// </summary>
-        public bool IsValid { get; set; }
         public DateTime CreateTime { get; set; }
 
         public decimal HistoryMax { get; set; }

@@ -27,7 +27,7 @@ namespace DogService.Dao
 
         public DogControl GetDogControlBySet(string symbolName, string quoteCurrency)
         {
-            var dogControl = Database.Get<DogControl>(new { SymbolName = symbolName, QuoteCurrency = quoteCurrency, IsValid = true });
+            var dogControl = Database.Get<DogControl>(new { SymbolName = symbolName, QuoteCurrency = quoteCurrency });
             return dogControl;
         }
 
@@ -52,15 +52,26 @@ namespace DogService.Dao
             {
                 var emptyPrice = Math.Max(dogControl.EmptyPrice, indb.HistoryMin * (decimal)1.5);
                 var maxInputPrice = Math.Min(dogControl.MaxInputPrice, indb.HistoryMax);
-                var avgPrice = dogControl.AvgPrice > 0 ? dogControl.AvgPrice : indb.AvgPrice;
-                await Database.UpdateAsync<DogControl>(new { EmptyPrice = emptyPrice, MaxInputPrice = maxInputPrice, AvgPrice = avgPrice, dogControl.HistoryMax, dogControl.HistoryMin }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
+                await Database.UpdateAsync<DogControl>(new { EmptyPrice = emptyPrice, MaxInputPrice = maxInputPrice, dogControl.WillDelist }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
             }
             else
             {
-                dogControl.IsValid = true;
                 dogControl.CreateTime = DateTime.Now;
                 await Database.InsertAsync(dogControl);
             }
+        }
+
+        public async Task UpdateDogControlMaxAndMin(DogControl dogControl)
+        {
+            if (dogControl.QuoteCurrency != "usdt"
+                && dogControl.QuoteCurrency != "btc"
+                && dogControl.QuoteCurrency != "eth"
+                && dogControl.QuoteCurrency != "ht")
+            {
+                throw new ApplicationException("管控数据QuoteCurrency出错");
+            }
+
+            await Database.UpdateAsync<DogControl>(new { dogControl.HistoryMax, dogControl.HistoryMin, dogControl.AvgPrice }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
         }
 
         public async Task<List<DogControlMemo>> ListDogControl(string quoteCurrency)

@@ -18,9 +18,21 @@ namespace DogRunService
 {
     public class CoinTrade
     {
+        /// <summary>
+        /// 做多间隔
+        /// </summary>
         public static decimal ladderMoreBuyPercent = (decimal)1.078;
+        /// <summary>
+        /// 收割间隔
+        /// </summary>
         public static decimal ladderMoreSellPercent = (decimal)1.095;
+        /// <summary>
+        /// 做空间隔
+        /// </summary>
         private static decimal ladderEmptySellPercent = (decimal)1.088;
+        /// <summary>
+        /// 收割空单
+        /// </summary>
         private static decimal ladderEmptyBuyPercent = (decimal)1.10;
 
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));

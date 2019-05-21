@@ -73,7 +73,7 @@ namespace DogRunService
                     findTicker.close / maxDogEmptySell.SellOrderPrice > (decimal)1.082)
                 )
 
-                || (maxDogEmptySell != null && 
+                || (maxDogEmptySell != null &&
                 maxDogEmptySell.SellOrderPrice / findTicker.close > (decimal)1.085))
             {
                 maySell = true;
@@ -522,8 +522,23 @@ namespace DogRunService
 
             var nowPrice = analyzeResult.NowPrice;
 
+            var thisLadderMoreSellPercent = ladderMoreSellPercent;
+            if (analyzeResult.NowPrice / analyzeResult.MinPrice > (decimal)1.20)
+            {
+                thisLadderMoreSellPercent = (decimal)1.085;
+            }
+            else if (analyzeResult.NowPrice / analyzeResult.MinPrice > (decimal)1.40)
+            {
+                thisLadderMoreSellPercent = (decimal)1.075;
+            }
+            else if (analyzeResult.NowPrice / analyzeResult.MinPrice > (decimal)1.60)
+            {
+                thisLadderMoreSellPercent = (decimal)1.065;
+            }
+            thisLadderMoreSellPercent = Math.Max(thisLadderMoreSellPercent, (decimal)1.065);
+
             // 没有大于预期, 也不能收割
-            if (nowPrice < dogMoreBuy.BuyTradePrice * ladderMoreSellPercent)
+            if (nowPrice < dogMoreBuy.BuyTradePrice * thisLadderMoreSellPercent)
             {
                 return;
             }

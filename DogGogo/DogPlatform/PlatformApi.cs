@@ -10,6 +10,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using RestSharp.Deserializers;
 
 namespace DogPlatform
 {
@@ -190,10 +191,13 @@ namespace DogPlatform
             var result = client.Execute(request);
             try
             {
-                return JsonConvert.DeserializeObject<HBResponse<T>>(result.Content);
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.NullValueHandling = NullValueHandling.Ignore;
+                return JsonConvert.DeserializeObject<HBResponse<T>>(result.Content, settings);
             }
             catch (Exception ex)
             {
+                logger.Error(ex.Message, ex);
                 logger.Error(resourcePath);
                 logger.Error(JsonConvert.SerializeObject(result.Content));
                 //logger.Error(ex.Message, ex);

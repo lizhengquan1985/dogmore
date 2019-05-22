@@ -48,6 +48,13 @@ namespace DogRunService
                 //logger.Error($"{symbol.QuoteCurrency}, {symbol.BaseCurrency}");
                 return false;
             }
+
+            if (findTicker.open <= 0 || findTicker.close <= 0 || findTicker.high <= 0 || findTicker.low <= 0)
+            {
+                logger.Error($"数据不对 : {JsonConvert.SerializeObject(findTicker)}");
+                return false;
+            }
+
             var control = new DogControlDao().GetDogControl(symbol.BaseCurrency, symbol.QuoteCurrency);
             if (control == null)
             {

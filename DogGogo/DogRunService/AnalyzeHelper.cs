@@ -36,27 +36,11 @@ namespace DogRunService
         /// <returns></returns>
         public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol)
         {
-            //KlineUtils.InitMarketInDB(0, symbol);
-            //var historyKlines = new KlineDao().List24HourKline(symbol.QuoteCurrency, symbol.BaseCurrency);
-
             var historyKlines = KlineUtils.ListKlines(symbol);
             if (historyKlines == null || historyKlines.Count < 100)
             {
                 return null;
             }
-            //var idDate = Utils.GetDateById(historyKlines[0].Id);
-
-            //var now = DateTime.Now;
-            //if (historyKlines == null
-            //    || historyKlines.Count < 100
-            //    || idDate < now.AddSeconds(-60))
-            //{
-            //    if (idDate.Minute == now.Minute)
-            //    {
-            //        logger.Error($"----------{symbol.BaseCurrency}{symbol.QuoteCurrency}--------------> analyzeResult 为 null  idDate.Minute == now.Minute, {idDate.Second}, {now.Second}");
-            //    }
-            //    return null;
-            //}
 
             var minute30Klines = historyKlines.FindAll(it => it.Id > Utils.GetIdByDate(DateTime.Now.AddMinutes(-30)));
 

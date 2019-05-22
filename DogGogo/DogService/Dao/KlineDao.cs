@@ -17,60 +17,60 @@ namespace DogService.Dao
 
         public void CheckTableExistsAndCreate(string quoteCurrency, string baseCurrency)
         {
-            try
-            {
-                var createTableSql = $"CREATE TABLE IF NOT EXISTS `t_{quoteCurrency}_{baseCurrency}` ( `RecordId` bigint(20) NOT NULL AUTO_INCREMENT,  " +
-                    $" `Id` bigint(20) NOT NULL, " +
-                    $" `Open` decimal(18, 10) NOT NULL, " +
-                    $" `Close` decimal(18, 10) NOT NULL, " +
-                    $" `Low` decimal(18, 10) NOT NULL, " +
-                    $" `High` decimal(18, 10) NOT NULL, " +
-                    $" `Vol` decimal(18, 10) NOT NULL, " +
-                    $" `Count` decimal(18, 10) NOT NULL, " +
-                    $" `CreateTime` datetime NOT NULL, " +
-                    $" PRIMARY KEY(`RecordId`))" +
-                    $" ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; ";
-                Database.Execute(createTableSql);
+            //try
+            //{
+            //    var createTableSql = $"CREATE TABLE IF NOT EXISTS `t_{quoteCurrency}_{baseCurrency}` ( `RecordId` bigint(20) NOT NULL AUTO_INCREMENT,  " +
+            //        $" `Id` bigint(20) NOT NULL, " +
+            //        $" `Open` decimal(18, 10) NOT NULL, " +
+            //        $" `Close` decimal(18, 10) NOT NULL, " +
+            //        $" `Low` decimal(18, 10) NOT NULL, " +
+            //        $" `High` decimal(18, 10) NOT NULL, " +
+            //        $" `Vol` decimal(18, 10) NOT NULL, " +
+            //        $" `Count` decimal(18, 10) NOT NULL, " +
+            //        $" `CreateTime` datetime NOT NULL, " +
+            //        $" PRIMARY KEY(`RecordId`))" +
+            //        $" ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; ";
+            //    Database.Execute(createTableSql);
 
 
-            }
-            catch (Exception ex)
-            {
+            //}
+            //catch (Exception ex)
+            //{
 
-            }
+            //}
 
-            try
-            {
-                var createIndex = $"CREATE INDEX `index_{quoteCurrency}_{baseCurrency}_id` ON `t_{quoteCurrency}_{baseCurrency}` (`Id`)";
-                Database.Execute(createIndex);
-            }
-            catch (Exception ex)
-            {
+            //try
+            //{
+            //    var createIndex = $"CREATE INDEX `index_{quoteCurrency}_{baseCurrency}_id` ON `t_{quoteCurrency}_{baseCurrency}` (`Id`)";
+            //    Database.Execute(createIndex);
+            //}
+            //catch (Exception ex)
+            //{
                 
-            }
+            //}
         }
 
         public void CheckTable(string coin)
         {
-            try
-            {
-                var createTableSql = $"CREATE TABLE `t_coin_{coin}` ( `RecordId` bigint(20) NOT NULL AUTO_INCREMENT,  " +
-                    $" `Id` bigint(20) NOT NULL, " +
-                    $" `Open` decimal(14, 6) NOT NULL, " +
-                    $" `Close` decimal(14, 6) NOT NULL, " +
-                    $" `Low` decimal(14, 6) NOT NULL, " +
-                    $" `High` decimal(14, 6) NOT NULL, " +
-                    $" `Vol` decimal(14, 6) NOT NULL, " +
-                    $" `Count` decimal(14, 6) NOT NULL, " +
-                    $" `CreateTime` datetime NOT NULL, " +
-                    $" PRIMARY KEY(`RecordId`))" +
-                    $" ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; ";
-                Database.Execute(createTableSql);
-            }
-            catch (Exception ex)
-            {
+            //try
+            //{
+            //    var createTableSql = $"CREATE TABLE `t_coin_{coin}` ( `RecordId` bigint(20) NOT NULL AUTO_INCREMENT,  " +
+            //        $" `Id` bigint(20) NOT NULL, " +
+            //        $" `Open` decimal(14, 6) NOT NULL, " +
+            //        $" `Close` decimal(14, 6) NOT NULL, " +
+            //        $" `Low` decimal(14, 6) NOT NULL, " +
+            //        $" `High` decimal(14, 6) NOT NULL, " +
+            //        $" `Vol` decimal(14, 6) NOT NULL, " +
+            //        $" `Count` decimal(14, 6) NOT NULL, " +
+            //        $" `CreateTime` datetime NOT NULL, " +
+            //        $" PRIMARY KEY(`RecordId`))" +
+            //        $" ENGINE = InnoDB DEFAULT CHARSET = utf8mb4; ";
+            //    Database.Execute(createTableSql);
+            //}
+            //catch (Exception ex)
+            //{
 
-            }
+            //}
         }
 
         public void Record(string name, HistoryKline line)

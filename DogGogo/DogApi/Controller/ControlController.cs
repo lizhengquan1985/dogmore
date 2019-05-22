@@ -110,6 +110,11 @@ namespace DogApi.Controller
                     var find = usdtCommonSymbols.Find(it => it.BaseCurrency == item);
                     if (find != null)
                     {
+                        if(dogCoin == null)
+                        {
+                            Console.WriteLine($"{JsonConvert.SerializeObject(find)}");
+                            continue;
+                        }
                         notInControlButUsdtDic.Add(item, dogCoin.Level);
                     }
                 }
@@ -149,7 +154,7 @@ namespace DogApi.Controller
                         it.QuoteCurrency,
                         it.SymbolName,
                         AvgPrice = it.AvgPrice + " -- " + it.Min8 + "" + (it.MaxInputPrice > it.Min8 || it.MaxInputPrice > it.AvgPrice ? " 我哭啊 " : ""),
-
+                        it.WillDelist,
                     }).ToList(),
                     closeDic,
                     noRunPre50 = pre50,

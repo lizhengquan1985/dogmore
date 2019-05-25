@@ -54,87 +54,22 @@ namespace DogApi.Controller
                     }
                     closeDic.Add(item.SymbolName, item.NowPrice);
                 }
-                var pre50 = CoinsPre45.GetPre40Coins();
-                var pre80 = CoinsPre45.GetPre80Coins();
-                var pre120 = CoinsPre45.GetPre120Coins();
 
-                var dogCoinList = await new DogCoinDao().ListDogCoin();
+                //var outList = new List<string> { "mtl", "ncash", "phx", "sbtc", "adx", "mtl", "mtl", "mtl", "mtl", "mtl" };
 
-                var outList = new List<string> { "mtl", "ncash", "phx", "sbtc", "adx", "mtl", "mtl", "mtl", "mtl", "mtl" };
+                PlatformApi api = PlatformApi.GetInstance("xx");
+                var tickers = api.GetTickers();
 
-                var notInControl50 = pre50.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
-                var notInControl80 = pre80.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
-                var notInControl120 = pre120.FindAll(coin => res.Find(it => it.SymbolName == coin) == null);
-
-                var notInPre = res.FindAll(it => pre50.IndexOf(it.SymbolName) < 0 && pre80.IndexOf(it.SymbolName) < 0 && pre120.IndexOf(it.SymbolName) < 0);
-
-                var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
-
-                var commonSymbols22 = CoinUtils.GetAllCommonSymbols22(quoteCurrency);
-                pre50.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
-                pre50.RemoveAll(it => commonSymbols22.Find(item => item.BaseCurrency == it) == null);
-
-                pre80.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
-                pre80.RemoveAll(it => commonSymbols22.Find(item => item.BaseCurrency == it) == null);
-
-                pre120.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) != null);
-                pre120.RemoveAll(it => commonSymbols22.Find(item => item.BaseCurrency == it) == null);
-
-
-                notInControl50.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
-                notInControl80.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
-                notInControl120.RemoveAll(it => string.IsNullOrEmpty(it) || commonSymbols.Find(item => item.BaseCurrency == it) == null);
-
-                var notInControlList = commonSymbols.FindAll(it => res.Find(item => item.SymbolName == it.BaseCurrency) == null).Select(it => it.BaseCurrency).ToList();
-                var notInControlDic = new Dictionary<string, int>();
-                foreach (var item in notInControlList)
+                var notInControl = new List<string>();
+                foreach (var ticker in tickers)
                 {
-                    try
+                    if (ticker.symbol.EndsWith(quoteCurrency))
                     {
-                        var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
-                        notInControlDic.Add(item, dogCoin.Level);
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.Error(ex.Message, ex);
-                        logger.Error(JsonConvert.SerializeObject(item));
-                        continue;
-                    }
-                }
-
-                var usdtCommonSymbols = CoinUtils.GetAllCommonSymbols("usdt");
-                var notInControlButUsdtDic = new Dictionary<string, int>();
-                foreach (var item in notInControlList)
-                {
-                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
-                    var find = usdtCommonSymbols.Find(it => it.BaseCurrency == item);
-                    if (find != null)
-                    {
-                        notInControlButUsdtDic.Add(item, dogCoin.Level);
-                    }
-                }
-
-                var btcCommonSymbols = await new DogControlDao().ListDogControl("btc");
-                var notInControlButBtcDic = new Dictionary<string, int>();
-                foreach (var item in notInControlList)
-                {
-                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
-                    var find = btcCommonSymbols.Find(it => it.SymbolName == item);
-                    if (find != null)
-                    {
-                        notInControlButBtcDic.Add(item, dogCoin.Level);
-                    }
-                }
-
-                var ethCommonSymbols = await new DogControlDao().ListDogControl("eth");
-                var notInControlButEthDic = new Dictionary<string, int>();
-                foreach (var item in notInControlList)
-                {
-                    var dogCoin = dogCoinList.Find(it => it.SymbolName == item);
-                    var find = ethCommonSymbols.Find(it => it.SymbolName == item);
-                    if (find != null)
-                    {
-                        notInControlButEthDic.Add(item, dogCoin.Level);
+                        var find = res.Find(it => ticker.symbol.StartsWith(it.SymbolName));
+                        if (find == null)
+                        {
+                            notInControl.Add(ticker.symbol);
+                        }
                     }
                 }
 
@@ -152,17 +87,7 @@ namespace DogApi.Controller
 
                     }).ToList(),
                     closeDic,
-                    noRunPre50 = pre50,
-                    noRunPre80 = pre80,
-                    noRunPre120 = pre120,
-                    notInControl50,
-                    notInControl80,
-                    notInControl120,
-                    notInControl = notInControlDic.OrderBy(it => it.Value),
-                    notInControlButUsdt = notInControlButUsdtDic.OrderBy(it => it.Value),
-                    notInControlButEth = notInControlButEthDic.OrderBy(it => it.Value),
-                    notInControlButBtc = notInControlButBtcDic.OrderBy(it => it.Value),
-                    hasControlButNotInPre = notInPre.Select(it => it.SymbolName).ToList(),
+                    notInControl,
                     allItems = res.Select(it => it.SymbolName).ToList()
                 };
             }

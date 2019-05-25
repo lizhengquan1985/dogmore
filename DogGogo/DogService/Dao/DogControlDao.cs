@@ -13,7 +13,7 @@ namespace DogService.Dao
     {
         public DogControl GetDogControl(string symbolName, string quoteCurrency)
         {
-            var dogControl = Database.Get<DogControl>(new { SymbolName = symbolName, QuoteCurrency = quoteCurrency, IsValid = true });
+            var dogControl = Database.Get<DogControl>(new { SymbolName = symbolName, QuoteCurrency = quoteCurrency });
             if (dogControl == null ||
                 dogControl.HistoryMax < dogControl.HistoryMin ||
                 dogControl.MaxInputPrice <= 0 ||
@@ -76,26 +76,26 @@ namespace DogService.Dao
 
         public async Task<List<DogControlMemo>> ListDogControl(string quoteCurrency)
         {
-            return (await Database.QueryAsync<DogControlMemo>(new { IsValid = true, QuoteCurrency = quoteCurrency })).ToList();
+            return (await Database.QueryAsync<DogControlMemo>(new { QuoteCurrency = quoteCurrency })).ToList();
         }
 
         public List<DogControl> ListAllDogControl()
         {
-            return (Database.Query<DogControl>(new { IsValid = true })).ToList();
+            return (Database.Query<DogControl>(new { })).ToList();
         }
 
         public async Task SetUnvalid(string symbolName, string quoteCurrency)
         {
             using (var tx = Database.BeginTransaction())
             {
-                await Database.UpdateAsync<DogControl>(new { IsValid = false }, new { SymbolName = symbolName, QuoteCurrency = quoteCurrency });
+                await Database.UpdateAsync<DogControl>(new { }, new { SymbolName = symbolName, QuoteCurrency = quoteCurrency });
                 tx.Commit();
             }
         }
 
         public async Task<long> GetCount(string quoteCurrency)
         {
-            var sql = $"select count(1) from t_dog_control where QuoteCurrency=@QuoteCurrency and IsValid={true}";
+            var sql = $"select count(1) from t_dog_control where QuoteCurrency=@QuoteCurrency ";
             return (await Database.QueryAsync<long>(sql, new { QuoteCurrency = quoteCurrency })).FirstOrDefault();
         }
 

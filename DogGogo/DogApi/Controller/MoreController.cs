@@ -83,9 +83,16 @@ namespace DogApi.Controller
                     var itemSymbolName = item.symbol.Replace(quoteCurrency, "");
                     closeDic.Add(itemSymbolName, item.close);
 
-                    todayDic.Add(itemSymbolName + "+", item.high / item.close);
-                    todayDic.Add(itemSymbolName, item.high / item.low);
-                    todayDic.Add(itemSymbolName + "-", item.close / item.low);
+                    if (item.close > 0)
+                    {
+                        todayDic.Add(itemSymbolName + "+", item.high / item.close);
+                    }
+
+                    if (item.low > 0)
+                    {
+                        todayDic.Add(itemSymbolName, item.high / item.low);
+                        todayDic.Add(itemSymbolName + "-", item.close / item.low);
+                    }
                 }
 
                 var dogcontrol = new DogControlDao().ListAllDogControl();
@@ -148,6 +155,10 @@ namespace DogApi.Controller
                             return (b.BuyDate.Ticks > a.BuyDate.Ticks || (b.BuyDate.Ticks == a.BuyDate.Ticks && string.Compare(b.SymbolName, a.SymbolName) > 0)) ? 1 : -1;
                         });
                     }
+                }
+                else
+                {
+                    list = new DogMoreBuyDao().listMoreBuyIsNotFinished(userName, symbolName, quoteCurrency);
                 }
 
                 var noBuy = symbols.Select(it => it.BaseCurrency).ToList();

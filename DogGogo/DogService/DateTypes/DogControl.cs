@@ -41,7 +41,7 @@ namespace DogService.DateTypes
     {
         public decimal Min8
         {
-            get { return this.HistoryMin * (decimal)Math.Pow(1.08, 10); }
+            get { return this.HistoryMin * (decimal)Math.Pow(1.08, 8); }
         }
     }
 }

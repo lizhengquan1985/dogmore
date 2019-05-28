@@ -18,7 +18,7 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
         static Dictionary<string, int> coinCount = new Dictionary<string, int> {
-            { "usdt", 65 }, { "btc", 105 }, { "eth", 90 }, { "ht", 15 }
+            { "usdt", 80 }, { "btc", 185 }, { "eth", 180 }, { "ht", 16 }
         };
 
         static List<DogControl> dogControls = new List<DogControl>();
@@ -74,11 +74,11 @@ namespace DogService
             }
             else if (symbol.QuoteCurrency == "btc")
             {
-                recommendAmount = (decimal)0.0003;
+                recommendAmount = (decimal)0.00028;
             }
             else if (symbol.QuoteCurrency == "eth")
             {
-                recommendAmount = (decimal)0.009;
+                recommendAmount = (decimal)0.008;
             }
             else if (symbol.QuoteCurrency == "ht")
             {

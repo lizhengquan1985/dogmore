@@ -61,7 +61,7 @@ namespace DogService.Dao
             }
         }
 
-        public async Task UpdateDogControlMaxAndMin(DogControl dogControl)
+        public void UpdateDogControlMaxAndMin(DogControl dogControl)
         {
             if (dogControl.QuoteCurrency != "usdt"
                 && dogControl.QuoteCurrency != "btc"
@@ -71,7 +71,7 @@ namespace DogService.Dao
                 throw new ApplicationException("管控数据QuoteCurrency出错");
             }
 
-            await Database.UpdateAsync<DogControl>(new { dogControl.HistoryMax, dogControl.HistoryMin, dogControl.AvgPrice }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
+            Database.Update<DogControl>(new { dogControl.HistoryMax, dogControl.HistoryMin, dogControl.AvgPrice }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
         }
 
         public async Task<List<DogControlMemo>> ListDogControl(string quoteCurrency)

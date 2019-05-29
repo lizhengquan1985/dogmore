@@ -190,7 +190,7 @@ namespace DogApi.Controller
                     AvgPrice = avgPrice
                 };
 
-                await new DogControlDao().UpdateDogControlMaxAndMin(dogControl);
+                new DogControlDao().UpdateDogControlMaxAndMin(dogControl);
             }
             catch (Exception ex)
             {

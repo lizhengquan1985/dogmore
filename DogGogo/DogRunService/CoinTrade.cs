@@ -61,6 +61,12 @@ namespace DogRunService
                 return false;
             }
 
+            if (control.HistoryMin >= findTicker.close || control.HistoryMax <= findTicker.close)
+            {
+                // 初始化一下
+                RefreshHistoryMaxMinAsync(control.SymbolName, control.QuoteCurrency);
+            }
+
             new DogNowPriceDao().CreateDogNowPrice(new DogNowPrice
             {
                 NowPrice = findTicker.close,
@@ -995,5 +1001,59 @@ namespace DogRunService
         }
 
         #endregion
+
+        public static void RefreshHistoryMaxMinAsync(string symbolName, string quoteCurrency)
+        {
+            try
+            {
+                // 先计算最近500天的数据, 如果数据量少, 则计算4小时数据1000天
+                PlatformApi api = PlatformApi.GetInstance("xx");
+                var klines = api.GetHistoryKline(symbolName + quoteCurrency, "1day", 500);
+                if (klines.Count < 180)
+                {
+                    klines = api.GetHistoryKline(symbolName + quoteCurrency, "4hour", 1000);
+                }
+                var min = decimal.MinValue;
+                var max = decimal.MaxValue;
+
+                min = klines.Where(it => it.Low > min).Min(it => it.Low);
+                min = klines.Where(it => it.Low > min).Min(it => it.Low);
+                min = klines.Where(it => it.Low > min).Min(it => it.Low);
+
+                max = klines.Where(it => it.High < max).Max(it => it.High);
+                max = klines.Where(it => it.High < max).Max(it => it.High);
+                max = klines.Where(it => it.High < max).Max(it => it.High);
+
+                // 判断max
+                var maxNotSell = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(quoteCurrency, symbolName);
+                if (maxNotSell > max)
+                {
+                    max = maxNotSell;
+                }
+
+                var avgPrice = (decimal)0;
+                foreach (var item in klines)
+                {
+                    avgPrice += (item.Open + item.Close) / 2;
+                }
+                avgPrice = avgPrice / klines.Count;
+
+                var dogControl = new DogControl()
+                {
+                    HistoryMax = max,
+                    HistoryMin = min,
+                    SymbolName = symbolName,
+                    QuoteCurrency = quoteCurrency,
+                    AvgPrice = avgPrice
+                };
+
+                new DogControlDao().UpdateDogControlMaxAndMin(dogControl);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message, ex);
+                throw ex;
+            }
+        }
     }
 }

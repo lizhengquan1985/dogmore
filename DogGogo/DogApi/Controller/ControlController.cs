@@ -532,15 +532,16 @@ namespace DogApi.Controller
 
             result.Sort((a, b) =>
             {
-                return string.Compare(a.StatDate, b.StatDate);
+                return string.Compare(b.StatDate, a.StatDate);
             });
 
-            for (var i = 1; i < result.Count - 1; i++)
+            for (var i = result.Count - 1; i > 1; i--)
             {
-                if (result[i].EarnAmount < result[i + 1].EarnAmount)
+                Console.WriteLine($"{result[i].EarnAmount}, {result[i - 1].EarnAmount}");
+                if (result[i].EarnAmount > result[i - 1].EarnAmount)
                 {
-                    result[i].EarnAmount = result[i + 1].EarnAmount;
-                    new DogStatSymbolDao().UpdateDogStatSymbol(result[i]);
+                    result[i - 1].EarnAmount = result[i].EarnAmount;
+                    new DogStatSymbolDao().UpdateDogStatSymbol(result[i - 1]);
                 }
             }
         }

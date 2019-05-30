@@ -26,7 +26,7 @@ namespace DogRunService.Helper
                     {
                         logger.Error("查看购买以及出售结果" + ex.Message, ex);
                     }
-                    Thread.Sleep(1000 * 5);
+                    Thread.Sleep(1000 * 30);
                 }
             });
         }

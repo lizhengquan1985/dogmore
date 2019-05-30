@@ -28,5 +28,11 @@ namespace DogService.Dao
             var sql = $"select * from t_dog_stat_symbol where UserName=@UserName and StatDate in ({GetStateStringIn(dateList)})";
             return (Database.Query<DogStatSymbol>(sql, new { UserName = userName })).ToList();
         }
+
+        public void UpdateDogStatSymbol(DogStatSymbol dogStatSymbol)
+        {
+            var sql = $"update t_dog_stat_symbol set EarnAmount=@EarnAmount where SymbolName=@SymbolName and StatDate=@StatDate and UserName=@UserName";
+            Database.ExecuteAsync(sql, dogStatSymbol);
+        }
     }
 }

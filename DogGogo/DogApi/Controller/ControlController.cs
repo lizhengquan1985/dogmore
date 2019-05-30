@@ -513,5 +513,36 @@ namespace DogApi.Controller
 
             return new { data, dateList, closeDic };
         }
+
+
+        [HttpGet]
+        [ActionName("resetDogStatCurrency")]
+        public async Task ResetDogStatCurrency(string userName, string symbolName)
+        {
+            var dateList = new List<string>();
+
+            for (int i = 0; i <= 15 * 1; i = i + 1)
+            {
+                var date = DateTime.Now.AddDays(0 - i).ToString("yyyy-MM-dd");
+                dateList.Add(date);
+            }
+
+            var result = new DogStatSymbolDao().ListDogStatSymbol(userName, dateList);
+            result = result.FindAll(it => it.SymbolName == symbolName);
+
+            result.Sort((a, b) =>
+            {
+                return string.Compare(a.StatDate, b.StatDate);
+            });
+
+            for (var i = 1; i < result.Count; i++)
+            {
+                if (result[i].EarnAmount < result[i + 1].EarnAmount)
+                {
+                    result[i].EarnAmount = result[i + 1].EarnAmount;
+                    new DogStatSymbolDao().UpdateDogStatSymbol(result[i]);
+                }
+            }
+        }
     }
 }

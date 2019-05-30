@@ -535,7 +535,7 @@ namespace DogApi.Controller
                 return string.Compare(a.StatDate, b.StatDate);
             });
 
-            for (var i = 1; i < result.Count; i++)
+            for (var i = 1; i < result.Count - 1; i++)
             {
                 if (result[i].EarnAmount < result[i + 1].EarnAmount)
                 {

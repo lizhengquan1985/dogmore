@@ -62,7 +62,7 @@ namespace DogService
             if (symbol.QuoteCurrency == "usdt")
             {
                 var ladderPosition = GetLadderPosition(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-                var min = (decimal)1.5;
+                var min = (decimal)2;
                 if (ladderPosition < (decimal)0.2)
                 {
                     min = (decimal)2;

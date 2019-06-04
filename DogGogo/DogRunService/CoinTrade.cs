@@ -33,7 +33,7 @@ namespace DogRunService
         /// <summary>
         /// 收割空单
         /// </summary>
-        private static decimal ladderEmptyBuyPercent = (decimal)1.10;
+        private static decimal ladderEmptyBuyPercent = (decimal)1.08;
 
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
 

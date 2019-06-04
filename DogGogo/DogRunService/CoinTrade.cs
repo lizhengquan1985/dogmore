@@ -192,7 +192,12 @@ namespace DogRunService
             var nowPrice = analyzeResult.NowPrice;
 
             var dogMoreBuy = new DogMoreBuyDao().GetMinBuyPriceDataOfNotSellFinished(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
-            if (dogMoreBuy != null && (nowPrice * ladderMoreBuyPercent > Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice)))
+            var ladderBuyWhenDoMore = ladderMoreBuyPercent;
+            if (symbol.QuoteCurrency == "usdt")
+            {
+                ladderBuyWhenDoMore = (decimal)1.06;
+            }
+            if (dogMoreBuy != null && (nowPrice * ladderBuyWhenDoMore > Math.Min(dogMoreBuy.BuyTradePrice, dogMoreBuy.BuyOrderPrice)))
             {
                 throw new ApplicationException("有价格比这个更低得还没有收割。不能重新做多。");
             }

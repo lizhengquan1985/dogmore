@@ -74,7 +74,7 @@ namespace DogService
             }
             else if (symbol.QuoteCurrency == "btc")
             {
-                recommendAmount = (decimal)0.00028;
+                recommendAmount = (decimal)0.0002;
             }
             else if (symbol.QuoteCurrency == "eth")
             {

@@ -44,7 +44,6 @@ namespace DogApi.Controller
                 CommonSymbol symbol = CoinUtils.GetCommonSymbol(dogEmptySell.SymbolName, dogEmptySell.QuoteCurrency);
 
                 // 先初始化一下
-                KlineUtils.InitMarketInDB(0, symbol);
                 AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
                 if (analyzeResult == null)
                 {

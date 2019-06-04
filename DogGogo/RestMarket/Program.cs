@@ -104,7 +104,6 @@ namespace RestMarket
 
                         try
                         {
-                            KlineUtils.InitMarketInDB(i, symbol);
                         }
                         catch (Exception ex)
                         {

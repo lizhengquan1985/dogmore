@@ -49,7 +49,6 @@ namespace DogApi.Controller
                 var symbols = CoinUtils.GetAllCommonSymbols(dogMoreBuy.QuoteCurrency);
                 CommonSymbol symbol = symbols.Find(it => it.BaseCurrency == dogMoreBuy.SymbolName);
 
-                KlineUtils.InitMarketInDB(0, symbol);
                 CoinTrade.ShouGeDogMore(dogMoreBuy, symbol);
 
                 return "操作结束";
@@ -397,7 +396,6 @@ namespace DogApi.Controller
                 {
                     ladder = (decimal)1.058;
                 }
-                KlineUtils.InitMarketInDB(0, symbol);
                 return CoinTrade.BuyWhenDoMoreAnalyze(symbol, AccountConfigUtils.GetAccountConfig(userName), ladder);
             }
             catch (Exception ex)

@@ -289,10 +289,15 @@ namespace DogRunService
 
         }
 
-        public static string ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult)
+        public static string ShouGeDogEmpty(DogEmptySell dogEmptySell, CommonSymbol symbol, AnalyzeResult analyzeResult, bool isShouge = false)
         {
             var nowPrice = analyzeResult.NowPrice;
-            if (nowPrice * ladderEmptyBuyPercent > dogEmptySell.SellTradePrice)
+            var ladderEmptyWhenShouGe = ladderEmptyBuyPercent;
+            if (isShouge)
+            {
+                ladderEmptyWhenShouGe = (decimal)1.05;
+            }
+            if (nowPrice * ladderEmptyWhenShouGe > dogEmptySell.SellTradePrice)
             {
                 Console.WriteLine("没有收益，不能收割");
                 return "没有收益，不能收割";

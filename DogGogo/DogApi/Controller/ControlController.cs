@@ -82,7 +82,7 @@ namespace DogApi.Controller
                         it.MaxInputPrice,
                         it.QuoteCurrency,
                         it.SymbolName,
-                        AvgPrice = it.AvgPrice + " -- " + it.Min8 + "" + (it.MaxInputPrice > it.Min8 || it.MaxInputPrice > it.AvgPrice ? " 我哭啊 " : ""),
+                        AvgPrice = decimal.Round(it.AvgPrice).ToString() + (it.MaxInputPrice > it.AvgPrice ? " 大于加权平均 " : "") + " -- " + decimal.Round(it.Min8, 9).ToString() + (it.MaxInputPrice > it.Min8 ? " 大于8阶层" : ""),
                         it.WillDelist,
                     }).ToList(),
                     closeDic,

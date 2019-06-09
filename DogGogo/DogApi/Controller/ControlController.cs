@@ -82,7 +82,7 @@ namespace DogApi.Controller
                         it.MaxInputPrice,
                         it.QuoteCurrency,
                         it.SymbolName,
-                        AvgPrice = decimal.Round(it.AvgPrice).ToString() + (it.MaxInputPrice > it.AvgPrice ? " 大于加权平均 " : "") + " -- " + decimal.Round(it.Min8, 9).ToString() + (it.MaxInputPrice > it.Min8 ? " 大于8阶层" : ""),
+                        AvgPrice = decimal.Round(it.AvgPrice, 9).ToString() + (it.MaxInputPrice > it.AvgPrice ? " 大于加权平均 " : "") + " -- " + decimal.Round(it.Min8, 9).ToString() + (it.MaxInputPrice > it.Min8 ? " 大于8阶层" : ""),
                         it.WillDelist,
                     }).ToList(),
                     closeDic,
@@ -527,21 +527,25 @@ namespace DogApi.Controller
                 dateList.Add(date);
             }
 
-            var result = new DogStatSymbolDao().ListDogStatSymbol(userName, dateList);
-            result = result.FindAll(it => it.SymbolName == symbolName);
-
-            result.Sort((a, b) =>
+            var allStatSymbolList = new DogStatSymbolDao().ListDogStatSymbol(userName, dateList);
+            var allSymbolList = allStatSymbolList.Select(it => it.SymbolName).Distinct().ToList();
+            foreach (var sysbolNameItem in allSymbolList)
             {
-                return string.Compare(b.StatDate, a.StatDate);
-            });
+                var result = allStatSymbolList.FindAll(it => it.SymbolName == sysbolNameItem);
 
-            for (var i = result.Count - 1; i > 1; i--)
-            {
-                Console.WriteLine($"{result[i].EarnAmount}, {result[i - 1].EarnAmount}");
-                if (result[i].EarnAmount > result[i - 1].EarnAmount)
+                result.Sort((a, b) =>
                 {
-                    result[i - 1].EarnAmount = result[i].EarnAmount;
-                    new DogStatSymbolDao().UpdateDogStatSymbol(result[i - 1]);
+                    return string.Compare(b.StatDate, a.StatDate);
+                });
+
+                for (var i = result.Count - 1; i > 1; i--)
+                {
+                    Console.WriteLine($"{result[i].EarnAmount}, {result[i - 1].EarnAmount}");
+                    if (result[i].EarnAmount > result[i - 1].EarnAmount)
+                    {
+                        result[i - 1].EarnAmount = result[i].EarnAmount;
+                        new DogStatSymbolDao().UpdateDogStatSymbol(result[i - 1]);
+                    }
                 }
             }
         }

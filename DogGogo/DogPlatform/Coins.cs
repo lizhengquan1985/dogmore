@@ -201,7 +201,7 @@ namespace DogPlatform
                     return quantity;
                 }
 
-                if (leastBy * 6 > quantity)
+                if (leastBy * 4 > quantity)
                 {
                     Console.WriteLine($"最小购买数量不对啊{leastBy}, {symbol.BaseCurrency} {symbol.QuoteCurrency}");
                     throw new ApplicationException("----");

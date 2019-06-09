@@ -153,7 +153,7 @@ namespace DogService
                 }
             }
 
-            logger.Error($"{count}, maxBuyPrice:{maxBuyPrice},nowPrice:{nowPrice},baseBuyPrice:{baseBuyPrice}");
+            Console.WriteLine($"{count}, maxBuyPrice:{maxBuyPrice},nowPrice:{nowPrice},baseBuyPrice:{baseBuyPrice}");
 
             return baseBuyPrice * (1 + count / (decimal)80);
         }

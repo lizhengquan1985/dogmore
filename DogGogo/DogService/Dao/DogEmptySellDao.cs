@@ -134,10 +134,10 @@ namespace DogService.Dao
             return res;
         }
 
-        public long GetCountSell(string userName, string symbolName, string quoteCurrency)
+        public decimal GetMaxSellEmptyPrice(string userName, string symbolName, string quoteCurrency)
         {
-            var sql = $"select count(1) from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and QuoteCurrency=@quoteCurrency and UserName=@userName";
-            var res = Database.ExecuteScalar<long>(sql, new { symbolName, userName, quoteCurrency });
+            var sql = $"select min(SellOrderPrice) from t_dog_empty_sell where IsFinished=0 and SymbolName=@symbolName and QuoteCurrency=@quoteCurrency and UserName=@userName";
+            var res = Database.ExecuteScalar<decimal>(sql, new { symbolName, userName, quoteCurrency });
             return res;
         }
 

@@ -90,6 +90,50 @@ namespace DogService
             return recommendAmount;
         }
 
+        public static decimal GetEmptySize(string userName, string symbolName)
+        {
+            Dictionary<string, decimal> qqEmptySize = new Dictionary<string, decimal>();
+            Dictionary<string, decimal> xxEmptySize = new Dictionary<string, decimal>();
+
+            if (userName == "qq")
+            {
+                if (qqEmptySize.ContainsKey(symbolName))
+                {
+                    return qqEmptySize[symbolName];
+                }
+            }
+
+            if (userName == "xx")
+            {
+                if (xxEmptySize.ContainsKey(symbolName))
+                {
+                    return xxEmptySize[symbolName];
+                }
+            }
+
+            return 0;
+        }
+
+        public static decimal GetEmptySize(string userName, string symbolName, decimal minSellEmptyPrice, decimal nowPrice)
+        {
+            var baseEmptySize = GetEmptySize(userName, symbolName);
+            if (minSellEmptyPrice <= 0)
+            {
+                return baseEmptySize;
+            }
+            var count = 0;
+            for (var i = 0; i < 20; i++)
+            {
+                minSellEmptyPrice *= (decimal)1.08;
+                if (minSellEmptyPrice < nowPrice)
+                {
+                    count++;
+                }
+            }
+
+            return baseEmptySize * (1 + count / 40);
+        }
+
         public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice)
         {
             int divide = coinCount[quoteCurrency] * 25;

@@ -424,21 +424,16 @@ namespace DogRunService
 
                     var accountConfig = AccountConfigUtils.GetAccountConfig(userName);
                     var accountId = accountConfig.MainAccountId;
-                    PlatformApi api = PlatformApi.GetInstance(userName);
 
-                    var accountInfo = api.GetAccountBalance(accountId);
-                    var balanceItem = accountInfo.Data.list.Find(it => it.currency == symbol.BaseCurrency);
                     // 要减去未收割得。
                     var notShougeQuantity = new DogMoreBuyDao().GetBuyQuantityNotShouge(userName, symbol.BaseCurrency);
-
-                    var baseSellQuantity = (balanceItem.balance - notShougeQuantity) / 60;
 
                     // 出售
                     decimal sellPrice = decimal.Round(nowPrice * (decimal)0.988, symbol.PricePrecision);
 
                     // 阶梯有数量差别
-                    var count = new DogEmptySellDao().GetCountSell(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
-                    decimal sellQuantity = baseSellQuantity * (1 + count / (decimal)40);
+                    var minSellEmptyPrice = new DogEmptySellDao().GetMaxSellEmptyPrice(userName, symbol.BaseCurrency, symbol.QuoteCurrency);
+                    var sellQuantity = DogControlUtils.GetEmptySize(userName, symbol.BaseCurrency, minSellEmptyPrice, nowPrice);
                     sellQuantity = decimal.Round(sellQuantity, symbol.AmountPrecision);
 
                     if (
@@ -452,7 +447,7 @@ namespace DogRunService
                         continue;
                     }
 
-                    Console.WriteLine($"准备做空 sellQuantity:{sellQuantity}, nowPrice:{nowPrice},baseSellQuantity:{baseSellQuantity}");
+                    Console.WriteLine($"准备做空 sellQuantity:{sellQuantity}, nowPrice:{nowPrice}");
                     SellWhenDoEmpty(accountId, userName, symbol, sellQuantity, sellPrice, $"device:");
                 }
                 catch (Exception ex)

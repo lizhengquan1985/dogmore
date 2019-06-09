@@ -93,6 +93,10 @@ namespace DogService
         public static decimal GetEmptySize(string userName, string symbolName)
         {
             Dictionary<string, decimal> qqEmptySize = new Dictionary<string, decimal>();
+            qqEmptySize.Add("eos", 1);
+            qqEmptySize.Add("kcash", 30);
+            qqEmptySize.Add("hpt", 2000);
+            qqEmptySize.Add("xrp", 2);
             Dictionary<string, decimal> xxEmptySize = new Dictionary<string, decimal>();
 
             if (userName == "qq")

@@ -18,7 +18,7 @@ namespace DogService
     {
         static ILog logger = LogManager.GetLogger(typeof(DogControlUtils));
         static Dictionary<string, int> coinCount = new Dictionary<string, int> {
-            { "usdt", 80 }, { "btc", 185 }, { "eth", 180 }, { "ht", 16 }
+            { "usdt", 82 }, { "btc", 200 }, { "eth", 180 }, { "ht", 16 }
         };
 
         static List<DogControl> dogControls = new List<DogControl>();

@@ -79,7 +79,7 @@ namespace DogApi.Controller
                 var findTickers = tickers.FindAll(it => it.symbol.EndsWith(quoteCurrency));
                 foreach (var item in findTickers)
                 {
-                    var itemSymbolName = item.symbol.Replace(quoteCurrency, "");
+                    var itemSymbolName = item.symbol.Substring(0, item.symbol.Length - quoteCurrency.Length);
                     closeDic.Add(itemSymbolName, item.close);
 
                     if (item.close > 0)

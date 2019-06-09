@@ -182,6 +182,13 @@ namespace DogService.Dao
             return Database.Query<DogMoreBuy>(sql).FirstOrDefault();
         }
 
+        public decimal GetMaxBuyPrice(string accountId, string userName, string quoteCurrency, string coin)
+        {
+            var sql = $"select max(BuyOrderPrice) from t_dog_more_buy where AccountId='{accountId}' and QuoteCurrency = '{quoteCurrency}' and SymbolName = '{coin}' and BuyState!='({StateConst.Canceled.ToString()})' " +
+                      $" and IsFinished=0 and UserName='{userName}' order by id desc limit 0, 1";
+            return Database.ExecuteScalar<decimal>(sql);
+        }
+
         public decimal GetMaxPriceOfNotSellFinished(string quoteCurrency, string symbolName)
         {
             var sql = $"select * from t_dog_more_buy where SymbolName=@SymbolName and QuoteCurrency=@quoteCurrency and BuyState!='({StateConst.Canceled.ToString()})' " +

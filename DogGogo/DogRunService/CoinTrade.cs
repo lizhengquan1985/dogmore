@@ -213,8 +213,9 @@ namespace DogRunService
                 throw new ApplicationException($"余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
             }
 
-            decimal recommendAmount = (quoteCurrency.balance - notShougeEmptySellAmount) / DogControlUtils.GetRecommendDivideForMore(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-            recommendAmount = DogControlUtils.GetRecommendBuyAmount(symbol, recommendAmount, nowPrice);
+            decimal recommendAmount = DogControlUtils.GetRecommendBuyAmount(symbol);
+            var maxBuyPrice = new DogMoreBuyDao().GetMaxBuyPrice(accountId, userName, symbol.QuoteCurrency, symbol.BaseCurrency);
+            recommendAmount = DogControlUtils.GetMoreSize(recommendAmount, maxBuyPrice, nowPrice);
 
             // 购买的要求
             decimal buyQuantity = recommendAmount / nowPrice;

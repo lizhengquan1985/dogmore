@@ -57,37 +57,25 @@ namespace DogService
 
         }
 
-        public static decimal GetRecommendBuyAmount(CommonSymbol symbol, decimal recommendAmount, decimal nowPrice)
+        public static decimal GetRecommendBuyAmount(CommonSymbol symbol)
         {
             if (symbol.QuoteCurrency == "usdt")
             {
-                var ladderPosition = GetLadderPosition(symbol.BaseCurrency, symbol.QuoteCurrency, nowPrice);
-                var min = (decimal)2;
-                if (ladderPosition < (decimal)0.2)
-                {
-                    min = (decimal)2;
-                }
-                if (recommendAmount < min)
-                {
-                    recommendAmount = min;
-                }
+                return (decimal)2;
             }
             else if (symbol.QuoteCurrency == "btc")
             {
-                recommendAmount = (decimal)0.0002;
+                return (decimal)0.0002;
             }
             else if (symbol.QuoteCurrency == "eth")
             {
-                recommendAmount = (decimal)0.008;
+                return (decimal)0.008;
             }
             else if (symbol.QuoteCurrency == "ht")
             {
-                if (recommendAmount < (decimal)1.3)
-                {
-                    recommendAmount = (decimal)1.3;
-                }
+                return (decimal)1.3;
             }
-            return recommendAmount;
+            throw new ApplicationException("不合理的数据");
         }
 
         public static decimal GetEmptySize(string userName, string symbolName)
@@ -133,9 +121,36 @@ namespace DogService
                 {
                     count++;
                 }
+                else
+                {
+                    break;
+                }
             }
 
             return baseEmptySize * (1 + count / 40);
+        }
+
+        public static decimal GetMoreSize(decimal baseBuyPrice, decimal maxBuyPrice, decimal nowPrice)
+        {
+            if (maxBuyPrice <= 0)
+            {
+                return baseBuyPrice;
+            }
+            var count = 0;
+            for (var i = 0; i < 20; i++)
+            {
+                maxBuyPrice /= (decimal)1.08;
+                if (maxBuyPrice > nowPrice)
+                {
+                    count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return baseBuyPrice * (1 + count / 80);
         }
 
         public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice)

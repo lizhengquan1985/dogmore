@@ -439,8 +439,8 @@ namespace DogRunService
 
                     if (
                         (symbol.QuoteCurrency == "usdt" && sellQuantity * nowPrice < (decimal)0.8)
-                        || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.0001)
-                        || (symbol.QuoteCurrency == "eth" && sellQuantity * nowPrice < (decimal)0.004)
+                        || (symbol.QuoteCurrency == "btc" && sellQuantity * nowPrice < (decimal)0.00009)
+                        || (symbol.QuoteCurrency == "eth" && sellQuantity * nowPrice < (decimal)0.003)
                         || (symbol.QuoteCurrency == "ht" && sellQuantity * nowPrice < (decimal)0.5)
                         )
                     {

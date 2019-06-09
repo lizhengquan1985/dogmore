@@ -86,6 +86,9 @@ namespace DogService
             qqEmptySize.Add("hpt", 2000);
             qqEmptySize.Add("xrp", 2);
             Dictionary<string, decimal> xxEmptySize = new Dictionary<string, decimal>();
+            xxEmptySize.Add("get", 15);
+            xxEmptySize.Add("kcash", 12);
+            xxEmptySize.Add("itc", (decimal)0.8);
 
             if (userName == "qq")
             {

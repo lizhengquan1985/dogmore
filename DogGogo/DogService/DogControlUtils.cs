@@ -155,7 +155,7 @@ namespace DogService
 
             logger.Error($"{count}, maxBuyPrice:{maxBuyPrice},nowPrice:{nowPrice},baseBuyPrice:{baseBuyPrice}");
 
-            return baseBuyPrice * (1 + count / 80);
+            return baseBuyPrice * (1 + count / (decimal)80);
         }
 
         public static int GetRecommendDivideForMore(string symbolName, string quoteCurrency, decimal nowPrice)

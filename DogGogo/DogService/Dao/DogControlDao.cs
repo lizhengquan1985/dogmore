@@ -51,7 +51,7 @@ namespace DogService.Dao
             if (indb != null)
             {
                 var emptyPrice = Math.Max(dogControl.EmptyPrice, indb.HistoryMin * (decimal)1.5);
-                var maxInputPrice = Math.Min(dogControl.MaxInputPrice, indb.HistoryMax);
+                var maxInputPrice = Math.Min(dogControl.MaxInputPrice, indb.HistoryMax * (decimal)1.5);
                 await Database.UpdateAsync<DogControl>(new { EmptyPrice = emptyPrice, MaxInputPrice = maxInputPrice, dogControl.WillDelist }, new { dogControl.SymbolName, dogControl.QuoteCurrency });
             }
             else

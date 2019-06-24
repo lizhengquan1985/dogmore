@@ -36,6 +36,7 @@ namespace DogRunService
         private static decimal ladderEmptyBuyPercent = (decimal)1.08;
 
         static ILog logger = LogManager.GetLogger(typeof(CoinTrade));
+        public static int RunCount = 0;
 
         public static bool Run(int index, CommonSymbol symbol, List<Ticker> tickers)
         {
@@ -123,6 +124,8 @@ namespace DogRunService
             {
                 // 计算是否适合出售
                 RunSell(symbol, analyzeResult);
+
+                RunCount++;
             }
             catch (Exception ex)
             {

@@ -110,6 +110,7 @@ namespace AutoTrade
                 while (true)
                 {
                     var begin = DateTime.Now;
+                    CoinTrade.RunCount = 0;
                     try
                     {
                         var tickers = PlatformApi.GetInstance("xx").GetTickers();
@@ -135,7 +136,7 @@ namespace AutoTrade
                         logger.Error(ex.Message, ex);
                     }
                     var useTime = (DateTime.Now - begin).TotalSeconds;
-                    logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds);
+                    logger.Error("一轮总共耗时：" + (DateTime.Now - begin).TotalSeconds + ", 执行次数：" + CoinTrade.RunCount);
 
 
                     Thread.Sleep(1000);

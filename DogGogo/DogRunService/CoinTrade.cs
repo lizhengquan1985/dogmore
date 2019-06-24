@@ -95,7 +95,8 @@ namespace DogRunService
             if (
                 (control.MaxInputPrice > findTicker.close && (
                 minDogMoreBuy == null
-                || minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.072))
+                || minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.062))
+
                 || (minDogMoreBuy != null && findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.09))
             {
                 mayBuy = true;
@@ -110,6 +111,7 @@ namespace DogRunService
             {
                 return false;
             }
+
             try
             {
                 // 计算是否适合购买
@@ -123,7 +125,7 @@ namespace DogRunService
             try
             {
                 // 计算是否适合出售
-                RunSell(symbol, analyzeResult);
+                RunSell(symbol, analyzeResult, findTicker);
 
                 RunCount++;
             }
@@ -380,13 +382,18 @@ namespace DogRunService
             }
         }
 
-        private static void RunSell(CommonSymbol symbol, AnalyzeResult analyzeResult)
+        private static void RunSell(CommonSymbol symbol, AnalyzeResult analyzeResult, Ticker ticker)
         {
+            if (ticker.symbol != symbol.BaseCurrency + symbol.QuoteCurrency)
+            {
+                Console.WriteLine("--------------------- 数据错误");
+                return;
+            }
+
             var historyKlines = analyzeResult.HistoryKlines;
             var nowPrice = analyzeResult.NowPrice;
 
             var userNames = UserPools.GetAllUserName();
-
 
             // 多单的自动波动收割
             foreach (var userName in userNames)
@@ -397,7 +404,12 @@ namespace DogRunService
                 {
                     try
                     {
-                        ShouGeDogMore(dogMoreBuyItem, symbol);
+                        if (ticker.close < dogMoreBuyItem.BuyOrderPrice * (decimal)1.08)
+                        {
+                            continue;
+                        }
+
+                        ShouGeDogMore(dogMoreBuyItem, symbol, analyzeResult);
                     }
                     catch (Exception ex)
                     {
@@ -534,9 +546,12 @@ namespace DogRunService
             }
         }
 
-        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol)
+        public static void ShouGeDogMore(DogMoreBuy dogMoreBuy, CommonSymbol symbol, AnalyzeResult analyzeResult = null)
         {
-            AnalyzeResult analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
+            if (analyzeResult == null)
+            {
+                analyzeResult = AnalyzeResult.GetAnalyzeResult(symbol);
+            }
             if (analyzeResult == null)
             {
                 return;

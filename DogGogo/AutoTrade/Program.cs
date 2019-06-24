@@ -119,10 +119,16 @@ namespace AutoTrade
                             var symbol = symbols[i];
                             try
                             {
+                                DateTime now = DateTime.Now;
                                 var bl = CoinTrade.Run(i, symbol, tickers);
+                                var mis = (DateTime.Now - now).TotalMilliseconds;
+                                if (mis > 1000)
+                                {
+                                    Console.WriteLine("每轮------------------------>" + mis);
+                                }
                                 if (bl)
                                 {
-                                    Thread.Sleep(550);
+                                    Thread.Sleep(150);
                                 }
                             }
                             catch (Exception ex)

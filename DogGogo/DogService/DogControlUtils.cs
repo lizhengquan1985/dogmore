@@ -65,11 +65,11 @@ namespace DogService
             }
             else if (symbol.QuoteCurrency == "btc")
             {
-                return (decimal)0.0002;
+                return (decimal)0.00019;
             }
             else if (symbol.QuoteCurrency == "eth")
             {
-                return (decimal)0.008;
+                return (decimal)0.007;
             }
             else if (symbol.QuoteCurrency == "ht")
             {

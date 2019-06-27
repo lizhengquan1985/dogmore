@@ -173,13 +173,13 @@ namespace DogRunService.Helper
             var now = DateTime.Now;
             PlatformApi api = PlatformApi.GetInstance("xx");
             var period = "1min";
-            var count = 300;
+            var count = 200;
             var klines = api.GetHistoryKline(symbol.BaseCurrency + symbol.QuoteCurrency, period, count);
             if (klines == null || klines.Count == 0)
             {
                 return null;
             }
-            Console.WriteLine($"{(DateTime.Now - now).TotalMilliseconds}, {klines[0].Id} {klines[klines.Count - 1].Id}");
+            Console.WriteLine($"listklines: 花费时间：{(DateTime.Now - now).TotalMilliseconds}, {klines[0].Id} {klines[klines.Count - 1].Id}");
             return klines;
         }
 

@@ -22,7 +22,6 @@ namespace DogRunService
         public decimal NowPrice { get; set; }
         public decimal MaxPrice { get; set; }
         public decimal MinPrice { get; set; }
-        public decimal Minute30MaxPrice { get; set; }
         /// <summary>
         /// 原始数据
         /// </summary>
@@ -36,6 +35,7 @@ namespace DogRunService
         /// <returns></returns>
         public static AnalyzeResult GetAnalyzeResult(CommonSymbol symbol)
         {
+            var now = DateTime.Now;
             var historyKlines = KlineUtils.ListKlines(symbol);
             if (historyKlines == null || historyKlines.Count < 100)
             {
@@ -49,9 +49,13 @@ namespace DogRunService
                 NowPrice = historyKlines[0].Close,
                 MaxPrice = historyKlines.Max(it => it.Close),
                 MinPrice = historyKlines.Min(it => it.Close),
-                Minute30MaxPrice = minute30Klines.Max(it => it.Close),
                 HistoryKlines = historyKlines,
             };
+            var milSecond = (DateTime.Now - now).TotalMilliseconds;
+            if(milSecond > 1000)
+            {
+                Console.WriteLine($"GetAnalyzeResult: 花费时间：{milSecond}");
+            }
             return analyzeResult;
         }
 

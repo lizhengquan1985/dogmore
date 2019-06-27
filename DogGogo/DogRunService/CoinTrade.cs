@@ -18,6 +18,8 @@ namespace DogRunService
 {
     public class CoinTrade
     {
+        static DateTime nobtcbalanceTime = DateTime.MinValue;
+
         /// <summary>
         /// 做多间隔
         /// </summary>
@@ -100,6 +102,17 @@ namespace DogRunService
                 || (minDogMoreBuy != null && findTicker.close / minDogMoreBuy.BuyOrderPrice > (decimal)1.09))
             {
                 mayBuy = true;
+                if (symbol.QuoteCurrency == "btc" && nobtcbalanceTime > DateTime.Now.AddMinutes(-5) && (
+                    minDogMoreBuy == null || minDogMoreBuy.BuyOrderPrice / findTicker.close > (decimal)1.06
+                    ))
+                {
+                    mayBuy = false;
+                }
+            }
+
+            if (symbol.BaseCurrency == "xmx")
+            {
+                Console.WriteLine($"{maySell}, {mayBuy}");
             }
             if (!mayBuy && !maySell)
             {
@@ -215,6 +228,10 @@ namespace DogRunService
             if (!CommonHelper.CheckBalanceForDoMore(symbol.QuoteCurrency, quoteCurrency.balance, notShougeEmptySellAmount))
             {
                 Console.WriteLine($"{symbol.BaseCurrency}{symbol.QuoteCurrency}余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
+                if (symbol.QuoteCurrency == "btc" && account.MainAccountId == "529880")
+                {
+                    nobtcbalanceTime = DateTime.Now;
+                }
                 throw new ApplicationException($"余额不足notShougeEmptySellAmount:{notShougeEmptySellAmount},balance:{quoteCurrency.balance}");
             }
 
@@ -404,7 +421,7 @@ namespace DogRunService
                 {
                     try
                     {
-                        if (ticker.close < dogMoreBuyItem.BuyOrderPrice * (decimal)1.08)
+                        if (ticker.close < dogMoreBuyItem.BuyOrderPrice * (decimal)1.07)
                         {
                             continue;
                         }
@@ -422,6 +439,10 @@ namespace DogRunService
             // 不符合管控的，则不考虑做空
             if (!JudgeBuyUtils.ControlCanSell(symbol.BaseCurrency, symbol.QuoteCurrency, historyKlines, nowPrice))
             {
+                if (symbol.BaseCurrency == "xmx")
+                {
+                    Console.WriteLine("----------------------------------------------------------------------------------------");
+                }
                 return;
             }
 
@@ -564,9 +585,17 @@ namespace DogRunService
             {
                 thisLadderMoreSellPercent = (decimal)1.085;
             }
+            else if (analyzeResult.NowPrice / analyzeResult.MinPrice > (decimal)1.30)
+            {
+                thisLadderMoreSellPercent = (decimal)1.08;
+            }
             else if (analyzeResult.NowPrice / analyzeResult.MinPrice > (decimal)1.40)
             {
                 thisLadderMoreSellPercent = (decimal)1.075;
+            }
+            else if (analyzeResult.NowPrice / analyzeResult.MinPrice > (decimal)1.50)
+            {
+                thisLadderMoreSellPercent = (decimal)1.07;
             }
             else if (analyzeResult.NowPrice / analyzeResult.MinPrice > (decimal)1.60)
             {

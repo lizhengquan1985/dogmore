@@ -98,15 +98,5 @@ namespace DogService.Dao
             var sql = $"select count(1) from t_dog_control where QuoteCurrency=@QuoteCurrency ";
             return (await Database.QueryAsync<long>(sql, new { QuoteCurrency = quoteCurrency })).FirstOrDefault();
         }
-
-        public async Task DeleteData(string symbolName, string quoteCurrency)
-        {
-            using (var tx = Database.BeginTransaction())
-            {
-                var sql = $"delete from t_{quoteCurrency}_{symbolName} where id<{Utils.GetIdByDate(DateTime.Now.AddMinutes(-2880))}";
-                await Database.ExecuteAsync(sql);
-                tx.Commit();
-            }
-        }
     }
 }

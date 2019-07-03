@@ -394,24 +394,6 @@ namespace DogApi.Controller
             return closeDic;
         }
 
-        [HttpGet]
-        [ActionName("deleteData")]
-        public async Task DeleteData(string quoteCurrency)
-        {
-            var commonSymbols = CoinUtils.GetAllCommonSymbols(quoteCurrency);
-            foreach (var commonSymbol in commonSymbols)
-            {
-                try
-                {
-                    await new DogControlDao().DeleteData(commonSymbol.BaseCurrency, commonSymbol.QuoteCurrency);
-                }
-                catch (Exception ex)
-                {
-
-                }
-            }
-        }
-
         static int aaa = 0;
 
         [HttpGet]
@@ -546,6 +528,33 @@ namespace DogApi.Controller
                         result[i - 1].EarnAmount = result[i].EarnAmount;
                         new DogStatSymbolDao().UpdateDogStatSymbol(result[i - 1]);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 检查价格的合理性
+        /// </summary>
+        /// <param name="quote"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ActionName("checkControl")]
+        public async Task CheckControl(string quote)
+        {
+            // 检查btc，eth最大购买p，以及设置maxbuyprice之间的距离。
+            var controls = await new DogControlDao().ListDogControl(quote);
+
+            foreach (var control in controls)
+            {
+                // 获取最大的
+                var maxBuyPriceOfNoSell = new DogMoreBuyDao().GetMaxPriceOfNotSellFinished(control.QuoteCurrency, control.SymbolName);
+                if (maxBuyPriceOfNoSell > control.MaxInputPrice)
+                {
+                    logger.Error($"最大购买价格小于未出售的最大价格 maxBuyPriceOfNoSell:{maxBuyPriceOfNoSell} --  {JsonConvert.SerializeObject(control)}");
+                }
+                if (maxBuyPriceOfNoSell * (decimal)1.06 < control.MaxInputPrice)
+                {
+                    logger.Error($"最大购买价格过分大于未出售的最大价格 maxBuyPriceOfNoSell:{maxBuyPriceOfNoSell} --  {JsonConvert.SerializeObject(control)}");
                 }
             }
         }
